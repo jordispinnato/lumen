@@ -1,6 +1,6 @@
 import { notFound } from "next/navigation";
-import { createSupabaseServerClient } from "@/lib/supabase/server";
-import { demoCourses, formatPrice, normalizeCourse } from "@/lib/courses";
+import { createSupabaseServerClient } from "../../../lib/supabase/server";
+import { demoCourses, formatPrice, normalizeCourse } from "../../../lib/courses";
 
 export function generateStaticParams() {
   return demoCourses.map((course) => ({ slug: course.slug }));

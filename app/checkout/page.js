@@ -1,4 +1,4 @@
-import { demoCourses, formatPrice } from "@/lib/courses";
+import { demoCourses, formatPrice } from "../../lib/courses";
 
 export default async function CheckoutPage({ searchParams }) {
   const params = await searchParams;

@@ -1,5 +1,5 @@
 import "./globals.css";
-import { createSupabaseServerClient } from "@/lib/supabase/server";
+import { createSupabaseServerClient } from "../lib/supabase/server";
 
 export const metadata = {
   title: "LUMEN | Plataforma interdisciplinaria",

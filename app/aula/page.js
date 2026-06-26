@@ -1,6 +1,6 @@
 import { redirect } from "next/navigation";
-import { createSupabaseServerClient } from "@/lib/supabase/server";
-import { formatPrice } from "@/lib/courses";
+import { createSupabaseServerClient } from "../../lib/supabase/server";
+import { formatPrice } from "../../lib/courses";
 
 export default async function ClassroomPage() {
   const supabase = await createSupabaseServerClient();

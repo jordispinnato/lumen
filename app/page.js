@@ -1,5 +1,5 @@
-import { createSupabaseServerClient } from "@/lib/supabase/server";
-import { demoCourses, formatPrice, normalizeCourse } from "@/lib/courses";
+import { createSupabaseServerClient } from "../lib/supabase/server";
+import { demoCourses, formatPrice, normalizeCourse } from "../lib/courses";
 
 export default async function HomePage() {
   const supabase = await createSupabaseServerClient();
