@@ -26,14 +26,6 @@ export default async function ClassroomPage() {
           video_url,
           position
         )
-      ),
-      course_materials (
-        id,
-        title,
-        file_path,
-        file_name,
-        file_type,
-        position
       )
     `)
     .eq("user_id", data.user.id)
@@ -41,10 +33,16 @@ export default async function ClassroomPage() {
 
   const activeCourse = enrollments?.[0]?.courses;
   const lessons = activeCourse?.lessons?.sort((a, b) => a.position - b.position) || [];
+  const { data: materials } = activeCourse
+    ? await supabase
+        .from("course_materials")
+        .select("id, title, file_path, file_name, file_type, position")
+        .eq("course_id", activeCourse.id)
+        .order("position", { ascending: true })
+    : { data: [] };
+
   const materialsWithUrls = await Promise.all(
-    (activeCourse?.course_materials || [])
-      .sort((a, b) => a.position - b.position)
-      .map(async (material) => {
+    (materials || []).map(async (material) => {
         const { data: signed } = await supabase.storage
           .from("course-materials")
           .createSignedUrl(material.file_path, 60 * 10);
@@ -53,7 +51,8 @@ export default async function ClassroomPage() {
           ...material,
           signedUrl: signed?.signedUrl,
         };
-      })
+      }
+    )
   );
 
   return (
