@@ -171,7 +171,7 @@ h3 {
   position: absolute;
   inset: 0;
   z-index: -2;
-  background: url("/assets/lumen-hero.png") center / cover;
+  background: url("/assets/lumen-hero-v2.png") center / cover;
 }
 
 .hero::after {
@@ -419,7 +419,7 @@ h3 {
   overflow: hidden;
   background:
     linear-gradient(120deg, rgba(11, 74, 83, 0.72), rgba(104, 199, 189, 0.22)),
-    url("/assets/lumen-hero.png") center / cover;
+    url("/assets/lumen-hero-v2.png") center / cover;
   color: white;
   font-weight: 800;
 }
