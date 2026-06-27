@@ -18,36 +18,73 @@ export default async function HomePage() {
           <p className="eyebrow">Plataforma interdisciplinaria online</p>
           <h1>Claridad para avanzar.</h1>
           <p className="lead">
-            Orientación profesional, formación y recursos para transformar información en acciones concretas.
+            Atencion psicologica, formacion y recursos para transformar informacion en acciones concretas.
           </p>
           <div className="actions">
+            <a className="button" href="/turnos">Reservar turno</a>
             <a className="button" href="/cursos">Explorar cursos</a>
-            <a className="secondary-button" href="/registro">Crear cuenta</a>
+            <a className="secondary-button" href="#catalogo">Catalogo online</a>
           </div>
         </div>
       </section>
 
-      <section className="stats-strip" aria-label="Datos principales">
+      <section className="stats-strip" aria-label="Accesos principales">
         <div>
-          <strong>Academia</strong>
-          <span>Cursos, charlas y talleres con acceso privado.</span>
+          <strong>Turnos</strong>
+          <span>Atencion psicologica online con dias y horarios disponibles.</span>
         </div>
         <div>
-          <strong>Aula online</strong>
-          <span>Videos y lecciones habilitados por usuario.</span>
+          <strong>Cursos</strong>
+          <span>Formacion asincronica con videos, bibliografia y materiales.</span>
         </div>
         <div>
-          <strong>Admin real</strong>
-          <span>Carga de cursos, alumnos, lecciones y accesos.</span>
+          <strong>Catalogo</strong>
+          <span>Recursos fisicos y digitales para bienestar y practica clinica.</span>
         </div>
       </section>
 
       <section className="section">
         <div className="section-head">
-          <p className="eyebrow">Ecosistema LUMEN</p>
-          <h2>Atención, academia, recursos y acompañamiento en un mismo lugar.</h2>
+          <p className="eyebrow">Accesos principales</p>
+          <h2>Tres caminos simples para encontrar lo que necesitas.</h2>
           <p className="muted">
-            Una base preparada para crecer con usuarios reales, pagos, aula privada y gestión de contenidos.
+            La pagina de inicio organiza LUMEN en turnos, cursos y catalogo para que cada persona llegue rapido a su objetivo.
+          </p>
+        </div>
+        <div className="grid">
+          <article className="card feature-card">
+            <p className="eyebrow">Atencion psicologica</p>
+            <h3>Reservar turno</h3>
+            <p>Selecciona especialista, dia y horario disponible para una consulta online.</p>
+            <div className="actions">
+              <a className="button" href="/turnos">Ver disponibilidad</a>
+            </div>
+          </article>
+          <article className="card feature-card">
+            <p className="eyebrow">Academia online</p>
+            <h3>Explorar cursos</h3>
+            <p>Accede a cursos asincronicos con videos, bibliografia y material complementario.</p>
+            <div className="actions">
+              <a className="button" href="/cursos">Ver cursos</a>
+            </div>
+          </article>
+          <article className="card feature-card" id="catalogo">
+            <p className="eyebrow">Recursos terapeuticos</p>
+            <h3>Catalogo online</h3>
+            <p>Productos fisicos y recursos digitales para terapeutas, familias y bienestar cotidiano.</p>
+            <div className="actions">
+              <a className="secondary-button" href="#catalogo">Proximamente</a>
+            </div>
+          </article>
+        </div>
+      </section>
+
+      <section className="section">
+        <div className="section-head">
+          <p className="eyebrow">Cursos destacados</p>
+          <h2>Aprendizaje online para acompanar procesos reales.</h2>
+          <p className="muted">
+            Cursos asincronicos con acceso privado, lecciones en video y materiales complementarios.
           </p>
         </div>
         <div className="grid">
@@ -57,7 +94,7 @@ export default async function HomePage() {
               <h3>{course.title}</h3>
               <p>{course.summary}</p>
               <p className="muted">
-                {course.audience} · {course.duration}
+                {course.audience} - {course.duration}
               </p>
               <p className="price">{formatPrice(course.price)}</p>
               <div className="actions">
