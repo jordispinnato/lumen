@@ -31,7 +31,15 @@ export default async function AdminPage({ searchParams }) {
     );
   }
 
-  const [{ data: courses }, { data: profiles }, { data: enrollments }, { data: lessons }, { data: materials }] = await Promise.all([
+  const [
+    { data: courses },
+    { data: profiles },
+    { data: enrollments },
+    { data: lessons },
+    { data: materials },
+    { data: specialists },
+    { data: appointmentSlots },
+  ] = await Promise.all([
     supabase.from("courses").select("id,slug,title,summary,price,status").order("created_at", { ascending: false }),
     supabase.from("profiles").select("id,full_name,email,role").order("created_at", { ascending: false }),
     supabase
@@ -46,6 +54,15 @@ export default async function AdminPage({ searchParams }) {
       .from("course_materials")
       .select("id,title,file_name,file_type,file_size,position,courses:course_id (id,title,slug)")
       .order("position", { ascending: true }),
+    supabase
+      .from("appointment_specialists")
+      .select("id,name,role,focus,session,price,status,created_at")
+      .order("created_at", { ascending: false }),
+    supabase
+      .from("appointment_slots")
+      .select("id,slot_date,slot_time,status,appointment_specialists:specialist_id (id,name)")
+      .order("slot_date", { ascending: true })
+      .order("slot_time", { ascending: true }),
   ]);
 
   return (
@@ -62,6 +79,111 @@ export default async function AdminPage({ searchParams }) {
         </div>
 
         <div className="admin-layout">
+          <section className="panel">
+            <h2>Cargar especialista</h2>
+            <form className="admin-form" action="/admin/specialists/create" method="post">
+              <label>
+                Nombre
+                <input name="name" required placeholder="Ej: Lic. Valentina Rivas" />
+              </label>
+              <label>
+                Rol
+                <input name="role" required defaultValue="Psicologia" />
+              </label>
+              <label className="wide-field">
+                Enfoque
+                <textarea name="focus" rows="3" placeholder="Ej: Ansiedad, estres y acompanamiento en crisis" />
+              </label>
+              <label>
+                Sesion
+                <input name="session" required defaultValue="Consulta online de 50 minutos" />
+              </label>
+              <label>
+                Precio en ARS
+                <input name="price" type="number" min="0" step="1" required placeholder="18000" />
+              </label>
+              <label>
+                Estado
+                <select name="status" defaultValue="active">
+                  <option value="active">Activo</option>
+                  <option value="inactive">Inactivo</option>
+                </select>
+              </label>
+              <button className="button" type="submit">Guardar especialista</button>
+            </form>
+          </section>
+
+          <section className="panel">
+            <h2>Cargar horarios disponibles</h2>
+            <form className="admin-form" action="/admin/appointment-slots/create" method="post">
+              <label className="wide-field">
+                Especialista
+                <select name="specialistId" required>
+                  <option value="">Seleccionar especialista</option>
+                  {specialists?.map((specialist) => (
+                    <option value={specialist.id} key={specialist.id}>
+                      {specialist.name}
+                    </option>
+                  ))}
+                </select>
+              </label>
+              <label>
+                Dia
+                <input name="slotDate" type="date" required />
+              </label>
+              <label>
+                Horario
+                <input name="slotTime" type="time" min="08:00" max="20:00" step="900" required />
+              </label>
+              <label>
+                Estado
+                <select name="status" defaultValue="available">
+                  <option value="available">Disponible</option>
+                  <option value="blocked">Bloqueado</option>
+                  <option value="booked">Reservado</option>
+                </select>
+              </label>
+              <button className="button" type="submit">Guardar horario</button>
+            </form>
+            <p className="muted">
+              Horarios permitidos: lunes a viernes de 08:00 a 20:00 y sabados de 08:00 a 13:00.
+            </p>
+          </section>
+        </div>
+
+        <div className="admin-layout spaced-panel">
+          <section className="panel">
+            <h2>Especialistas cargados</h2>
+            <div className="compact-list">
+              {specialists?.length ? specialists.map((specialist) => (
+                <article key={specialist.id}>
+                  <strong>{specialist.name}</strong>
+                  <span>{specialist.role} - {formatPrice(specialist.price)}</span>
+                  <small>{specialist.status} - {specialist.focus || "Sin enfoque cargado"}</small>
+                </article>
+              )) : (
+                <p className="muted">Todavia no hay especialistas cargados.</p>
+              )}
+            </div>
+          </section>
+
+          <section className="panel">
+            <h2>Horarios cargados</h2>
+            <div className="compact-list">
+              {appointmentSlots?.length ? appointmentSlots.map((slot) => (
+                <article key={slot.id}>
+                  <strong>{slot.appointment_specialists?.name || "Especialista"} - {slot.slot_time?.slice(0, 5)}</strong>
+                  <span>{new Date(`${slot.slot_date}T00:00:00`).toLocaleDateString("es-AR")}</span>
+                  <small>{slot.status}</small>
+                </article>
+              )) : (
+                <p className="muted">Todavia no hay horarios cargados.</p>
+              )}
+            </div>
+          </section>
+        </div>
+
+        <div className="admin-layout spaced-panel">
           <section className="panel">
             <h2>Crear o actualizar curso</h2>
             <form className="admin-form" action="/admin/courses/create" method="post">

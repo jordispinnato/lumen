@@ -46,6 +46,11 @@ button {
   cursor: pointer;
 }
 
+button:disabled {
+  cursor: not-allowed;
+  opacity: 0.55;
+}
+
 h1,
 h2,
 h3,
@@ -561,14 +566,14 @@ h3 {
 }
 
 .specialist-list,
-.calendar-strip,
 .slot-grid {
   display: grid;
   gap: 10px;
 }
 
 .specialist-option,
-.day-option,
+.month-tab,
+.calendar-day,
 .slot-option {
   width: 100%;
   border: 1px solid var(--line);
@@ -580,14 +585,16 @@ h3 {
 }
 
 .specialist-option:hover,
-.day-option:hover,
+.month-tab:hover,
+.calendar-day:hover,
 .slot-option:hover {
   transform: translateY(-1px);
   border-color: rgba(11, 74, 83, 0.34);
 }
 
 .specialist-option.is-active,
-.day-option.is-active,
+.month-tab.is-active,
+.calendar-day.is-active,
 .slot-option.is-active {
   border-color: rgba(11, 74, 83, 0.62);
   box-shadow: 0 0 0 3px rgba(104, 199, 189, 0.22);
@@ -601,20 +608,47 @@ h3 {
 
 .specialist-option span,
 .specialist-option small,
-.day-option span {
+.calendar-day span,
+.calendar-day small {
   color: var(--muted);
   line-height: 1.45;
 }
 
-.calendar-strip {
-  grid-template-columns: repeat(5, minmax(0, 1fr));
+.month-tabs {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 10px;
 }
 
-.day-option {
+.month-tab {
+  min-height: 46px;
+  padding: 0 14px;
+  font-weight: 800;
+  text-align: center;
+  text-transform: capitalize;
+}
+
+.calendar-grid {
   display: grid;
-  gap: 5px;
-  min-height: 82px;
-  padding: 14px;
+  grid-template-columns: repeat(7, minmax(0, 1fr));
+  gap: 8px;
+}
+
+.calendar-day {
+  display: grid;
+  gap: 4px;
+  min-height: 92px;
+  padding: 10px;
+}
+
+.calendar-day strong {
+  color: var(--deep);
+  font-size: 1.25rem;
+}
+
+.calendar-day:disabled:hover {
+  transform: none;
+  border-color: var(--line);
 }
 
 .slot-grid {
@@ -704,7 +738,8 @@ h3 {
   .admin-layout,
   .admin-form,
   .booking-layout,
-  .calendar-strip,
+  .calendar-grid,
+  .month-tabs,
   .slot-grid,
   .stats-strip {
     grid-template-columns: 1fr;

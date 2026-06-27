@@ -1,12 +1,27 @@
 import BookingPicker from "./BookingPicker";
-import { appointmentDays, psychologySpecialists } from "../../lib/appointments";
+import { createSupabaseServerClient } from "../../lib/supabase/server";
 
 export const metadata = {
   title: "Reservar turno | LUMEN",
   description: "Reserva de turnos para atencion psicologica online.",
 };
 
-export default function TurnosPage() {
+export default async function TurnosPage() {
+  const supabase = await createSupabaseServerClient();
+  const [{ data: specialists }, { data: slots }] = await Promise.all([
+    supabase
+      .from("appointment_specialists")
+      .select("id,name,role,focus,session,price,status")
+      .eq("status", "active")
+      .order("created_at", { ascending: true }),
+    supabase
+      .from("appointment_slots")
+      .select("id,specialist_id,slot_date,slot_time,status")
+      .eq("status", "available")
+      .order("slot_date", { ascending: true })
+      .order("slot_time", { ascending: true }),
+  ]);
+
   return (
     <main className="section">
       <div className="dashboard-shell">
@@ -18,7 +33,7 @@ export default function TurnosPage() {
           </p>
         </div>
 
-        <BookingPicker specialists={psychologySpecialists} days={appointmentDays} />
+        <BookingPicker specialists={specialists || []} slots={slots || []} />
       </div>
     </main>
   );
