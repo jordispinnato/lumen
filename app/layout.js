@@ -1,5 +1,6 @@
 import "./globals.css";
 import { createSupabaseServerClient } from "../lib/supabase/server";
+import SiteNav from "./SiteNav";
 
 export const metadata = {
   title: "LUMEN | Plataforma interdisciplinaria",
@@ -29,23 +30,7 @@ export default async function RootLayout({ children }) {
             <span className="brand-mark" aria-hidden="true" />
             <span>LUMEN</span>
           </a>
-          <nav className="site-nav" aria-label="Principal">
-            <a href="/turnos">Turnos</a>
-            <a href="/cursos">Cursos</a>
-            <a href="/catalogo">Catalogo</a>
-            <a href="/aula">Aula</a>
-            {isAdmin ? <a href="/admin">Admin</a> : null}
-            {userData.user ? (
-              <form action="/auth/logout" method="post">
-                <button className="nav-button" type="submit">Salir</button>
-              </form>
-            ) : (
-              <>
-                <a href="/login">Ingresar</a>
-                <a className="button" href="/registro">Crear cuenta</a>
-              </>
-            )}
-          </nav>
+          <SiteNav isAdmin={isAdmin} isLoggedIn={Boolean(userData.user)} />
         </header>
         {children}
         <footer className="site-footer">
