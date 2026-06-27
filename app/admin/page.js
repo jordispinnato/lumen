@@ -39,6 +39,7 @@ export default async function AdminPage({ searchParams }) {
     { data: materials },
     { data: specialists },
     { data: appointmentSlots },
+    { data: appointmentBookings },
     { data: catalogProducts },
   ] = await Promise.all([
     supabase.from("courses").select("id,slug,title,summary,price,status").order("created_at", { ascending: false }),
@@ -65,6 +66,10 @@ export default async function AdminPage({ searchParams }) {
       .order("slot_date", { ascending: true })
       .order("slot_time", { ascending: true }),
     supabase
+      .from("appointment_bookings")
+      .select("id,patient_email,patient_name,status,created_at,appointment_specialists:specialist_id (name),appointment_slots:slot_id (slot_date,slot_time)")
+      .order("created_at", { ascending: false }),
+    supabase
       .from("catalog_products")
       .select("id,title,product_type,category,summary,price,stock,status,created_at")
       .order("created_at", { ascending: false }),
@@ -82,6 +87,20 @@ export default async function AdminPage({ searchParams }) {
           {params?.error ? <p className="notice error">{params.error}</p> : null}
           {params?.message ? <p className="notice success">{params.message}</p> : null}
         </div>
+
+        <nav className="admin-tabs" aria-label="Secciones admin">
+          <a href="#turnos">Turnos</a>
+          <a href="#catalogo">Catalogo</a>
+          <a href="#cursos">Cursos</a>
+          <a href="#contenido">Contenido</a>
+          <a href="#inscripciones">Inscripciones</a>
+        </nav>
+
+        <section className="admin-section" id="turnos">
+          <div className="admin-section-head">
+            <p className="eyebrow">Turnos</p>
+            <h2>Especialistas, disponibilidad y reservas</h2>
+          </div>
 
         <div className="admin-layout">
           <section className="panel">
@@ -188,6 +207,43 @@ export default async function AdminPage({ searchParams }) {
           </section>
         </div>
 
+        <section className="panel spaced-panel">
+          <h2>Reservas confirmadas</h2>
+          <table className="table">
+            <thead>
+              <tr>
+                <th>Paciente</th>
+                <th>Especialista</th>
+                <th>Fecha</th>
+                <th>Horario</th>
+                <th>Estado</th>
+              </tr>
+            </thead>
+            <tbody>
+              {appointmentBookings?.length ? appointmentBookings.map((booking) => (
+                <tr key={booking.id}>
+                  <td>{booking.patient_name || booking.patient_email}</td>
+                  <td>{booking.appointment_specialists?.name}</td>
+                  <td>{booking.appointment_slots?.slot_date ? new Date(`${booking.appointment_slots.slot_date}T00:00:00`).toLocaleDateString("es-AR") : ""}</td>
+                  <td>{booking.appointment_slots?.slot_time?.slice(0, 5)}</td>
+                  <td>{booking.status}</td>
+                </tr>
+              )) : (
+                <tr>
+                  <td colSpan="5">Todavia no hay reservas confirmadas.</td>
+                </tr>
+              )}
+            </tbody>
+          </table>
+        </section>
+        </section>
+
+        <section className="admin-section" id="catalogo">
+          <div className="admin-section-head">
+            <p className="eyebrow">Catalogo</p>
+            <h2>Productos fisicos y digitales</h2>
+          </div>
+
         <div className="admin-layout spaced-panel">
           <section className="panel">
             <h2>Cargar producto de catalogo</h2>
@@ -250,6 +306,13 @@ export default async function AdminPage({ searchParams }) {
             </div>
           </section>
         </div>
+        </section>
+
+        <section className="admin-section" id="cursos">
+          <div className="admin-section-head">
+            <p className="eyebrow">Cursos</p>
+            <h2>Cursos, lecciones y materiales</h2>
+          </div>
 
         <div className="admin-layout spaced-panel">
           <section className="panel">
@@ -375,6 +438,13 @@ export default async function AdminPage({ searchParams }) {
             </form>
           </section>
         </div>
+        </section>
+
+        <section className="admin-section" id="contenido">
+          <div className="admin-section-head">
+            <p className="eyebrow">Contenido</p>
+            <h2>Materiales y lecciones cargadas</h2>
+          </div>
 
         <div className="admin-layout spaced-panel">
           <section className="panel">
@@ -407,8 +477,9 @@ export default async function AdminPage({ searchParams }) {
             </div>
           </section>
         </div>
+        </section>
 
-        <section className="panel spaced-panel">
+        <section className="panel spaced-panel" id="inscripciones">
           <h2>Cursos</h2>
           <table className="table">
             <thead>

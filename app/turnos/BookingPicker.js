@@ -45,7 +45,7 @@ function slotLabel(count) {
   return count === 1 ? "1 turno" : `${count} turnos`;
 }
 
-export default function BookingPicker({ specialists, slots }) {
+export default function BookingPicker({ specialists, slots, userEmail }) {
   const [selectedSpecialistId, setSelectedSpecialistId] = useState(specialists[0]?.id);
   const [selectedMonthIndex, setSelectedMonthIndex] = useState(0);
   const [selectedDate, setSelectedDate] = useState("");
@@ -207,10 +207,26 @@ export default function BookingPicker({ specialists, slots }) {
           </div>
         </dl>
         <p className="price">$ {selectedSpecialist.price.toLocaleString("es-AR")}</p>
-        <button className="button" disabled={!selectedSlot} type="button">Continuar al pago</button>
-        <p className="muted">
-          En la siguiente etapa conectamos este boton con pago y confirmacion automatica del turno.
-        </p>
+        {userEmail ? (
+          <form className="booking-confirm-form" action="/turnos/reservar" method="post">
+            <input name="slotId" type="hidden" value={selectedSlot?.id || ""} />
+            <label>
+              Nombre del paciente
+              <input name="patientName" placeholder="Nombre y apellido" />
+            </label>
+            <label>
+              Email de confirmacion
+              <input readOnly value={userEmail} />
+            </label>
+            <button className="button" disabled={!selectedSlot} type="submit">Confirmar reserva</button>
+          </form>
+        ) : (
+          <div className="booking-login-box">
+            <p className="muted">Para confirmar la reserva necesitás iniciar sesión.</p>
+            <a className="button" href="/login">Ingresar</a>
+          </div>
+        )}
+        <p className="muted">El pago se conectara en una etapa posterior.</p>
       </aside>
     </div>
   );

@@ -527,6 +527,45 @@ h3 {
   align-items: start;
 }
 
+.admin-tabs {
+  position: sticky;
+  top: 74px;
+  z-index: 20;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin-bottom: 22px;
+  padding: 12px;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  background: rgba(255, 253, 248, 0.94);
+  backdrop-filter: blur(14px);
+}
+
+.admin-tabs a {
+  min-height: 38px;
+  display: inline-flex;
+  align-items: center;
+  border-radius: 999px;
+  padding: 0 14px;
+  background: white;
+  color: var(--deep);
+  font-weight: 800;
+}
+
+.admin-section {
+  scroll-margin-top: 150px;
+  margin-top: 28px;
+}
+
+.admin-section-head {
+  margin-bottom: 14px;
+}
+
+.admin-section-head h2 {
+  font-size: clamp(1.5rem, 2.4vw, 2.4rem);
+}
+
 .admin-form {
   display: grid;
   grid-template-columns: 1fr 1fr;
@@ -743,6 +782,33 @@ h3 {
   color: var(--deep);
   font-weight: 800;
   line-height: 1.35;
+}
+
+.booking-confirm-form {
+  display: grid;
+  gap: 12px;
+}
+
+.booking-confirm-form label {
+  display: grid;
+  gap: 7px;
+  color: var(--deep);
+  font-weight: 800;
+}
+
+.booking-confirm-form input {
+  width: 100%;
+  min-height: 44px;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  padding: 0 12px;
+  background: white;
+  color: var(--ink);
+}
+
+.booking-login-box {
+  display: grid;
+  gap: 12px;
 }
 
 .catalog-toolbar {
