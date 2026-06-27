@@ -39,6 +39,7 @@ export default async function AdminPage({ searchParams }) {
     { data: materials },
     { data: specialists },
     { data: appointmentSlots },
+    { data: catalogProducts },
   ] = await Promise.all([
     supabase.from("courses").select("id,slug,title,summary,price,status").order("created_at", { ascending: false }),
     supabase.from("profiles").select("id,full_name,email,role").order("created_at", { ascending: false }),
@@ -63,6 +64,10 @@ export default async function AdminPage({ searchParams }) {
       .select("id,slot_date,slot_time,status,appointment_specialists:specialist_id (id,name)")
       .order("slot_date", { ascending: true })
       .order("slot_time", { ascending: true }),
+    supabase
+      .from("catalog_products")
+      .select("id,title,product_type,category,summary,price,stock,status,created_at")
+      .order("created_at", { ascending: false }),
   ]);
 
   return (
@@ -178,6 +183,69 @@ export default async function AdminPage({ searchParams }) {
                 </article>
               )) : (
                 <p className="muted">Todavia no hay horarios cargados.</p>
+              )}
+            </div>
+          </section>
+        </div>
+
+        <div className="admin-layout spaced-panel">
+          <section className="panel">
+            <h2>Cargar producto de catalogo</h2>
+            <form className="admin-form" action="/admin/catalog-products/create" method="post">
+              <label>
+                Nombre
+                <input name="title" required placeholder="Ej: Kit de fidgets sensoriales" />
+              </label>
+              <label>
+                Tipo
+                <select name="productType" defaultValue="physical">
+                  <option value="physical">Fisico</option>
+                  <option value="digital">Digital</option>
+                </select>
+              </label>
+              <label>
+                Categoria
+                <input name="category" required placeholder="Ej: Regulacion sensorial" />
+              </label>
+              <label>
+                Precio en ARS
+                <input name="price" type="number" min="0" step="1" required placeholder="12000" />
+              </label>
+              <label>
+                Stock fisico
+                <input name="stock" type="number" min="0" step="1" placeholder="8" />
+              </label>
+              <label>
+                Estado
+                <select name="status" defaultValue="published">
+                  <option value="published">Publicado</option>
+                  <option value="draft">Borrador</option>
+                  <option value="archived">Archivado</option>
+                </select>
+              </label>
+              <label className="wide-field">
+                URL digital opcional
+                <input name="digitalUrl" type="url" placeholder="https://..." />
+              </label>
+              <label className="wide-field">
+                Descripcion
+                <textarea name="summary" rows="4" placeholder="Breve descripcion del producto o recurso" />
+              </label>
+              <button className="button" type="submit">Guardar producto</button>
+            </form>
+          </section>
+
+          <section className="panel">
+            <h2>Productos cargados</h2>
+            <div className="compact-list">
+              {catalogProducts?.length ? catalogProducts.map((product) => (
+                <article key={product.id}>
+                  <strong>{product.title}</strong>
+                  <span>{product.product_type === "digital" ? "Digital" : "Fisico"} - {formatPrice(product.price)}</span>
+                  <small>{product.status} - {product.category}</small>
+                </article>
+              )) : (
+                <p className="muted">Todavia no hay productos cargados.</p>
               )}
             </div>
           </section>

@@ -32,6 +32,7 @@ export default async function RootLayout({ children }) {
           <nav className="site-nav" aria-label="Principal">
             <a href="/turnos">Turnos</a>
             <a href="/cursos">Cursos</a>
+            <a href="/catalogo">Catalogo</a>
             <a href="/aula">Aula</a>
             {isAdmin ? <a href="/admin">Admin</a> : null}
             {userData.user ? (

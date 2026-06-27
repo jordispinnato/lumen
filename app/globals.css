@@ -745,6 +745,55 @@ h3 {
   line-height: 1.35;
 }
 
+.catalog-toolbar {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin-bottom: 22px;
+}
+
+.filter-chip {
+  min-height: 42px;
+  border: 1px solid var(--line);
+  border-radius: 999px;
+  padding: 0 18px;
+  background: rgba(255, 253, 248, 0.92);
+  color: var(--deep);
+  font-weight: 800;
+}
+
+.filter-chip.is-active {
+  border-color: rgba(11, 74, 83, 0.62);
+  background: var(--petrol);
+  color: white;
+}
+
+.catalog-grid {
+  align-items: stretch;
+}
+
+.product-card {
+  gap: 8px;
+}
+
+.product-type {
+  width: fit-content;
+  margin-bottom: 10px;
+  border-radius: 999px;
+  padding: 6px 10px;
+  background: rgba(104, 199, 189, 0.2);
+  color: var(--petrol);
+  font-size: 0.76rem;
+  font-weight: 900;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+}
+
+.product-type.digital {
+  background: rgba(148, 170, 130, 0.24);
+  color: #4a6446;
+}
+
 @media (max-width: 980px) {
   .grid,
   .admin-layout,

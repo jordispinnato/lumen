@@ -23,7 +23,7 @@ export default async function HomePage() {
           <div className="actions">
             <a className="button" href="/turnos">Reservar turno</a>
             <a className="button" href="/cursos">Explorar cursos</a>
-            <a className="secondary-button" href="#catalogo">Catalogo online</a>
+            <a className="secondary-button" href="/catalogo">Catalogo online</a>
           </div>
         </div>
       </section>
@@ -73,7 +73,7 @@ export default async function HomePage() {
             <h3>Catalogo online</h3>
             <p>Productos fisicos y recursos digitales para terapeutas, familias y bienestar cotidiano.</p>
             <div className="actions">
-              <a className="secondary-button" href="#catalogo">Proximamente</a>
+              <a className="button" href="/catalogo">Ver catalogo</a>
             </div>
           </article>
         </div>
