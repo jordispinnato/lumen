@@ -15,6 +15,7 @@ function buildMonth(offset) {
   const monthStart = new Date(today.getFullYear(), today.getMonth() + offset, 1);
   const monthEnd = new Date(today.getFullYear(), today.getMonth() + offset + 1, 0);
   const days = [];
+  const leadingBlanks = monthStart.getDay() === 0 ? 6 : monthStart.getDay() - 1;
 
   for (let date = new Date(monthStart); date <= monthEnd; date.setDate(date.getDate() + 1)) {
     days.push({
@@ -27,12 +28,21 @@ function buildMonth(offset) {
 
   return {
     label: monthStart.toLocaleDateString("es-AR", { month: "long", year: "numeric" }),
+    leadingBlanks,
     days,
   };
 }
 
 function formatTime(value) {
   return value?.slice(0, 5) || "";
+}
+
+function slotLabel(count) {
+  if (!count) {
+    return "Sin turnos";
+  }
+
+  return count === 1 ? "1 turno" : `${count} turnos`;
 }
 
 export default function BookingPicker({ specialists, slots }) {
@@ -124,22 +134,29 @@ export default function BookingPicker({ specialists, slots }) {
             </button>
           ))}
         </div>
+        <div className="calendar-weekdays" aria-hidden="true">
+          {["Lun", "Mar", "Mie", "Jue", "Vie", "Sab", "Dom"].map((day) => (
+            <span key={day}>{day}</span>
+          ))}
+        </div>
         <div className="calendar-grid" aria-label="Calendario de turnos disponibles">
+          {Array.from({ length: months[selectedMonthIndex].leadingBlanks }).map((_, index) => (
+            <span className="calendar-empty" key={`empty-${index}`} />
+          ))}
           {months[selectedMonthIndex].days.map((day) => {
             const daySlots = slotsByDate[day.iso] || [];
             const isSelectable = !day.isPast && daySlots.length > 0;
 
             return (
               <button
-                className={`calendar-day ${day.iso === selectedDate ? "is-active" : ""}`}
+                className={`calendar-day ${day.iso === selectedDate ? "is-active" : ""} ${daySlots.length ? "has-slots" : ""}`}
                 disabled={!isSelectable}
                 key={day.iso}
                 type="button"
                 onClick={() => selectDay(day)}
               >
-                <span>{day.weekday}</span>
                 <strong>{day.dayNumber}</strong>
-                {daySlots.length ? <small>{daySlots.length} horarios</small> : <small>Sin turnos</small>}
+                <small>{slotLabel(daySlots.length)}</small>
               </button>
             );
           })}

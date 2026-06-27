@@ -555,7 +555,7 @@ h3 {
 
 .booking-layout {
   display: grid;
-  grid-template-columns: minmax(0, 0.95fr) minmax(0, 1.15fr) 360px;
+  grid-template-columns: minmax(240px, 0.75fr) minmax(520px, 1.35fr) minmax(320px, 0.9fr);
   gap: 18px;
   align-items: start;
 }
@@ -575,6 +575,7 @@ h3 {
 .month-tab,
 .calendar-day,
 .slot-option {
+  min-width: 0;
   width: 100%;
   border: 1px solid var(--line);
   border-radius: 8px;
@@ -614,6 +615,12 @@ h3 {
   line-height: 1.45;
 }
 
+.specialist-option strong,
+.specialist-option span,
+.specialist-option small {
+  overflow-wrap: anywhere;
+}
+
 .month-tabs {
   display: grid;
   grid-template-columns: repeat(2, minmax(0, 1fr));
@@ -634,16 +641,52 @@ h3 {
   gap: 8px;
 }
 
+.calendar-weekdays {
+  display: grid;
+  grid-template-columns: repeat(7, minmax(0, 1fr));
+  gap: 8px;
+  color: var(--muted);
+  font-size: 0.72rem;
+  font-weight: 800;
+  text-align: center;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+}
+
+.calendar-empty {
+  min-height: 76px;
+}
+
 .calendar-day {
   display: grid;
-  gap: 4px;
-  min-height: 92px;
-  padding: 10px;
+  align-content: center;
+  justify-items: center;
+  gap: 7px;
+  min-height: 76px;
+  padding: 8px;
+  text-align: center;
 }
 
 .calendar-day strong {
   color: var(--deep);
-  font-size: 1.25rem;
+  font-size: 1.28rem;
+  line-height: 1;
+}
+
+.calendar-day small {
+  max-width: 100%;
+  border-radius: 999px;
+  padding: 3px 7px;
+  background: rgba(20, 53, 56, 0.06);
+  font-size: 0.68rem;
+  font-weight: 800;
+  line-height: 1.1;
+  white-space: nowrap;
+}
+
+.calendar-day.has-slots small {
+  background: rgba(104, 199, 189, 0.22);
+  color: var(--petrol);
 }
 
 .calendar-day:disabled:hover {
@@ -706,12 +749,11 @@ h3 {
   .grid,
   .admin-layout,
   .booking-layout {
-    grid-template-columns: repeat(2, minmax(0, 1fr));
+    grid-template-columns: 1fr;
   }
 
   .booking-summary {
     position: static;
-    grid-column: 1 / -1;
   }
 }
 
@@ -738,11 +780,30 @@ h3 {
   .admin-layout,
   .admin-form,
   .booking-layout,
-  .calendar-grid,
   .month-tabs,
   .slot-grid,
   .stats-strip {
     grid-template-columns: 1fr;
+  }
+
+  .calendar-grid,
+  .calendar-weekdays {
+    grid-template-columns: repeat(7, minmax(34px, 1fr));
+    gap: 6px;
+  }
+
+  .calendar-empty {
+    min-height: 62px;
+  }
+
+  .calendar-day {
+    min-height: 62px;
+    padding: 6px 4px;
+  }
+
+  .calendar-day small {
+    padding-inline: 4px;
+    font-size: 0.58rem;
   }
 
   .stats-strip div {
