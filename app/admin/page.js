@@ -41,6 +41,7 @@ export default async function AdminPage({ searchParams }) {
     { data: appointmentSlots },
     { data: appointmentBookings },
     { data: catalogProducts },
+    { data: catalogOrders },
   ] = await Promise.all([
     supabase.from("courses").select("id,slug,title,summary,price,status").order("created_at", { ascending: false }),
     supabase.from("profiles").select("id,full_name,email,role").order("created_at", { ascending: false }),
@@ -71,7 +72,11 @@ export default async function AdminPage({ searchParams }) {
       .order("created_at", { ascending: false }),
     supabase
       .from("catalog_products")
-      .select("id,title,product_type,category,summary,price,stock,status,created_at")
+      .select("id,title,product_type,category,summary,price,stock,status,digital_url,digital_file_name,created_at")
+      .order("created_at", { ascending: false }),
+    supabase
+      .from("catalog_orders")
+      .select("id,customer_email,customer_name,product_type,amount,status,shipping_province,shipping_city,shipping_postal_code,shipping_street,shipping_number,catalog_products:product_id (title)")
       .order("created_at", { ascending: false }),
   ]);
 
@@ -247,7 +252,7 @@ export default async function AdminPage({ searchParams }) {
         <div className="admin-layout spaced-panel">
           <section className="panel">
             <h2>Cargar producto de catalogo</h2>
-            <form className="admin-form" action="/admin/catalog-products/create" method="post">
+            <form className="admin-form" action="/admin/catalog-products/create" method="post" encType="multipart/form-data">
               <label>
                 Nombre
                 <input name="title" required placeholder="Ej: Kit de fidgets sensoriales" />
@@ -284,6 +289,14 @@ export default async function AdminPage({ searchParams }) {
                 <input name="digitalUrl" type="url" placeholder="https://..." />
               </label>
               <label className="wide-field">
+                Archivo digital opcional
+                <input
+                  name="digitalFile"
+                  type="file"
+                  accept=".pdf,.doc,.docx,.xls,.xlsx,.ppt,.pptx,.png,.jpg,.jpeg,.txt,.zip"
+                />
+              </label>
+              <label className="wide-field">
                 Descripcion
                 <textarea name="summary" rows="4" placeholder="Breve descripcion del producto o recurso" />
               </label>
@@ -298,7 +311,11 @@ export default async function AdminPage({ searchParams }) {
                 <article key={product.id}>
                   <strong>{product.title}</strong>
                   <span>{product.product_type === "digital" ? "Digital" : "Fisico"} - {formatPrice(product.price)}</span>
-                  <small>{product.status} - {product.category}</small>
+                  <small>
+                    {product.status} - {product.category}
+                    {product.product_type === "digital" && product.digital_file_name ? ` - Archivo: ${product.digital_file_name}` : ""}
+                    {product.product_type === "digital" && !product.digital_file_name && product.digital_url ? " - URL cargada" : ""}
+                  </small>
                 </article>
               )) : (
                 <p className="muted">Todavia no hay productos cargados.</p>
@@ -306,6 +323,42 @@ export default async function AdminPage({ searchParams }) {
             </div>
           </section>
         </div>
+
+        <section className="panel spaced-panel">
+          <h2>Solicitudes de compra</h2>
+          <table className="table">
+            <thead>
+              <tr>
+                <th>Cliente</th>
+                <th>Producto</th>
+                <th>Tipo</th>
+                <th>Total</th>
+                <th>Envio</th>
+                <th>Estado</th>
+              </tr>
+            </thead>
+            <tbody>
+              {catalogOrders?.length ? catalogOrders.map((order) => (
+                <tr key={order.id}>
+                  <td>{order.customer_name || order.customer_email}</td>
+                  <td>{order.catalog_products?.title}</td>
+                  <td>{order.product_type === "digital" ? "Digital" : "Fisico"}</td>
+                  <td>{formatPrice(order.amount)}</td>
+                  <td>
+                    {order.product_type === "physical"
+                      ? `${order.shipping_street || ""} ${order.shipping_number || ""}, ${order.shipping_city || ""}, ${order.shipping_province || ""} (${order.shipping_postal_code || ""})`
+                      : "Entrega digital"}
+                  </td>
+                  <td>{order.status}</td>
+                </tr>
+              )) : (
+                <tr>
+                  <td colSpan="6">Todavia no hay solicitudes de compra.</td>
+                </tr>
+              )}
+            </tbody>
+          </table>
+        </section>
         </section>
 
         <section className="admin-section" id="cursos">

@@ -52,7 +52,7 @@ export default function CatalogFilters({ products }) {
             )}
             <p className="price">{formatPrice(product.price)}</p>
             <div className="actions">
-              <button className="secondary-button" type="button">Comprar mas adelante</button>
+              <a className="button" href={`/catalogo/${product.id}`}>Ver producto</a>
             </div>
           </article>
         ))}

@@ -28,13 +28,37 @@ export async function POST(request) {
   const price = Number(formData.get("price") || 0);
   const stockValue = formData.get("stock");
   const digitalUrl = String(formData.get("digitalUrl") || "").trim();
+  const digitalFile = formData.get("digitalFile");
   const status = String(formData.get("status") || "published");
   const stock = productType === "physical" && stockValue !== "" ? Number(stockValue) : null;
+  let digitalFilePath = null;
+  let digitalFileName = null;
+  let digitalFileType = null;
+  let digitalFileSize = null;
 
   if (!title || !category) {
-    return NextResponse.redirect(`${origin}/admin?error=${encodeURIComponent("Completá nombre y categoría del producto")}`, {
+    return NextResponse.redirect(`${origin}/admin?error=${encodeURIComponent("Completa nombre y categoria del producto")}`, {
       status: 303,
     });
+  }
+
+  if (productType === "digital" && digitalFile?.size) {
+    const safeName = digitalFile.name.replace(/[^a-zA-Z0-9._-]/g, "-");
+    digitalFilePath = `${Date.now()}-${safeName}`;
+    digitalFileName = digitalFile.name;
+    digitalFileType = digitalFile.type || "application/octet-stream";
+    digitalFileSize = digitalFile.size;
+
+    const { error: uploadError } = await supabase.storage
+      .from("catalog-digital-files")
+      .upload(digitalFilePath, digitalFile, {
+        contentType: digitalFileType,
+        upsert: false,
+      });
+
+    if (uploadError) {
+      return NextResponse.redirect(`${origin}/admin?error=${encodeURIComponent(uploadError.message)}`, { status: 303 });
+    }
   }
 
   const { error } = await supabase.from("catalog_products").insert({
@@ -45,6 +69,10 @@ export async function POST(request) {
     price: Number.isFinite(price) ? Math.max(0, Math.round(price)) : 0,
     stock: Number.isFinite(stock) ? Math.max(0, Math.round(stock)) : null,
     digital_url: digitalUrl || null,
+    digital_file_path: digitalFilePath,
+    digital_file_name: digitalFileName,
+    digital_file_type: digitalFileType,
+    digital_file_size: digitalFileSize,
     status,
   });
 
