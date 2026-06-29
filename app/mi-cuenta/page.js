@@ -1,6 +1,7 @@
 import { redirect } from "next/navigation";
 import { createSupabaseServerClient } from "../../lib/supabase/server";
 import { formatPrice } from "../../lib/courses";
+import AccountDashboardShell from "./AccountDashboardShell";
 
 function formatDate(value) {
   if (!value) {
@@ -27,14 +28,72 @@ function formatTime(value) {
   return value?.slice(0, 5) || "";
 }
 
+function initialsFromName(name) {
+  return String(name || "L")
+    .split(" ")
+    .filter(Boolean)
+    .slice(0, 2)
+    .map((part) => part.slice(0, 1).toUpperCase())
+    .join("");
+}
+
 function EmptyState({ title, text, href, action }) {
   return (
-    <div className="empty-state">
+    <div className="account-empty-state">
+      <span className="account-empty-icon" aria-hidden="true">+</span>
       <h3>{title}</h3>
-      <p className="muted">{text}</p>
-      {href ? <a className="secondary-button" href={href}>{action}</a> : null}
+      <p>{text}</p>
+      {href ? <a className="account-secondary-action" href={href}>{action}</a> : null}
     </div>
   );
+}
+
+function AccountIcon({ children, tone = "blue" }) {
+  return <span className={`account-icon is-${tone}`} aria-hidden="true">{children}</span>;
+}
+
+function StatCard({ icon, tone, label, value, helper, href, action }) {
+  const content = (
+    <>
+      <AccountIcon tone={tone}>{icon}</AccountIcon>
+      <div>
+        <span>{label}</span>
+        <strong>{value}</strong>
+        {helper ? <small>{helper}</small> : null}
+      </div>
+      {action ? <em>{action}</em> : null}
+    </>
+  );
+
+  return href ? (
+    <a className="account-stat-card" href={href}>{content}</a>
+  ) : (
+    <article className="account-stat-card">{content}</article>
+  );
+}
+
+function getCourseState(progress) {
+  if (progress.percent >= 100) {
+    return "Completado";
+  }
+
+  if (progress.percent > 0) {
+    return "En progreso";
+  }
+
+  return "Pendiente";
+}
+
+function getCourseTone(progress) {
+  if (progress.percent >= 100) {
+    return "complete";
+  }
+
+  if (progress.percent > 0) {
+    return "progress";
+  }
+
+  return "pending";
 }
 
 export default async function MiCuentaPage() {
@@ -121,8 +180,10 @@ export default async function MiCuentaPage() {
   const nextBooking = upcomingBookings[0];
   const approvedDigitalOrders = (digitalOrders || []).filter((order) => order.status === "paid" || order.status === "delivered");
   const displayName = profile?.full_name || userData.user.email;
+  const firstName = profile?.full_name?.split(" ")?.[0] || userData.user.email?.split("@")?.[0] || "LUMEN";
+  const avatarInitials = initialsFromName(displayName);
   const courseIds = (enrollments || []).map((enrollment) => enrollment.courses?.id).filter(Boolean);
-  const [{ data: enrolledLessons }, { data: courseProgress }] = courseIds.length
+  const [{ data: enrolledLessons }, { data: lessonProgress }] = courseIds.length
     ? await Promise.all([
         supabase
           .from("lessons")
@@ -143,7 +204,7 @@ export default async function MiCuentaPage() {
     lessonsByCourse.set(lesson.course_id, [...(lessonsByCourse.get(lesson.course_id) || []), lesson]);
   });
 
-  (courseProgress || []).forEach((item) => {
+  (lessonProgress || []).forEach((item) => {
     progressByCourse.set(item.course_id, [...(progressByCourse.get(item.course_id) || []), item]);
   });
 
@@ -165,225 +226,328 @@ export default async function MiCuentaPage() {
     };
   }
 
+  const courseCards = (enrollments || []).map((enrollment, index) => {
+    const progress = getCourseProgress(enrollment.courses?.id);
+    const continueUrl = enrollment.courses?.slug
+      ? `/aula?curso=${enrollment.courses.slug}${progress.lastLessonId ? `&lesson=${progress.lastLessonId}` : ""}`
+      : "/aula";
+
+    return {
+      id: enrollment.id,
+      course: enrollment.courses,
+      progress,
+      state: getCourseState(progress),
+      tone: getCourseTone(progress),
+      continueUrl,
+      enrolledAt: enrollment.created_at,
+      visual: index % 3,
+    };
+  });
+  const averageProgress = courseCards.length
+    ? Math.round(courseCards.reduce((total, item) => total + item.progress.percent, 0) / courseCards.length)
+    : 0;
+  const recentActivity = [
+    ...courseCards.slice(0, 3).map((item) => ({
+      id: `course-${item.id}`,
+      icon: "C",
+      text: `Tenes acceso al curso ${item.course?.title || "Curso"}`,
+      date: item.enrolledAt,
+    })),
+    ...upcomingBookings.slice(0, 2).map((booking) => ({
+      id: `booking-${booking.id}`,
+      icon: "T",
+      text: `Reservaste un turno con ${booking.appointment_specialists?.name || "un profesional"}`,
+      date: booking.created_at,
+    })),
+    ...approvedDigitalOrders.slice(0, 2).map((order) => ({
+      id: `resource-${order.id}`,
+      icon: "R",
+      text: `Tenes disponible el recurso ${order.catalog_products?.title || "digital"}`,
+      date: order.created_at,
+    })),
+  ]
+    .sort((a, b) => String(b.date || "").localeCompare(String(a.date || "")))
+    .slice(0, 4);
+
+  const navItems = [
+    { href: "#inicio", icon: "I", label: "Inicio" },
+    { href: "#turnos", icon: "T", label: "Mis turnos" },
+    { href: "#cursos", icon: "C", label: "Mis cursos" },
+    { href: "#recursos", icon: "R", label: "Mis recursos" },
+    { href: "#pedidos", icon: "P", label: "Mis pedidos" },
+    { href: "#certificados", icon: "D", label: "Certificados" },
+    { href: "#configuracion", icon: "S", label: "Configuracion" },
+  ];
+
   return (
-    <main className="section">
-      <div className="dashboard-shell">
-        <div className="section-head">
-          <p className="eyebrow">Mi cuenta</p>
-          <h1>Hola, {displayName}</h1>
-          <p className="lead">Tu espacio privado para revisar turnos, cursos, recursos y datos de perfil.</p>
-        </div>
-
-        <nav className="account-tabs" aria-label="Secciones de mi cuenta">
-          <a href="#inicio">Inicio</a>
-          <a href="#turnos">Mis turnos</a>
-          <a href="#cursos">Mis cursos</a>
-          <a href="#recursos">Mis recursos</a>
-          <a href="#perfil">Mi perfil</a>
-        </nav>
-
-        <section className="account-section" id="inicio">
-          <div className="account-grid">
-            <article className="panel account-highlight">
-              <p className="eyebrow">Proximo turno</p>
-              {nextBooking ? (
-                <>
-                  <h2>{nextBooking.appointment_specialists?.name}</h2>
-                  <p className="muted">
-                    {formatDate(nextBooking.appointment_slots?.slot_date)} a las {formatTime(nextBooking.appointment_slots?.slot_time)}
-                  </p>
-                  <span className="status-pill">{nextBooking.status}</span>
-                </>
-              ) : (
-                <EmptyState
-                  title="Todavia no tenes turnos reservados"
-                  text="Cuando reserves una consulta, el proximo turno va a aparecer aca."
-                  href="/turnos"
-                  action="Reservar turno"
-                />
-              )}
-            </article>
-
-            <div className="account-actions">
-              <a className="quick-card" href="/turnos">
-                <strong>Reservar nuevo turno</strong>
-                <span>Elegir especialista y horario.</span>
-              </a>
-              <a className="quick-card" href="#cursos">
-                <strong>Mis cursos</strong>
-                <span>{enrollments?.length || 0} cursos habilitados.</span>
-              </a>
-              <a className="quick-card" href="/catalogo">
-                <strong>Catalogo</strong>
-                <span>Explorar recursos fisicos y digitales.</span>
-              </a>
-              <a className="quick-card" href="#recursos">
-                <strong>Mis recursos</strong>
-                <span>{approvedDigitalOrders.length} recursos disponibles.</span>
-              </a>
+    <AccountDashboardShell navItems={navItems} displayName={displayName} avatarInitials={avatarInitials}>
+        <div className="account-dashboard" id="inicio">
+          <section className="account-hero">
+            <div>
+              <h1>¡Hola, {firstName}!</h1>
+              <p>Bienvenido a tu espacio personal. Aca tenes un resumen de tu actividad.</p>
             </div>
-          </div>
-        </section>
+            <a className="account-primary-action" href="/turnos">Reservar turno</a>
+          </section>
 
-        <section className="account-section" id="turnos">
-          <div className="admin-section-head">
-            <p className="eyebrow">Mis turnos</p>
-            <h2>Proximos turnos</h2>
-          </div>
-          {upcomingBookings.length ? (
-            <div className="account-list">
-              {upcomingBookings.map((booking) => (
-                <article className="panel account-row" key={booking.id}>
-                  <div>
-                    <p className="eyebrow">{booking.status}</p>
-                    <h3>{booking.appointment_specialists?.name}</h3>
-                    <p className="muted">{booking.appointment_specialists?.session || "Consulta online"}</p>
-                  </div>
-                  <div>
-                    <strong>{formatDate(booking.appointment_slots?.slot_date)}</strong>
-                    <span>{formatTime(booking.appointment_slots?.slot_time)}</span>
-                  </div>
-                  <div>
-                    <strong>{formatPrice(booking.appointment_specialists?.price || 0)}</strong>
-                    <span>Precio de referencia</span>
-                  </div>
-                </article>
-              ))}
+          <section className="account-stats-grid" aria-label="Resumen de mi cuenta">
+            <StatCard
+              icon="T"
+              tone="blue"
+              label="Proximo turno"
+              value={nextBooking ? formatDate(nextBooking.appointment_slots?.slot_date) : "Sin turnos"}
+              helper={nextBooking ? `${formatTime(nextBooking.appointment_slots?.slot_time)} hs` : "Reserva cuando quieras"}
+              href="#turnos"
+              action="Ver detalles"
+            />
+            <StatCard
+              icon="C"
+              tone="purple"
+              label="Cursos activos"
+              value={courseCards.length}
+              helper={courseCards.length === 1 ? "curso habilitado" : "cursos habilitados"}
+              href="#cursos"
+              action="Ver mis cursos"
+            />
+            <StatCard
+              icon="%"
+              tone="green"
+              label="Progreso promedio"
+              value={`${averageProgress}%`}
+              helper="Sobre cursos habilitados"
+              href="#cursos"
+              action="Ver progreso"
+            />
+            <StatCard
+              icon="R"
+              tone="orange"
+              label="Recursos descargados"
+              value={approvedDigitalOrders.length}
+              helper="Recursos digitales disponibles"
+              href="#recursos"
+              action="Ver recursos"
+            />
+          </section>
+
+          <section className="account-panel account-courses-panel" id="cursos">
+            <div className="account-panel-head">
+              <div>
+                <AccountIcon tone="purple">C</AccountIcon>
+                <h2>Mis cursos</h2>
+              </div>
+              <a href="/cursos">Ver todos los cursos</a>
             </div>
-          ) : (
-            <EmptyState title="No tenes turnos proximos" text="Podes reservar un nuevo turno cuando lo necesites." href="/turnos" action="Reservar turno" />
-          )}
-
-          <div className="admin-section-head spaced-panel">
-            <h2>Historial</h2>
-          </div>
-          {pastBookings.length ? (
-            <div className="account-list">
-              {pastBookings.map((booking) => (
-                <article className="panel account-row" key={booking.id}>
-                  <div>
-                    <p className="eyebrow">{booking.status}</p>
-                    <h3>{booking.appointment_specialists?.name}</h3>
-                  </div>
-                  <div>
-                    <strong>{formatDate(booking.appointment_slots?.slot_date)}</strong>
-                    <span>{formatTime(booking.appointment_slots?.slot_time)}</span>
-                  </div>
-                  <div>
-                    <strong>{booking.appointment_specialists?.session || "Consulta online"}</strong>
-                    <span>{formatPrice(booking.appointment_specialists?.price || 0)}</span>
-                  </div>
-                </article>
-              ))}
+            <div className="account-course-tabs" aria-label="Estados de cursos">
+              <span className="is-active">Todos</span>
+              <span>En progreso</span>
+              <span>Completados</span>
+              <span>Pendientes</span>
             </div>
-          ) : (
-            <p className="muted">Todavia no hay turnos en el historial.</p>
-          )}
-        </section>
-
-        <section className="account-section" id="cursos">
-          <div className="admin-section-head">
-            <p className="eyebrow">Mis cursos</p>
-            <h2>Cursos habilitados</h2>
-          </div>
-          {enrollments?.length ? (
-            <div className="grid">
-              {enrollments.map((enrollment) => (
-                (() => {
-                  const courseProgress = getCourseProgress(enrollment.courses?.id);
-                  const continueUrl = enrollment.courses?.slug
-                    ? `/aula?curso=${enrollment.courses.slug}${courseProgress.lastLessonId ? `&lesson=${courseProgress.lastLessonId}` : ""}`
-                    : "/aula";
-
-                  return (
-                    <article className="card account-course-card" key={enrollment.id}>
-                      <p className="eyebrow">Acceso habilitado</p>
-                      <h3>{enrollment.courses?.title}</h3>
-                      <p>{enrollment.courses?.summary}</p>
-                      <div className="progress-panel compact">
-                        <div>
-                          <strong>{courseProgress.percent}%</strong>
-                          <span>{courseProgress.completed} de {courseProgress.total} clases completadas</span>
+            {courseCards.length ? (
+              <div className="account-course-grid">
+                {courseCards.map((item) => (
+                  <article className={`account-course-card is-visual-${item.visual}`} key={item.id}>
+                    <div className="account-course-media">
+                      <span className={`account-course-status is-${item.tone}`}>{item.state}</span>
+                    </div>
+                    <div className="account-course-body">
+                      <h3>{item.course?.title}</h3>
+                      <p>{item.course?.summary || "Curso disponible en tu aula privada."}</p>
+                      <div className="account-progress-row">
+                        <div className="account-progress-track">
+                          <span style={{ width: `${item.progress.percent}%` }} />
                         </div>
-                        <div className="progress-bar">
-                          <span style={{ width: `${courseProgress.percent}%` }} />
-                        </div>
+                        <strong>{item.progress.percent}%</strong>
                       </div>
-                      <p className="muted">Ultima clase: {courseProgress.lastLessonTitle}</p>
-                      <p className="muted">Inscripto el {formatDateTime(enrollment.created_at)}</p>
-                      <div className="actions">
-                        <a className="button" href={continueUrl}>Continuar</a>
-                        {enrollment.courses?.slug ? (
-                          <a className="secondary-button" href={`/cursos/${enrollment.courses.slug}`}>Ver detalle</a>
-                        ) : null}
+                      <div className="account-course-meta">
+                        <span>Ultima leccion: {item.progress.lastLessonTitle}</span>
+                        <span>{item.progress.completed} de {item.progress.total} clases</span>
+                      </div>
+                      <div className="account-course-actions">
+                        <a href={item.continueUrl}>Continuar</a>
+                        {item.progress.percent >= 100 ? <a href="#certificados">Ver certificado</a> : null}
+                      </div>
+                    </div>
+                  </article>
+                ))}
+              </div>
+            ) : (
+              <EmptyState
+                title="Todavia no tenes cursos habilitados"
+                text="Cuando compres o te habiliten un curso, lo vas a ver en esta seccion."
+                href="/cursos"
+                action="Explorar cursos"
+              />
+            )}
+          </section>
+
+          <div className="account-lower-grid">
+            <section className="account-panel" id="turnos">
+              <div className="account-panel-head">
+                <div>
+                  <AccountIcon tone="blue">T</AccountIcon>
+                  <h2>Proximos turnos</h2>
+                </div>
+                <a href="/turnos">Ver todos</a>
+              </div>
+              {upcomingBookings.length ? (
+                <div className="account-appointment-list">
+                  {upcomingBookings.slice(0, 3).map((booking) => (
+                    <article className="account-appointment-card" key={booking.id}>
+                      <span className="account-avatar small">{initialsFromName(booking.appointment_specialists?.name)}</span>
+                      <div>
+                        <strong>{booking.appointment_specialists?.session || "Sesion individual"}</strong>
+                        <span>{booking.appointment_specialists?.name || "Profesional LUMEN"}</span>
+                      </div>
+                      <div>
+                        <strong>{formatDate(booking.appointment_slots?.slot_date)}</strong>
+                        <span>{formatTime(booking.appointment_slots?.slot_time)} hs</span>
                       </div>
                     </article>
-                  );
-                })()
-              ))}
-            </div>
-          ) : (
-            <EmptyState title="Todavia no tenes cursos habilitados" text="Cuando compres o te habiliten un curso, lo vas a ver en esta seccion." href="/cursos" action="Explorar cursos" />
-          )}
-        </section>
+                  ))}
+                </div>
+              ) : (
+                <EmptyState title="No tenes turnos proximos" text="Podes reservar un nuevo turno cuando lo necesites." href="/turnos" action="Reservar turno" />
+              )}
+              <a className="account-wide-action" href="/turnos">Reservar nuevo turno</a>
 
-        <section className="account-section" id="recursos">
-          <div className="admin-section-head">
-            <p className="eyebrow">Mis recursos</p>
-            <h2>Recursos digitales</h2>
-          </div>
-          {approvedDigitalOrders.length ? (
-            <div className="grid">
-              {approvedDigitalOrders.map((order) => (
-                <article className="card" key={order.id}>
-                  <p className="eyebrow">{order.status}</p>
-                  <h3>{order.catalog_products?.title}</h3>
-                  <p>{order.catalog_products?.summary}</p>
-                  <p className="muted">
-                    {order.catalog_products?.digital_file_name || order.catalog_products?.digital_url || "Recurso pendiente de descarga"}
-                  </p>
-                  <p className="price">{formatPrice(order.amount)}</p>
-                </article>
-              ))}
-            </div>
-          ) : (
-            <EmptyState
-              title="Todavia no tenes recursos digitales disponibles"
-              text="Cuando compres un recurso digital y el pago este aprobado, va a aparecer aca."
-              href="/catalogo"
-              action="Ir al catalogo"
-            />
-          )}
-        </section>
+              <div className="account-subsection">
+                <h3>Historial de turnos</h3>
+                {pastBookings.length ? (
+                  <div className="account-history-list">
+                    {pastBookings.slice(0, 4).map((booking) => (
+                      <article key={booking.id}>
+                        <span>{booking.status}</span>
+                        <strong>{booking.appointment_specialists?.name || "Profesional"}</strong>
+                        <small>{formatDate(booking.appointment_slots?.slot_date)} · {formatTime(booking.appointment_slots?.slot_time)} hs</small>
+                      </article>
+                    ))}
+                  </div>
+                ) : (
+                  <p className="account-muted">Todavia no hay turnos en el historial.</p>
+                )}
+              </div>
+            </section>
 
-        <section className="account-section" id="perfil">
-          <div className="admin-section-head">
-            <p className="eyebrow">Mi perfil</p>
-            <h2>Datos de cuenta</h2>
+            <section className="account-panel">
+              <div className="account-panel-head">
+                <div>
+                  <AccountIcon tone="green">A</AccountIcon>
+                  <h2>Actividad reciente</h2>
+                </div>
+                <a href="#inicio">Ver actividad</a>
+              </div>
+              {recentActivity.length ? (
+                <div className="account-activity-list">
+                  {recentActivity.map((item) => (
+                    <article key={item.id}>
+                      <AccountIcon tone="blue">{item.icon}</AccountIcon>
+                      <p>{item.text}</p>
+                      <span>{formatDateTime(item.date)}</span>
+                    </article>
+                  ))}
+                </div>
+              ) : (
+                <EmptyState title="Todavia no hay actividad reciente" text="A medida que uses la plataforma, tus movimientos importantes van a aparecer aca." />
+              )}
+            </section>
           </div>
-          <section className="panel profile-panel">
-            <dl>
+
+          <section className="account-panel" id="recursos">
+            <div className="account-panel-head">
               <div>
-                <dt>Email</dt>
-                <dd>{userData.user.email}</dd>
+                <AccountIcon tone="orange">R</AccountIcon>
+                <h2>Mis recursos</h2>
               </div>
-              <div>
-                <dt>Nombre</dt>
-                <dd>{profile?.full_name || "Sin nombre cargado"}</dd>
+              <a href="/catalogo">Ir al catalogo</a>
+            </div>
+            {approvedDigitalOrders.length ? (
+              <div className="account-resource-grid">
+                {approvedDigitalOrders.map((order) => (
+                  <article className="account-resource-card" key={order.id}>
+                    <span>{order.status}</span>
+                    <h3>{order.catalog_products?.title}</h3>
+                    <p>{order.catalog_products?.summary || "Recurso digital disponible en tu cuenta."}</p>
+                    <small>{order.catalog_products?.digital_file_name || order.catalog_products?.digital_url || "Recurso pendiente de descarga"}</small>
+                    <strong>{formatPrice(order.amount)}</strong>
+                  </article>
+                ))}
               </div>
-              <div>
-                <dt>Rol</dt>
-                <dd>{profile?.role || "student"}</dd>
-              </div>
-              <div>
-                <dt>Fecha de creacion</dt>
-                <dd>{formatDateTime(profile?.created_at || userData.user.created_at)}</dd>
-              </div>
-            </dl>
-            <p className="muted">Por ahora esta informacion es de solo lectura.</p>
+            ) : (
+              <EmptyState
+                title="Todavia no tenes recursos digitales disponibles"
+                text="Cuando compres un recurso digital y el pago este aprobado, va a aparecer aca."
+                href="/catalogo"
+                action="Ir al catalogo"
+              />
+            )}
           </section>
-        </section>
-      </div>
-    </main>
+
+          <div className="account-lower-grid">
+            <section className="account-panel" id="pedidos">
+              <div className="account-panel-head">
+                <div>
+                  <AccountIcon tone="blue">P</AccountIcon>
+                  <h2>Mis pedidos</h2>
+                </div>
+              </div>
+              {(digitalOrders || []).length ? (
+                <div className="account-history-list">
+                  {(digitalOrders || []).map((order) => (
+                    <article key={order.id}>
+                      <span>{order.status}</span>
+                      <strong>{order.catalog_products?.title || "Pedido"}</strong>
+                      <small>{formatPrice(order.amount)} · {formatDateTime(order.created_at)}</small>
+                    </article>
+                  ))}
+                </div>
+              ) : (
+                <EmptyState title="Todavia no tenes pedidos" text="Cuando solicites un producto o recurso, el seguimiento va a aparecer aca." href="/catalogo" action="Explorar catalogo" />
+              )}
+            </section>
+
+            <section className="account-panel" id="certificados">
+              <div className="account-panel-head">
+                <div>
+                  <AccountIcon tone="purple">D</AccountIcon>
+                  <h2>Certificados</h2>
+                </div>
+              </div>
+              <EmptyState
+                title="Certificados en preparacion"
+                text="Cuando un curso tenga certificado habilitado y lo completes, vas a poder verlo desde aca."
+              />
+            </section>
+          </div>
+
+          <section className="account-panel" id="configuracion">
+            <div className="account-panel-head">
+              <div>
+                <AccountIcon tone="green">S</AccountIcon>
+                <h2>Configuracion</h2>
+              </div>
+            </div>
+            <div className="account-profile-grid">
+              <div>
+                <span>Email</span>
+                <strong>{userData.user.email}</strong>
+              </div>
+              <div>
+                <span>Nombre</span>
+                <strong>{profile?.full_name || "Sin nombre cargado"}</strong>
+              </div>
+              <div>
+                <span>Rol</span>
+                <strong>{profile?.role || "student"}</strong>
+              </div>
+              <div>
+                <span>Fecha de creacion</span>
+                <strong>{formatDateTime(profile?.created_at || userData.user.created_at)}</strong>
+              </div>
+            </div>
+            <p className="account-muted">Por ahora esta informacion es de solo lectura.</p>
+          </section>
+        </div>
+    </AccountDashboardShell>
   );
 }
