@@ -121,6 +121,49 @@ export default async function MiCuentaPage() {
   const nextBooking = upcomingBookings[0];
   const approvedDigitalOrders = (digitalOrders || []).filter((order) => order.status === "paid" || order.status === "delivered");
   const displayName = profile?.full_name || userData.user.email;
+  const courseIds = (enrollments || []).map((enrollment) => enrollment.courses?.id).filter(Boolean);
+  const [{ data: enrolledLessons }, { data: courseProgress }] = courseIds.length
+    ? await Promise.all([
+        supabase
+          .from("lessons")
+          .select("id,course_id,title,status")
+          .in("course_id", courseIds)
+          .eq("status", "published"),
+        supabase
+          .from("lesson_progress")
+          .select("course_id,lesson_id,completed_at,last_viewed_at,lessons:lesson_id (title)")
+          .eq("user_id", userData.user.id)
+          .in("course_id", courseIds),
+      ])
+    : [{ data: [] }, { data: [] }];
+  const lessonsByCourse = new Map();
+  const progressByCourse = new Map();
+
+  (enrolledLessons || []).forEach((lesson) => {
+    lessonsByCourse.set(lesson.course_id, [...(lessonsByCourse.get(lesson.course_id) || []), lesson]);
+  });
+
+  (courseProgress || []).forEach((item) => {
+    progressByCourse.set(item.course_id, [...(progressByCourse.get(item.course_id) || []), item]);
+  });
+
+  function getCourseProgress(courseId) {
+    const lessons = lessonsByCourse.get(courseId) || [];
+    const progress = progressByCourse.get(courseId) || [];
+    const completed = new Set(progress.filter((item) => item.completed_at).map((item) => item.lesson_id));
+    const lastViewed = [...progress]
+      .filter((item) => item.last_viewed_at)
+      .sort((a, b) => String(b.last_viewed_at).localeCompare(String(a.last_viewed_at)))[0];
+    const total = lessons.length;
+
+    return {
+      total,
+      completed: completed.size,
+      percent: total ? Math.round((completed.size / total) * 100) : 0,
+      lastLessonId: lastViewed?.lesson_id || lessons[0]?.id || "",
+      lastLessonTitle: lastViewed?.lessons?.title || lessons[0]?.title || "Primera clase",
+    };
+  }
 
   return (
     <main className="section">
@@ -246,18 +289,37 @@ export default async function MiCuentaPage() {
           {enrollments?.length ? (
             <div className="grid">
               {enrollments.map((enrollment) => (
-                <article className="card" key={enrollment.id}>
-                  <p className="eyebrow">Acceso habilitado</p>
-                  <h3>{enrollment.courses?.title}</h3>
-                  <p>{enrollment.courses?.summary}</p>
-                  <p className="muted">Inscripto el {formatDateTime(enrollment.created_at)}</p>
-                  <div className="actions">
-                    <a className="button" href="/aula">Continuar curso</a>
-                    {enrollment.courses?.slug ? (
-                      <a className="secondary-button" href={`/cursos/${enrollment.courses.slug}`}>Ver detalle</a>
-                    ) : null}
-                  </div>
-                </article>
+                (() => {
+                  const courseProgress = getCourseProgress(enrollment.courses?.id);
+                  const continueUrl = enrollment.courses?.slug
+                    ? `/aula?curso=${enrollment.courses.slug}${courseProgress.lastLessonId ? `&lesson=${courseProgress.lastLessonId}` : ""}`
+                    : "/aula";
+
+                  return (
+                    <article className="card account-course-card" key={enrollment.id}>
+                      <p className="eyebrow">Acceso habilitado</p>
+                      <h3>{enrollment.courses?.title}</h3>
+                      <p>{enrollment.courses?.summary}</p>
+                      <div className="progress-panel compact">
+                        <div>
+                          <strong>{courseProgress.percent}%</strong>
+                          <span>{courseProgress.completed} de {courseProgress.total} clases completadas</span>
+                        </div>
+                        <div className="progress-bar">
+                          <span style={{ width: `${courseProgress.percent}%` }} />
+                        </div>
+                      </div>
+                      <p className="muted">Ultima clase: {courseProgress.lastLessonTitle}</p>
+                      <p className="muted">Inscripto el {formatDateTime(enrollment.created_at)}</p>
+                      <div className="actions">
+                        <a className="button" href={continueUrl}>Continuar</a>
+                        {enrollment.courses?.slug ? (
+                          <a className="secondary-button" href={`/cursos/${enrollment.courses.slug}`}>Ver detalle</a>
+                        ) : null}
+                      </div>
+                    </article>
+                  );
+                })()
               ))}
             </div>
           ) : (

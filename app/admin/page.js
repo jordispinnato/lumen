@@ -33,6 +33,7 @@ export default async function AdminPage({ searchParams }) {
 
   const [
     { data: courses },
+    { data: courseModules },
     { data: profiles },
     { data: enrollments },
     { data: lessons },
@@ -43,7 +44,15 @@ export default async function AdminPage({ searchParams }) {
     { data: catalogProducts },
     { data: catalogOrders },
   ] = await Promise.all([
-    supabase.from("courses").select("id,slug,title,summary,price,status").order("created_at", { ascending: false }),
+    supabase
+      .from("courses")
+      .select("id,slug,title,summary,description,cover_image_url,intro_video_url,instructor,level,total_duration,category,price,status,featured,display_order,learning_outcomes,audience,requirements,faq,created_at")
+      .order("display_order", { ascending: true })
+      .order("created_at", { ascending: false }),
+    supabase
+      .from("course_modules")
+      .select("id,title,description,position,status,courses:course_id (id,title,slug)")
+      .order("position", { ascending: true }),
     supabase.from("profiles").select("id,full_name,email,role").order("created_at", { ascending: false }),
     supabase
       .from("enrollments")
@@ -51,11 +60,11 @@ export default async function AdminPage({ searchParams }) {
       .order("created_at", { ascending: false }),
     supabase
       .from("lessons")
-      .select("id,title,video_url,position,courses:course_id (id,title,slug)")
+      .select("id,title,description,video_url,duration_minutes,position,status,is_preview,objectives,courses:course_id (id,title,slug),course_modules:module_id (id,title)")
       .order("position", { ascending: true }),
     supabase
       .from("course_materials")
-      .select("id,title,file_name,file_type,file_size,position,courses:course_id (id,title,slug)")
+      .select("id,title,file_name,file_type,file_size,material_type,external_url,status,position,courses:course_id (id,title,slug),lessons:lesson_id (id,title)")
       .order("position", { ascending: true }),
     supabase
       .from("appointment_specialists")
@@ -268,6 +277,7 @@ export default async function AdminPage({ searchParams }) {
                 <th>Fecha</th>
                 <th>Horario</th>
                 <th>Estado</th>
+                <th>Acciones</th>
               </tr>
             </thead>
             <tbody>
@@ -410,16 +420,20 @@ export default async function AdminPage({ searchParams }) {
         <section className="admin-section" id="cursos">
           <div className="admin-section-head">
             <p className="eyebrow">Cursos</p>
-            <h2>Cursos, lecciones y materiales</h2>
+            <h2>Constructor academico</h2>
           </div>
 
         <div className="admin-layout spaced-panel">
           <section className="panel">
             <h2>Crear o actualizar curso</h2>
-            <form className="admin-form" action="/admin/courses/create" method="post">
+            <form className="admin-form" action="/admin/courses/create" method="post" encType="multipart/form-data">
               <label>
                 Título
                 <input name="title" required placeholder="Ej: Crianza y comunicación" />
+              </label>
+              <label>
+                Slug
+                <input name="slug" placeholder="ej: crianza-y-comunicacion" />
               </label>
               <label>
                 Precio en ARS
@@ -433,17 +447,80 @@ export default async function AdminPage({ searchParams }) {
                   <option value="archived">Archivado</option>
                 </select>
               </label>
+              <label>
+                Instructor
+                <input name="instructor" placeholder="Ej: Equipo LUMEN" />
+              </label>
+              <label>
+                Nivel
+                <input name="level" placeholder="Ej: Inicial" />
+              </label>
+              <label>
+                Duracion total
+                <input name="totalDuration" placeholder="Ej: 5 horas" />
+              </label>
+              <label>
+                Categoria
+                <input name="category" placeholder="Ej: Psicologia y bienestar" />
+              </label>
+              <label>
+                Orden
+                <input name="displayOrder" type="number" min="0" step="1" defaultValue="100" />
+              </label>
+              <label>
+                Portada
+                <input name="coverImage" type="file" accept="image/png,image/jpeg,image/webp" />
+              </label>
+              <label className="wide-field">
+                Video de presentacion opcional
+                <input name="introVideoUrl" type="url" placeholder="https://..." />
+              </label>
               <label className="wide-field">
                 Resumen
                 <textarea name="summary" rows="4" required placeholder="Descripción breve del curso" />
+              </label>
+              <label className="wide-field">
+                Descripcion completa
+                <textarea name="description" rows="5" placeholder="Descripcion larga para la landing del curso" />
+              </label>
+              <label className="wide-field">
+                Que aprendera
+                <textarea name="learningOutcomes" rows="4" placeholder="Un punto por linea" />
+              </label>
+              <label className="wide-field">
+                A quien esta dirigido
+                <textarea name="audience" rows="4" placeholder="Un punto por linea" />
+              </label>
+              <label className="wide-field">
+                Requisitos
+                <textarea name="requirements" rows="3" placeholder="Un punto por linea" />
+              </label>
+              <label className="wide-field">
+                Preguntas frecuentes
+                <textarea name="faq" rows="3" placeholder="Estructura preparada para mas adelante" />
+              </label>
+              <label className="check-field wide-field">
+                <input name="featured" type="checkbox" />
+                Curso destacado
               </label>
               <button className="button" type="submit">Guardar curso</button>
             </form>
           </section>
 
           <section className="panel">
-            <h2>Agregar lección o video</h2>
-            <form className="admin-form" action="/admin/lessons/create" method="post">
+            <h2>Crear o actualizar modulo</h2>
+            <form className="admin-form" action="/admin/modules/create" method="post">
+              <label className="wide-field">
+                Modulo existente opcional
+                <select name="moduleId">
+                  <option value="">Crear modulo nuevo</option>
+                  {courseModules?.map((moduleItem) => (
+                    <option value={moduleItem.id} key={moduleItem.id}>
+                      {moduleItem.courses?.title} - {moduleItem.title}
+                    </option>
+                  ))}
+                </select>
+              </label>
               <label>
                 Curso
                 <select name="courseId" required>
@@ -457,15 +534,100 @@ export default async function AdminPage({ searchParams }) {
               </label>
               <label>
                 Orden
+                <input name="position" type="number" min="0" step="1" required placeholder="1" />
+              </label>
+              <label>
+                Estado
+                <select name="status" defaultValue="published">
+                  <option value="published">Publicado</option>
+                  <option value="hidden">Oculto</option>
+                </select>
+              </label>
+              <label className="wide-field">
+                Titulo del modulo
+                <input name="title" required placeholder="Ej: Modulo 1 - Fundamentos" />
+              </label>
+              <label className="wide-field">
+                Descripcion
+                <textarea name="description" rows="3" placeholder="Breve descripcion del modulo" />
+              </label>
+              <button className="button" type="submit">Guardar modulo</button>
+            </form>
+          </section>
+        </div>
+
+        <div className="admin-layout spaced-panel">
+          <section className="panel">
+            <h2>Agregar lección o video</h2>
+            <form className="admin-form" action="/admin/lessons/create" method="post">
+              <label className="wide-field">
+                Leccion existente opcional
+                <select name="lessonId">
+                  <option value="">Crear leccion nueva</option>
+                  {lessons?.map((lesson) => (
+                    <option value={lesson.id} key={lesson.id}>
+                      {lesson.courses?.title} - {lesson.title}
+                    </option>
+                  ))}
+                </select>
+              </label>
+              <label>
+                Curso
+                <select name="courseId" required>
+                  <option value="">Seleccionar curso</option>
+                  {courses?.map((course) => (
+                    <option value={course.id} key={course.id}>
+                      {course.title}
+                    </option>
+                  ))}
+                </select>
+              </label>
+              <label>
+                Modulo
+                <select name="moduleId">
+                  <option value="">Sin modulo</option>
+                  {courseModules?.map((moduleItem) => (
+                    <option value={moduleItem.id} key={moduleItem.id}>
+                      {moduleItem.courses?.title} - {moduleItem.title}
+                    </option>
+                  ))}
+                </select>
+              </label>
+              <label>
+                Orden
                 <input name="position" type="number" min="1" step="1" required placeholder="1" />
+              </label>
+              <label>
+                Duracion en minutos
+                <input name="durationMinutes" type="number" min="0" step="1" placeholder="20" />
+              </label>
+              <label>
+                Estado
+                <select name="status" defaultValue="published">
+                  <option value="published">Publicado</option>
+                  <option value="draft">Borrador</option>
+                  <option value="hidden">Oculto</option>
+                </select>
               </label>
               <label className="wide-field">
                 Título de la lección
                 <input name="title" required placeholder="Ej: Módulo 1 · Introducción" />
               </label>
               <label className="wide-field">
+                Descripcion
+                <textarea name="description" rows="3" placeholder="Resumen de la clase" />
+              </label>
+              <label className="wide-field">
                 URL del video
                 <input name="videoUrl" type="url" placeholder="https://vimeo.com/..." />
+              </label>
+              <label className="wide-field">
+                Objetivos
+                <textarea name="objectives" rows="3" placeholder="Un objetivo por linea" />
+              </label>
+              <label className="check-field wide-field">
+                <input name="isPreview" type="checkbox" />
+                Clase con vista previa
               </label>
               <button className="button" type="submit">Guardar lección</button>
             </form>
@@ -474,7 +636,7 @@ export default async function AdminPage({ searchParams }) {
 
         <div className="admin-layout spaced-panel">
           <section className="panel">
-            <h2>Subir material descargable</h2>
+            <h2>Subir material o link</h2>
             <form className="admin-form" action="/admin/materials/create" method="post" encType="multipart/form-data">
               <label>
                 Curso
@@ -488,20 +650,50 @@ export default async function AdminPage({ searchParams }) {
                 </select>
               </label>
               <label>
+                Leccion
+                <select name="lessonId">
+                  <option value="">Material general del curso</option>
+                  {lessons?.map((lesson) => (
+                    <option value={lesson.id} key={lesson.id}>
+                      {lesson.courses?.title} - {lesson.title}
+                    </option>
+                  ))}
+                </select>
+              </label>
+              <label>
                 Orden
                 <input name="position" type="number" min="1" step="1" required placeholder="1" />
+              </label>
+              <label>
+                Tipo
+                <select name="materialType" defaultValue="file">
+                  <option value="file">Archivo</option>
+                  <option value="pdf">PDF</option>
+                  <option value="audio">Audio</option>
+                  <option value="link">Link externo</option>
+                </select>
+              </label>
+              <label>
+                Estado
+                <select name="status" defaultValue="published">
+                  <option value="published">Publicado</option>
+                  <option value="hidden">Oculto</option>
+                </select>
               </label>
               <label className="wide-field">
                 Título del material
                 <input name="title" required placeholder="Ej: Guía de trabajo en PDF" />
               </label>
               <label className="wide-field">
-                Archivo
+                Link externo opcional
+                <input name="externalUrl" type="url" placeholder="https://..." />
+              </label>
+              <label className="wide-field">
+                Archivo opcional
                 <input
                   name="file"
                   type="file"
-                  required
-                  accept=".pdf,.doc,.docx,.xls,.xlsx,.ppt,.pptx,.png,.jpg,.jpeg,.txt"
+                  accept=".pdf,.doc,.docx,.xls,.xlsx,.ppt,.pptx,.png,.jpg,.jpeg,.txt,.mp3,.wav,.zip"
                 />
               </label>
               <button className="button" type="submit">Subir material</button>
@@ -547,13 +739,28 @@ export default async function AdminPage({ searchParams }) {
 
         <div className="admin-layout spaced-panel">
           <section className="panel">
+            <h2>Modulos cargados</h2>
+            <div className="compact-list">
+              {courseModules?.length ? courseModules.map((moduleItem) => (
+                <article key={moduleItem.id}>
+                  <strong>{moduleItem.position}. {moduleItem.title}</strong>
+                  <span>{moduleItem.courses?.title}</span>
+                  <small>{moduleItem.status} - {moduleItem.description || "Sin descripcion"}</small>
+                </article>
+              )) : (
+                <p className="muted">Todavia no hay modulos cargados.</p>
+              )}
+            </div>
+          </section>
+
+          <section className="panel">
             <h2>Materiales cargados</h2>
             <div className="compact-list">
               {materials?.length ? materials.map((material) => (
                 <article key={material.id}>
                   <strong>{material.position}. {material.title}</strong>
-                  <span>{material.courses?.title}</span>
-                  <small>{material.file_name}</small>
+                  <span>{material.courses?.title}{material.lessons?.title ? ` - ${material.lessons.title}` : ""}</span>
+                  <small>{material.status} - {material.material_type} - {material.file_name || material.external_url || "Sin archivo"}</small>
                 </article>
               )) : (
                 <p className="muted">Todavía no hay materiales cargados.</p>
@@ -567,8 +774,8 @@ export default async function AdminPage({ searchParams }) {
               {lessons?.length ? lessons.map((lesson) => (
                 <article key={lesson.id}>
                   <strong>{lesson.position}. {lesson.title}</strong>
-                  <span>{lesson.courses?.title}</span>
-                  <small>{lesson.video_url || "Sin video"}</small>
+                  <span>{lesson.courses?.title}{lesson.course_modules?.title ? ` - ${lesson.course_modules.title}` : ""}</span>
+                  <small>{lesson.status} - {lesson.duration_minutes || 0} min - {lesson.video_url || "Sin video"}</small>
                 </article>
               )) : (
                 <p className="muted">Todavía no hay lecciones cargadas.</p>
@@ -594,6 +801,17 @@ export default async function AdminPage({ searchParams }) {
                   <td>{course.title}</td>
                   <td>{formatPrice(course.price)}</td>
                   <td>{course.status}</td>
+                  <td>
+                    <form className="inline-actions" action="/admin/courses/action" method="post">
+                      <input name="courseId" type="hidden" value={course.id} />
+                      <button name="action" value={course.status === "published" ? "unpublish" : "publish"} type="submit">
+                        {course.status === "published" ? "Despublicar" : "Publicar"}
+                      </button>
+                      <button name="action" value="duplicate" type="submit">Duplicar</button>
+                      <button name="action" value="archive" type="submit">Archivar</button>
+                      <button name="action" value="delete" type="submit">Eliminar</button>
+                    </form>
+                  </td>
                 </tr>
               ))}
             </tbody>

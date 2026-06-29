@@ -15,8 +15,12 @@ export async function POST(request) {
   const origin = new URL(request.url).origin;
   const formData = await request.formData();
   const courseId = String(formData.get("courseId") || "").trim();
+  const lessonId = String(formData.get("lessonId") || "").trim();
   const title = String(formData.get("title") || "").trim();
   const position = Number(formData.get("position") || 0);
+  const materialType = String(formData.get("materialType") || "file");
+  const externalUrl = String(formData.get("externalUrl") || "").trim();
+  const status = String(formData.get("status") || "published");
   const file = formData.get("file");
   const supabase = await createSupabaseServerClient();
 
@@ -35,8 +39,16 @@ export async function POST(request) {
     return NextResponse.redirect(`${origin}/admin?error=No autorizado`, { status: 303 });
   }
 
-  if (!file || typeof file === "string" || file.size === 0) {
-    return NextResponse.redirect(`${origin}/admin?error=${encodeURIComponent("Seleccioná un archivo")}`, {
+  const hasFile = file && typeof file !== "string" && file.size > 0;
+
+  if (!courseId || !title) {
+    return NextResponse.redirect(`${origin}/admin?error=${encodeURIComponent("Completa curso y titulo del material")}`, {
+      status: 303,
+    });
+  }
+
+  if (!hasFile && !externalUrl) {
+    return NextResponse.redirect(`${origin}/admin?error=${encodeURIComponent("Selecciona un archivo o carga un link")}`, {
       status: 303,
     });
   }
@@ -52,42 +64,56 @@ export async function POST(request) {
     "image/png",
     "image/jpeg",
     "text/plain",
+    "audio/mpeg",
+    "audio/mp3",
+    "audio/wav",
+    "application/zip",
   ]);
 
-  if (file.type && !allowedTypes.has(file.type)) {
+  if (hasFile && file.type && !allowedTypes.has(file.type)) {
     return NextResponse.redirect(`${origin}/admin?error=${encodeURIComponent("Formato no permitido")}`, {
       status: 303,
     });
   }
 
-  const fileName = safeFileName(file.name);
-  const filePath = `${courseId}/${Date.now()}-${fileName}`;
+  let filePath = null;
 
-  const { error: uploadError } = await supabase.storage
-    .from("course-materials")
-    .upload(filePath, file, {
-      contentType: file.type || "application/octet-stream",
-      upsert: false,
-    });
+  if (hasFile) {
+    const fileName = safeFileName(file.name);
+    filePath = `${courseId}/${Date.now()}-${fileName}`;
 
-  if (uploadError) {
-    return NextResponse.redirect(`${origin}/admin?error=${encodeURIComponent(uploadError.message)}`, {
-      status: 303,
-    });
+    const { error: uploadError } = await supabase.storage
+      .from("course-materials")
+      .upload(filePath, file, {
+        contentType: file.type || "application/octet-stream",
+        upsert: false,
+      });
+
+    if (uploadError) {
+      return NextResponse.redirect(`${origin}/admin?error=${encodeURIComponent(uploadError.message)}`, {
+        status: 303,
+      });
+    }
   }
 
   const { error } = await supabase.from("course_materials").insert({
     course_id: courseId,
+    lesson_id: lessonId || null,
     title,
     file_path: filePath,
-    file_name: file.name,
-    file_type: file.type || null,
-    file_size: file.size,
-    position,
+    file_name: hasFile ? file.name : null,
+    file_type: hasFile ? file.type || null : null,
+    file_size: hasFile ? file.size : null,
+    material_type: materialType,
+    external_url: externalUrl || null,
+    status,
+    position: Number.isFinite(position) ? Math.max(0, Math.round(position)) : 0,
   });
 
   if (error) {
-    await supabase.storage.from("course-materials").remove([filePath]);
+    if (filePath) {
+      await supabase.storage.from("course-materials").remove([filePath]);
+    }
 
     return NextResponse.redirect(`${origin}/admin?error=${encodeURIComponent(error.message)}`, {
       status: 303,
