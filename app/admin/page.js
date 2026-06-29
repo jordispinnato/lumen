@@ -1,6 +1,7 @@
 import { redirect } from "next/navigation";
 import { createSupabaseServerClient } from "../../lib/supabase/server";
 import { formatPrice } from "../../lib/courses";
+import AdminCmsShell from "./AdminCmsShell";
 
 function formatDate(value) {
   if (!value) {
@@ -178,8 +179,8 @@ export default async function AdminPage({ searchParams }) {
   ].filter(Boolean);
 
   return (
-    <main className="section">
-      <div className="dashboard-shell">
+    <AdminCmsShell adminName={profile?.full_name || profile?.email || userData.user.email} adminEmail={profile?.email || userData.user.email}>
+      <div className="dashboard-shell admin-cms-inner">
         <div className="section-head">
           <p className="eyebrow">Panel admin</p>
           <h1>Gestión LUMEN</h1>
@@ -294,15 +295,6 @@ export default async function AdminPage({ searchParams }) {
           </div>
         </section>
 
-        <nav className="admin-tabs" aria-label="Secciones admin">
-          <a href="#dashboard">Dashboard</a>
-          <a href="#turnos">Turnos</a>
-          <a href="#catalogo">Catalogo</a>
-          <a href="#cursos">Cursos</a>
-          <a href="#contenido">Contenido</a>
-          <a href="#inscripciones">Inscripciones</a>
-        </nav>
-
         <section className="admin-section" id="turnos">
           <div className="admin-section-head">
             <p className="eyebrow">Turnos</p>
@@ -310,6 +302,7 @@ export default async function AdminPage({ searchParams }) {
           </div>
 
         <div className="admin-layout">
+          <span className="admin-anchor-target" id="profesionales" />
           <section className="panel">
             <h2>Crear o actualizar profesional</h2>
             <form className="admin-form" action="/admin/specialists/create" method="post" encType="multipart/form-data">
@@ -418,6 +411,8 @@ export default async function AdminPage({ searchParams }) {
         </div>
 
         <div className="admin-layout spaced-panel">
+          <span className="admin-anchor-target" id="productos" />
+          <span className="admin-anchor-target" id="categorias" />
           <section className="panel">
             <h2>Especialistas cargados</h2>
             <div className="professional-admin-list">
@@ -459,7 +454,7 @@ export default async function AdminPage({ searchParams }) {
           </section>
         </div>
 
-        <section className="panel spaced-panel">
+        <section className="panel spaced-panel" id="solicitudes">
           <h2>Reservas confirmadas</h2>
           <table className="table">
             <thead>
@@ -699,6 +694,7 @@ export default async function AdminPage({ searchParams }) {
           </section>
 
           <section className="panel">
+            <span className="admin-anchor-target" id="modulos" />
             <h2>Crear o actualizar modulo</h2>
             <form className="admin-form" action="/admin/modules/create" method="post">
               <label className="wide-field">
@@ -749,6 +745,7 @@ export default async function AdminPage({ searchParams }) {
 
         <div className="admin-layout spaced-panel">
           <section className="panel">
+            <span className="admin-anchor-target" id="lecciones" />
             <h2>Agregar lección o video</h2>
             <form className="admin-form" action="/admin/lessons/create" method="post">
               <label className="wide-field">
@@ -827,6 +824,7 @@ export default async function AdminPage({ searchParams }) {
 
         <div className="admin-layout spaced-panel">
           <section className="panel">
+            <span className="admin-anchor-target" id="materiales" />
             <h2>Subir material o link</h2>
             <form className="admin-form" action="/admin/materials/create" method="post" encType="multipart/form-data">
               <label>
@@ -892,6 +890,7 @@ export default async function AdminPage({ searchParams }) {
           </section>
 
           <section className="panel">
+            <span className="admin-anchor-target" id="usuarios" />
             <h2>Habilitar curso a un alumno</h2>
             <form className="admin-form" action="/admin/enrollments/create" method="post">
               <label>
@@ -930,6 +929,7 @@ export default async function AdminPage({ searchParams }) {
 
         <div className="admin-layout spaced-panel">
           <section className="panel">
+            <span className="admin-anchor-target" id="biblioteca" />
             <h2>Modulos cargados</h2>
             <div className="compact-list">
               {courseModules?.length ? courseModules.map((moduleItem) => (
@@ -984,6 +984,7 @@ export default async function AdminPage({ searchParams }) {
                 <th>Título</th>
                 <th>Precio</th>
                 <th>Estado</th>
+                <th>Acciones</th>
               </tr>
             </thead>
             <tbody>
@@ -1030,7 +1031,15 @@ export default async function AdminPage({ searchParams }) {
             </tbody>
           </table>
         </section>
+
+        <section className="panel spaced-panel" id="configuracion">
+          <p className="eyebrow">Configuracion</p>
+          <h2>Configuracion del CMS</h2>
+          <p className="muted">
+            Esta area queda preparada para futuras opciones administrativas, como pagos, emails, reportes y configuracion avanzada.
+          </p>
+        </section>
       </div>
-    </main>
+    </AdminCmsShell>
   );
 }
