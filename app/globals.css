@@ -1045,6 +1045,329 @@ body:has(.admin-cms-shell) {
   margin-top: 18px;
 }
 
+.cms-entity-table {
+  display: grid;
+  gap: 16px;
+  min-width: 0;
+}
+
+.cms-entity-head {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 18px;
+}
+
+.cms-entity-head h2 {
+  margin-bottom: 6px;
+}
+
+.cms-entity-controls {
+  display: grid;
+  grid-template-columns: minmax(220px, 0.9fr) minmax(260px, 1.1fr);
+  gap: 12px;
+  align-items: end;
+}
+
+.cms-search-bar,
+.cms-filter-bar label {
+  display: grid;
+  gap: 7px;
+  color: var(--deep);
+  font-size: 0.82rem;
+  font-weight: 800;
+}
+
+.cms-search-bar span,
+.cms-filter-bar span {
+  text-transform: uppercase;
+  color: var(--muted);
+  font-size: 0.72rem;
+  letter-spacing: 0;
+}
+
+.cms-search-bar input,
+.cms-filter-bar select {
+  width: 100%;
+  min-height: 42px;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  padding: 0 12px;
+  background: white;
+  color: var(--deep);
+}
+
+.cms-filter-bar {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+
+.cms-filter-bar label {
+  min-width: 160px;
+  flex: 1;
+}
+
+.cms-table-wrap {
+  width: 100%;
+  overflow-x: auto;
+}
+
+.cms-table {
+  min-width: 760px;
+}
+
+.cms-table th:first-child,
+.cms-table td:first-child {
+  width: 42px;
+}
+
+.cms-table th button {
+  border: 0;
+  padding: 0;
+  background: transparent;
+  color: inherit;
+  font-weight: 900;
+  text-align: left;
+}
+
+.cms-table td {
+  vertical-align: middle;
+}
+
+.cms-status-badge {
+  display: inline-flex;
+  align-items: center;
+  min-height: 28px;
+  width: fit-content;
+  border: 1px solid var(--line);
+  border-radius: 999px;
+  padding: 4px 10px;
+  background: rgba(20, 53, 56, 0.05);
+  color: var(--deep);
+  font-size: 0.78rem;
+  font-weight: 900;
+}
+
+.cms-status-badge.is-published,
+.cms-status-badge.is-active,
+.cms-status-badge.is-available,
+.cms-status-badge.is-confirmed,
+.cms-status-badge.is-completed {
+  border-color: rgba(11, 74, 83, 0.22);
+  background: rgba(104, 199, 189, 0.18);
+  color: var(--petrol);
+}
+
+.cms-status-badge.is-draft,
+.cms-status-badge.is-pending,
+.cms-status-badge.is-blocked {
+  border-color: rgba(148, 170, 130, 0.32);
+  background: rgba(148, 170, 130, 0.18);
+  color: #526640;
+}
+
+.cms-status-badge.is-archived,
+.cms-status-badge.is-inactive,
+.cms-status-badge.is-cancelled {
+  border-color: rgba(102, 113, 110, 0.24);
+  background: rgba(102, 113, 110, 0.1);
+  color: var(--muted);
+}
+
+.cms-action-toolbar,
+.cms-bulk-actions,
+.cms-pagination {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.cms-action-toolbar {
+  justify-content: flex-end;
+  color: var(--muted);
+  font-size: 0.86rem;
+  font-weight: 800;
+}
+
+.cms-bulk-actions button,
+.cms-pagination button {
+  min-height: 34px;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  padding: 0 11px;
+  background: white;
+  color: var(--deep);
+  font-size: 0.82rem;
+  font-weight: 900;
+}
+
+.cms-pagination {
+  justify-content: flex-end;
+}
+
+.cms-pagination span {
+  color: var(--muted);
+  font-size: 0.9rem;
+  font-weight: 800;
+}
+
+.cms-state {
+  display: grid;
+  gap: 8px;
+  border: 1px dashed var(--line);
+  border-radius: 8px;
+  padding: 22px;
+  background: rgba(255, 255, 255, 0.52);
+}
+
+.cms-state h3 {
+  margin: 0;
+}
+
+.cms-state p {
+  margin: 0;
+  color: var(--muted);
+}
+
+.cms-error-state {
+  border-color: rgba(143, 43, 29, 0.22);
+  background: #fff0ee;
+  color: #8f2b1d;
+}
+
+.cms-confirm-backdrop {
+  position: fixed;
+  inset: 0;
+  z-index: 90;
+  display: grid;
+  place-items: center;
+  padding: 18px;
+  background: rgba(20, 53, 56, 0.24);
+}
+
+.cms-confirm-dialog {
+  display: grid;
+  gap: 14px;
+  width: min(460px, 100%);
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  padding: 22px;
+  background: var(--paper);
+  box-shadow: var(--shadow);
+}
+
+.cms-confirm-dialog h3,
+.cms-confirm-dialog p {
+  margin: 0;
+}
+
+.cms-confirm-dialog div {
+  display: flex;
+  gap: 10px;
+}
+
+.cms-toast-stack {
+  position: fixed;
+  right: 18px;
+  bottom: 18px;
+  z-index: 100;
+  display: grid;
+  gap: 8px;
+  width: min(360px, calc(100vw - 36px));
+}
+
+.cms-toast {
+  margin: 0;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  padding: 12px 14px;
+  background: var(--paper);
+  color: var(--deep);
+  box-shadow: var(--shadow);
+  font-weight: 800;
+}
+
+.cms-toast.is-success {
+  border-color: rgba(11, 74, 83, 0.22);
+  background: #eaf5f1;
+}
+
+.cms-toast.is-error {
+  border-color: rgba(143, 43, 29, 0.22);
+  background: #fff0ee;
+  color: #8f2b1d;
+}
+
+.cms-entity-form-card,
+.cms-entity-details {
+  display: grid;
+  gap: 16px;
+}
+
+.cms-entity-form-head h2,
+.cms-entity-details-head h2 {
+  margin-bottom: 6px;
+}
+
+.cms-form-section {
+  display: grid;
+  grid-column: 1 / -1;
+  gap: 12px;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  padding: 14px;
+}
+
+.cms-form-section legend {
+  padding: 0 6px;
+  color: var(--deep);
+  font-weight: 900;
+}
+
+.cms-form-section > div {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 12px;
+}
+
+.cms-entity-details-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.cms-entity-details dl {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 12px;
+  margin: 0;
+}
+
+.cms-entity-details dl div {
+  display: grid;
+  gap: 5px;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  padding: 12px;
+  background: rgba(255, 255, 255, 0.48);
+}
+
+.cms-entity-details dt {
+  color: var(--muted);
+  font-size: 0.76rem;
+  font-weight: 900;
+  text-transform: uppercase;
+}
+
+.cms-entity-details dd {
+  margin: 0;
+  color: var(--deep);
+  font-weight: 800;
+}
+
 .feature-card {
   min-height: 260px;
 }
@@ -2245,6 +2568,42 @@ body:has(.admin-cms-shell) {
     align-items: flex-start;
     flex-direction: column;
     padding: 14px;
+  }
+
+  .cms-entity-head,
+  .cms-action-toolbar,
+  .cms-confirm-dialog div,
+  .cms-entity-details-head {
+    align-items: stretch;
+    flex-direction: column;
+  }
+
+  .cms-entity-controls,
+  .cms-form-section > div,
+  .cms-entity-details dl {
+    grid-template-columns: 1fr;
+  }
+
+  .cms-filter-bar,
+  .cms-bulk-actions,
+  .cms-pagination {
+    align-items: stretch;
+    flex-direction: column;
+  }
+
+  .cms-bulk-actions button,
+  .cms-pagination button,
+  .cms-confirm-dialog .button,
+  .cms-confirm-dialog .secondary-button {
+    width: 100%;
+  }
+
+  .cms-pagination {
+    justify-content: stretch;
+  }
+
+  .cms-table {
+    min-width: 720px;
   }
 
   .hero {

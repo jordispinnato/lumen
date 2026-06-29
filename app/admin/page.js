@@ -2,6 +2,7 @@ import { redirect } from "next/navigation";
 import { createSupabaseServerClient } from "../../lib/supabase/server";
 import { formatPrice } from "../../lib/courses";
 import AdminCmsShell from "./AdminCmsShell";
+import EntityTable from "./cms/EntityTable";
 
 function formatDate(value) {
   if (!value) {
@@ -177,6 +178,84 @@ export default async function AdminPage({ searchParams }) {
     inactiveProfessionals.length ? `${inactiveProfessionals.length} profesionales inactivos.` : "",
     orphanBookings.length ? `${orphanBookings.length} reservas sin profesional asociado.` : "",
   ].filter(Boolean);
+  const bookingRows = bookings.map((booking) => ({
+    id: booking.id,
+    patient: booking.patient_name || booking.patient_email || "Paciente sin datos",
+    professional: booking.appointment_specialists?.name || "Sin profesional",
+    date: formatDate(booking.appointment_slots?.slot_date),
+    time: formatTime(booking.appointment_slots?.slot_time),
+    status: booking.status || "Sin estado",
+  }));
+  const bookingStatusOptions = [...new Set(bookingRows.map((row) => row.status))].map((value) => ({
+    value,
+    label: value,
+  }));
+  const catalogOrderRows = (catalogOrders || []).map((order) => ({
+    id: order.id,
+    customer: order.customer_name || order.customer_email || "Cliente sin datos",
+    product: order.catalog_products?.title || "Producto",
+    type: order.product_type === "digital" ? "Digital" : "Fisico",
+    amount: formatPrice(order.amount || 0),
+    shipping:
+      order.product_type === "physical"
+        ? `${order.shipping_street || ""} ${order.shipping_number || ""}, ${order.shipping_city || ""}, ${order.shipping_province || ""} (${order.shipping_postal_code || ""})`
+        : "Entrega digital",
+    status: order.status || "Sin estado",
+  }));
+  const catalogOrderStatusOptions = [...new Set(catalogOrderRows.map((row) => row.status))].map((value) => ({
+    value,
+    label: value,
+  }));
+  const courseRows = (courses || []).map((course) => ({
+    id: course.id,
+    title: course.title,
+    price: formatPrice(course.price || 0),
+    category: course.category || "Sin categoria",
+    status: course.status || "Sin estado",
+    actions: [
+      {
+        label: course.status === "published" ? "Despublicar" : "Publicar",
+        endpoint: "/admin/courses/action",
+        fields: {
+          courseId: course.id,
+          action: course.status === "published" ? "unpublish" : "publish",
+        },
+        confirmTitle: "Confirmar cambio de estado",
+        confirmText: `Vas a ${course.status === "published" ? "despublicar" : "publicar"} este curso.`,
+      },
+      {
+        label: "Duplicar",
+        endpoint: "/admin/courses/action",
+        fields: { courseId: course.id, action: "duplicate" },
+        confirmTitle: "Duplicar curso",
+        confirmText: "Se creara una copia en borrador.",
+      },
+      {
+        label: "Archivar",
+        endpoint: "/admin/courses/action",
+        fields: { courseId: course.id, action: "archive" },
+        confirmTitle: "Archivar curso",
+        confirmText: "El curso quedara archivado.",
+      },
+      {
+        label: "Eliminar",
+        endpoint: "/admin/courses/action",
+        fields: { courseId: course.id, action: "delete" },
+        confirmTitle: "Eliminar curso",
+        confirmText: "Esta accion eliminara el curso. Revisa antes de confirmar.",
+      },
+    ],
+  }));
+  const courseStatusOptions = [...new Set(courseRows.map((row) => row.status))].map((value) => ({
+    value,
+    label: value,
+  }));
+  const enrollmentRows = (enrollments || []).map((enrollment) => ({
+    id: enrollment.id,
+    student: enrollment.profiles?.email || enrollment.profiles?.full_name || enrollment.profiles?.id || "Alumno",
+    course: enrollment.courses?.title || "Curso",
+    date: formatDateTime(enrollment.created_at),
+  }));
 
   return (
     <AdminCmsShell adminName={profile?.full_name || profile?.email || userData.user.email} adminEmail={profile?.email || userData.user.email}>
@@ -411,8 +490,6 @@ export default async function AdminPage({ searchParams }) {
         </div>
 
         <div className="admin-layout spaced-panel">
-          <span className="admin-anchor-target" id="productos" />
-          <span className="admin-anchor-target" id="categorias" />
           <section className="panel">
             <h2>Especialistas cargados</h2>
             <div className="professional-admin-list">
@@ -454,34 +531,23 @@ export default async function AdminPage({ searchParams }) {
           </section>
         </div>
 
-        <section className="panel spaced-panel" id="solicitudes">
-          <h2>Reservas confirmadas</h2>
-          <table className="table">
-            <thead>
-              <tr>
-                <th>Paciente</th>
-                <th>Especialista</th>
-                <th>Fecha</th>
-                <th>Horario</th>
-                <th>Estado</th>
-              </tr>
-            </thead>
-            <tbody>
-              {appointmentBookings?.length ? appointmentBookings.map((booking) => (
-                <tr key={booking.id}>
-                  <td>{booking.patient_name || booking.patient_email}</td>
-                  <td>{booking.appointment_specialists?.name}</td>
-                  <td>{booking.appointment_slots?.slot_date ? new Date(`${booking.appointment_slots.slot_date}T00:00:00`).toLocaleDateString("es-AR") : ""}</td>
-                  <td>{booking.appointment_slots?.slot_time?.slice(0, 5)}</td>
-                  <td>{booking.status}</td>
-                </tr>
-              )) : (
-                <tr>
-                  <td colSpan="5">Todavia no hay reservas confirmadas.</td>
-                </tr>
-              )}
-            </tbody>
-          </table>
+        <section className="panel spaced-panel">
+          <EntityTable
+            title="Reservas confirmadas"
+            description="Listado administrable de reservas creadas."
+            columns={[
+              { key: "patient", header: "Paciente" },
+              { key: "professional", header: "Especialista" },
+              { key: "date", header: "Fecha" },
+              { key: "time", header: "Horario" },
+              { key: "status", header: "Estado", type: "status" },
+            ]}
+            rows={bookingRows}
+            filters={bookingStatusOptions.length ? [{ key: "status", label: "Estado", options: bookingStatusOptions }] : []}
+            emptyTitle="Todavia no hay reservas confirmadas."
+            emptyText="Cuando se registren turnos, van a aparecer aca."
+            searchPlaceholder="Buscar por paciente, profesional o estado"
+          />
         </section>
         </section>
 
@@ -491,6 +557,8 @@ export default async function AdminPage({ searchParams }) {
             <h2>Productos fisicos y digitales</h2>
           </div>
 
+          <span className="admin-anchor-target" id="productos" />
+          <span className="admin-anchor-target" id="categorias" />
         <div className="admin-layout spaced-panel">
           <section className="panel">
             <h2>Cargar producto de catalogo</h2>
@@ -566,40 +634,34 @@ export default async function AdminPage({ searchParams }) {
           </section>
         </div>
 
-        <section className="panel spaced-panel">
-          <h2>Solicitudes de compra</h2>
-          <table className="table">
-            <thead>
-              <tr>
-                <th>Cliente</th>
-                <th>Producto</th>
-                <th>Tipo</th>
-                <th>Total</th>
-                <th>Envio</th>
-                <th>Estado</th>
-              </tr>
-            </thead>
-            <tbody>
-              {catalogOrders?.length ? catalogOrders.map((order) => (
-                <tr key={order.id}>
-                  <td>{order.customer_name || order.customer_email}</td>
-                  <td>{order.catalog_products?.title}</td>
-                  <td>{order.product_type === "digital" ? "Digital" : "Fisico"}</td>
-                  <td>{formatPrice(order.amount)}</td>
-                  <td>
-                    {order.product_type === "physical"
-                      ? `${order.shipping_street || ""} ${order.shipping_number || ""}, ${order.shipping_city || ""}, ${order.shipping_province || ""} (${order.shipping_postal_code || ""})`
-                      : "Entrega digital"}
-                  </td>
-                  <td>{order.status}</td>
-                </tr>
-              )) : (
-                <tr>
-                  <td colSpan="6">Todavia no hay solicitudes de compra.</td>
-                </tr>
-              )}
-            </tbody>
-          </table>
+        <section className="panel spaced-panel" id="solicitudes">
+          <EntityTable
+            title="Solicitudes de compra"
+            description="Pedidos registrados desde el catalogo."
+            columns={[
+              { key: "customer", header: "Cliente" },
+              { key: "product", header: "Producto" },
+              { key: "type", header: "Tipo" },
+              { key: "amount", header: "Total" },
+              { key: "shipping", header: "Envio" },
+              { key: "status", header: "Estado", type: "status" },
+            ]}
+            rows={catalogOrderRows}
+            filters={[
+              {
+                key: "type",
+                label: "Tipo",
+                options: [
+                  { value: "Fisico", label: "Fisico" },
+                  { value: "Digital", label: "Digital" },
+                ],
+              },
+              ...(catalogOrderStatusOptions.length ? [{ key: "status", label: "Estado", options: catalogOrderStatusOptions }] : []),
+            ]}
+            emptyTitle="Todavia no hay solicitudes de compra."
+            emptyText="Cuando una persona solicite un producto, el pedido aparecera aca."
+            searchPlaceholder="Buscar por cliente, producto o estado"
+          />
         </section>
         </section>
 
@@ -976,60 +1038,38 @@ export default async function AdminPage({ searchParams }) {
         </div>
         </section>
 
-        <section className="panel spaced-panel" id="inscripciones">
-          <h2>Cursos</h2>
-          <table className="table">
-            <thead>
-              <tr>
-                <th>Título</th>
-                <th>Precio</th>
-                <th>Estado</th>
-                <th>Acciones</th>
-              </tr>
-            </thead>
-            <tbody>
-              {courses?.map((course) => (
-                <tr key={course.id}>
-                  <td>{course.title}</td>
-                  <td>{formatPrice(course.price)}</td>
-                  <td>{course.status}</td>
-                  <td>
-                    <form className="inline-actions" action="/admin/courses/action" method="post">
-                      <input name="courseId" type="hidden" value={course.id} />
-                      <button name="action" value={course.status === "published" ? "unpublish" : "publish"} type="submit">
-                        {course.status === "published" ? "Despublicar" : "Publicar"}
-                      </button>
-                      <button name="action" value="duplicate" type="submit">Duplicar</button>
-                      <button name="action" value="archive" type="submit">Archivar</button>
-                      <button name="action" value="delete" type="submit">Eliminar</button>
-                    </form>
-                  </td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
+        <section className="panel spaced-panel">
+          <EntityTable
+            title="Cursos"
+            description="Gestion comun de cursos con acciones preparadas."
+            columns={[
+              { key: "title", header: "Titulo" },
+              { key: "price", header: "Precio" },
+              { key: "category", header: "Categoria" },
+              { key: "status", header: "Estado", type: "status" },
+            ]}
+            rows={courseRows}
+            filters={courseStatusOptions.length ? [{ key: "status", label: "Estado", options: courseStatusOptions }] : []}
+            emptyTitle="Todavia no existen cursos."
+            emptyText="Crea un curso desde el constructor academico."
+            searchPlaceholder="Buscar cursos"
+          />
         </section>
 
-        <section className="panel spaced-panel">
-          <h2>Inscripciones</h2>
-          <table className="table">
-            <thead>
-              <tr>
-                <th>Alumno</th>
-                <th>Curso</th>
-                <th>Fecha</th>
-              </tr>
-            </thead>
-            <tbody>
-              {enrollments?.map((enrollment) => (
-                <tr key={enrollment.id}>
-                  <td>{enrollment.profiles?.email || enrollment.profiles?.full_name || enrollment.profiles?.id}</td>
-                  <td>{enrollment.courses?.title}</td>
-                  <td>{new Date(enrollment.created_at).toLocaleDateString("es-AR")}</td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
+        <section className="panel spaced-panel" id="inscripciones">
+          <EntityTable
+            title="Inscripciones"
+            description="Accesos habilitados a cursos."
+            columns={[
+              { key: "student", header: "Alumno" },
+              { key: "course", header: "Curso" },
+              { key: "date", header: "Fecha" },
+            ]}
+            rows={enrollmentRows}
+            emptyTitle="Todavia no hay inscripciones."
+            emptyText="Cuando habilites un curso a un alumno, se vera aca."
+            searchPlaceholder="Buscar alumno o curso"
+          />
         </section>
 
         <section className="panel spaced-panel" id="configuracion">
