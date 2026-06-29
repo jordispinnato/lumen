@@ -2,6 +2,65 @@ import { redirect } from "next/navigation";
 import { createSupabaseServerClient } from "../../lib/supabase/server";
 import { formatPrice } from "../../lib/courses";
 
+function formatDate(value) {
+  if (!value) {
+    return "Sin fecha";
+  }
+
+  return new Date(`${value}T00:00:00`).toLocaleDateString("es-AR", {
+    day: "numeric",
+    month: "short",
+    year: "numeric",
+  });
+}
+
+function formatDateTime(value) {
+  if (!value) {
+    return "Sin fecha";
+  }
+
+  return new Date(value).toLocaleDateString("es-AR", {
+    day: "numeric",
+    month: "short",
+    year: "numeric",
+  });
+}
+
+function formatTime(value) {
+  return value?.slice(0, 5) || "Sin hora";
+}
+
+function bookingSortValue(booking) {
+  return `${booking.appointment_slots?.slot_date || ""} ${booking.appointment_slots?.slot_time || ""}`;
+}
+
+function MetricCard({ label, value, helper, href }) {
+  const content = (
+    <>
+      <span>{label}</span>
+      <strong>{value}</strong>
+      {helper ? <small>{helper}</small> : null}
+    </>
+  );
+
+  return href ? (
+    <a className="admin-metric-card" href={href}>
+      {content}
+    </a>
+  ) : (
+    <article className="admin-metric-card">{content}</article>
+  );
+}
+
+function DashboardList({ title, children, emptyText }) {
+  return (
+    <section className="panel admin-dashboard-list">
+      <h2>{title}</h2>
+      {children || <p className="muted">{emptyText}</p>}
+    </section>
+  );
+}
+
 export default async function AdminPage({ searchParams }) {
   const params = await searchParams;
   const supabase = await createSupabaseServerClient();
@@ -53,7 +112,7 @@ export default async function AdminPage({ searchParams }) {
       .from("course_modules")
       .select("id,title,description,position,status,courses:course_id (id,title,slug)")
       .order("position", { ascending: true }),
-    supabase.from("profiles").select("id,full_name,email,role").order("created_at", { ascending: false }),
+    supabase.from("profiles").select("id,full_name,email,role,created_at").order("created_at", { ascending: false }),
     supabase
       .from("enrollments")
       .select("id,created_at,profiles:user_id (id,full_name,email),courses:course_id (id,title,slug)")
@@ -86,9 +145,37 @@ export default async function AdminPage({ searchParams }) {
       .order("created_at", { ascending: false }),
     supabase
       .from("catalog_orders")
-      .select("id,customer_email,customer_name,product_type,amount,status,shipping_province,shipping_city,shipping_postal_code,shipping_street,shipping_number,catalog_products:product_id (title)")
+      .select("id,customer_email,customer_name,product_type,amount,status,created_at,shipping_province,shipping_city,shipping_postal_code,shipping_street,shipping_number,catalog_products:product_id (title)")
       .order("created_at", { ascending: false }),
   ]);
+
+  const today = new Date().toISOString().slice(0, 10);
+  const bookings = appointmentBookings || [];
+  const todayBookings = bookings.filter((booking) => booking.appointment_slots?.slot_date === today);
+  const futureBookings = bookings
+    .filter((booking) => booking.appointment_slots?.slot_date >= today && booking.status !== "cancelled")
+    .sort((a, b) => bookingSortValue(a).localeCompare(bookingSortValue(b)));
+  const latestBookings = bookings.slice(0, 5);
+  const activeProfessionals = (specialists || []).filter((specialist) => specialist.status === "active");
+  const inactiveProfessionals = (specialists || []).filter((specialist) => specialist.status === "inactive");
+  const publishedCourses = (courses || []).filter((course) => course.status === "published");
+  const draftCourses = (courses || []).filter((course) => course.status === "draft");
+  const activeProducts = (catalogProducts || []).filter((product) => product.status === "published");
+  const productsWithoutStock = (catalogProducts || []).filter((product) => {
+    return product.product_type === "physical" && product.status === "published" && Number(product.stock || 0) <= 0;
+  });
+  const orphanBookings = bookings.filter((booking) => !booking.appointment_specialists?.name);
+  const recentCourses = [...(courses || [])]
+    .sort((a, b) => String(b.created_at || "").localeCompare(String(a.created_at || "")))
+    .slice(0, 5);
+  const recentProducts = (catalogProducts || []).slice(0, 5);
+  const recentProfiles = (profiles || []).slice(0, 5);
+  const alerts = [
+    productsWithoutStock.length ? `${productsWithoutStock.length} productos fisicos publicados sin stock.` : "",
+    draftCourses.length ? `${draftCourses.length} cursos en borrador.` : "",
+    inactiveProfessionals.length ? `${inactiveProfessionals.length} profesionales inactivos.` : "",
+    orphanBookings.length ? `${orphanBookings.length} reservas sin profesional asociado.` : "",
+  ].filter(Boolean);
 
   return (
     <main className="section">
@@ -97,13 +184,118 @@ export default async function AdminPage({ searchParams }) {
           <p className="eyebrow">Panel admin</p>
           <h1>Gestión LUMEN</h1>
           <p className="lead">
-            Administrá cursos e inscripciones manuales desde Supabase.
+            Bienvenido al panel de administracion de LUMEN. Gestiona turnos, profesionales, cursos, catalogo y contenidos desde un solo lugar.
           </p>
           {params?.error ? <p className="notice error">{params.error}</p> : null}
           {params?.message ? <p className="notice success">{params.message}</p> : null}
         </div>
 
+        <section className="admin-dashboard" id="dashboard">
+          <div className="admin-metrics-grid">
+            <MetricCard label="Turnos de hoy" value={todayBookings.length} helper="Reservas para la fecha actual" href="#turnos" />
+            <MetricCard label="Proximos turnos" value={futureBookings.length} helper="Reservas futuras confirmadas" href="#turnos" />
+            <MetricCard label="Profesionales activos" value={activeProfessionals.length} helper="Perfiles disponibles para reservar" href="#turnos" />
+            <MetricCard label="Cursos publicados" value={publishedCourses.length} helper="Cursos visibles en la web" href="#cursos" />
+            <MetricCard label="Inscripciones" value={enrollments?.length || 0} helper="Accesos habilitados a cursos" href="#inscripciones" />
+            <MetricCard label="Productos activos" value={activeProducts.length} helper="Productos publicados del catalogo" href="#catalogo" />
+            <MetricCard label="Solicitudes de compra" value={catalogOrders?.length || 0} helper="Pedidos registrados" href="#catalogo" />
+            <MetricCard label="Usuarios registrados" value={profiles?.length || 0} helper="Perfiles creados" href="#inscripciones" />
+          </div>
+
+          <nav className="admin-quick-actions" aria-label="Accesos rapidos del dashboard">
+            <a href="#turnos">Gestionar turnos</a>
+            <a href="#turnos">Gestionar profesionales</a>
+            <a href="#cursos">Gestionar cursos</a>
+            <a href="#catalogo">Gestionar catalogo</a>
+            <a href="#inscripciones">Ver inscripciones</a>
+            <a href="#contenido">Ver contenido/materiales</a>
+          </nav>
+
+          <div className="admin-dashboard-grid">
+            <DashboardList title="Proximos turnos" emptyText="No hay turnos proximos registrados.">
+              {futureBookings.slice(0, 5).length ? (
+                <div className="admin-dashboard-items">
+                  {futureBookings.slice(0, 5).map((booking) => (
+                    <article key={booking.id}>
+                      <strong>{formatDate(booking.appointment_slots?.slot_date)} - {formatTime(booking.appointment_slots?.slot_time)}</strong>
+                      <span>{booking.appointment_specialists?.name || "Sin profesional"}</span>
+                      <small>{booking.patient_name || booking.patient_email || "Paciente sin datos"} - {booking.status}</small>
+                    </article>
+                  ))}
+                </div>
+              ) : null}
+            </DashboardList>
+
+            <DashboardList title="Ultimas reservas" emptyText="Todavia no hay reservas creadas.">
+              {latestBookings.length ? (
+                <div className="admin-dashboard-items">
+                  {latestBookings.map((booking) => (
+                    <article key={booking.id}>
+                      <strong>{booking.patient_name || booking.patient_email || "Paciente sin datos"}</strong>
+                      <span>{booking.appointment_specialists?.name || "Sin profesional"}</span>
+                      <small>{formatDateTime(booking.created_at)} - {booking.status}</small>
+                    </article>
+                  ))}
+                </div>
+              ) : null}
+            </DashboardList>
+
+            <DashboardList title="Ultimos usuarios registrados" emptyText="Todavia no hay usuarios registrados.">
+              {recentProfiles.length ? (
+                <div className="admin-dashboard-items">
+                  {recentProfiles.map((item) => (
+                    <article key={item.id}>
+                      <strong>{item.email || item.full_name || item.id}</strong>
+                      <span>{item.role || "student"}</span>
+                      <small>{formatDateTime(item.created_at)}</small>
+                    </article>
+                  ))}
+                </div>
+              ) : null}
+            </DashboardList>
+
+            <DashboardList title="Cursos recientes" emptyText="Todavia no hay cursos cargados.">
+              {recentCourses.length ? (
+                <div className="admin-dashboard-items">
+                  {recentCourses.map((course) => (
+                    <article key={course.id}>
+                      <strong>{course.title}</strong>
+                      <span>{course.status} - {formatPrice(course.price)}</span>
+                      <small>{course.category || "Sin categoria"} - {formatDateTime(course.created_at)}</small>
+                    </article>
+                  ))}
+                </div>
+              ) : null}
+            </DashboardList>
+
+            <DashboardList title="Productos recientes" emptyText="Todavia no hay productos cargados.">
+              {recentProducts.length ? (
+                <div className="admin-dashboard-items">
+                  {recentProducts.map((product) => (
+                    <article key={product.id}>
+                      <strong>{product.title}</strong>
+                      <span>{product.product_type === "digital" ? "Digital" : "Fisico"} - {formatPrice(product.price)}</span>
+                      <small>{product.status} - {product.category || "Sin categoria"}</small>
+                    </article>
+                  ))}
+                </div>
+              ) : null}
+            </DashboardList>
+
+            <DashboardList title="Alertas simples" emptyText="No hay alertas importantes por ahora.">
+              {alerts.length ? (
+                <div className="admin-alert-list">
+                  {alerts.map((alert) => (
+                    <p key={alert}>{alert}</p>
+                  ))}
+                </div>
+              ) : null}
+            </DashboardList>
+          </div>
+        </section>
+
         <nav className="admin-tabs" aria-label="Secciones admin">
+          <a href="#dashboard">Dashboard</a>
           <a href="#turnos">Turnos</a>
           <a href="#catalogo">Catalogo</a>
           <a href="#cursos">Cursos</a>
@@ -277,7 +469,6 @@ export default async function AdminPage({ searchParams }) {
                 <th>Fecha</th>
                 <th>Horario</th>
                 <th>Estado</th>
-                <th>Acciones</th>
               </tr>
             </thead>
             <tbody>
