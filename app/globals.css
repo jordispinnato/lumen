@@ -912,11 +912,172 @@ h3 {
   resize: vertical;
 }
 
+.account-tabs {
+  position: sticky;
+  top: 74px;
+  z-index: 20;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin-bottom: 22px;
+  padding: 12px;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  background: rgba(255, 253, 248, 0.94);
+  backdrop-filter: blur(14px);
+}
+
+.account-tabs a {
+  min-height: 38px;
+  display: inline-flex;
+  align-items: center;
+  border-radius: 999px;
+  padding: 0 14px;
+  background: white;
+  color: var(--deep);
+  font-weight: 800;
+}
+
+.account-section {
+  scroll-margin-top: 150px;
+  margin-top: 34px;
+}
+
+.account-grid {
+  display: grid;
+  grid-template-columns: minmax(0, 1.1fr) minmax(280px, 0.9fr);
+  gap: 18px;
+  align-items: stretch;
+}
+
+.account-highlight {
+  min-height: 260px;
+}
+
+.account-actions {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 12px;
+}
+
+.quick-card {
+  display: grid;
+  gap: 8px;
+  align-content: center;
+  min-height: 124px;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  padding: 18px;
+  background: rgba(255, 253, 248, 0.9);
+  transition: transform 180ms ease, border-color 180ms ease;
+}
+
+.quick-card:hover {
+  transform: translateY(-1px);
+  border-color: rgba(11, 74, 83, 0.34);
+}
+
+.quick-card strong {
+  color: var(--deep);
+  font-size: 1.05rem;
+}
+
+.quick-card span,
+.account-row span {
+  color: var(--muted);
+  line-height: 1.45;
+}
+
+.status-pill {
+  width: fit-content;
+  border-radius: 999px;
+  padding: 6px 10px;
+  background: rgba(104, 199, 189, 0.22);
+  color: var(--petrol);
+  font-size: 0.76rem;
+  font-weight: 900;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+}
+
+.empty-state {
+  display: grid;
+  justify-items: start;
+  gap: 10px;
+  padding: 18px;
+  border: 1px dashed var(--line);
+  border-radius: 8px;
+  background: rgba(255, 253, 248, 0.62);
+}
+
+.empty-state h3 {
+  margin-bottom: 0;
+}
+
+.account-list {
+  display: grid;
+  gap: 12px;
+}
+
+.account-row {
+  display: grid;
+  grid-template-columns: minmax(0, 1.4fr) minmax(150px, 0.5fr) minmax(150px, 0.5fr);
+  gap: 18px;
+  align-items: center;
+}
+
+.account-row h3 {
+  margin-bottom: 6px;
+}
+
+.account-row div {
+  display: grid;
+  gap: 5px;
+}
+
+.profile-panel dl {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 14px;
+  margin: 0 0 18px;
+}
+
+.profile-panel dl div {
+  display: grid;
+  gap: 5px;
+  padding: 14px;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  background: white;
+}
+
+.profile-panel dt {
+  color: var(--muted);
+  font-size: 0.78rem;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+}
+
+.profile-panel dd {
+  margin: 0;
+  color: var(--deep);
+  font-weight: 800;
+  overflow-wrap: anywhere;
+}
+
 @media (max-width: 980px) {
   .grid,
   .admin-layout,
   .booking-layout,
-  .product-detail {
+  .product-detail,
+  .account-grid,
+  .account-row {
+    grid-template-columns: 1fr;
+  }
+
+  .account-actions,
+  .profile-panel dl {
     grid-template-columns: 1fr;
   }
 

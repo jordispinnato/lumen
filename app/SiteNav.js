@@ -27,9 +27,12 @@ export default function SiteNav({ isAdmin, isLoggedIn }) {
         <a href="/aula" onClick={closeMenu}>Aula</a>
         {isAdmin ? <a href="/admin" onClick={closeMenu}>Admin</a> : null}
         {isLoggedIn ? (
-          <form action="/auth/logout" method="post">
-            <button className="nav-button" type="submit">Salir</button>
-          </form>
+          <>
+            <a href="/mi-cuenta" onClick={closeMenu}>Mi Cuenta</a>
+            <form action="/auth/logout" method="post">
+              <button className="nav-button" type="submit">Salir</button>
+            </form>
+          </>
         ) : (
           <>
             <a href="/login" onClick={closeMenu}>Ingresar</a>
