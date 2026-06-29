@@ -72,5 +72,12 @@ export async function POST(request) {
     console.error("Appointment confirmation email failed", error);
   }
 
-  return NextResponse.redirect(`${origin}/turnos?message=Turno confirmado`, { status: 303 });
+  const successParams = new URLSearchParams({
+    success: "1",
+    specialist: slot.appointment_specialists?.name || "Especialista LUMEN",
+    date: slot.slot_date,
+    time: slot.slot_time,
+  });
+
+  return NextResponse.redirect(`${origin}/turnos?${successParams.toString()}`, { status: 303 });
 }

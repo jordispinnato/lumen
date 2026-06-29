@@ -321,6 +321,12 @@ h3 {
   background: #083b43;
 }
 
+.button.secondary {
+  background: rgba(255, 253, 248, 0.72);
+  border-color: var(--line);
+  color: var(--deep);
+}
+
 .secondary-button {
   background: rgba(255, 253, 248, 0.72);
   border-color: var(--line);
@@ -626,6 +632,133 @@ h3 {
   gap: 10px;
 }
 
+.professional-card-list,
+.professional-admin-list {
+  display: grid;
+  gap: 12px;
+}
+
+.professional-option,
+.professional-admin-card {
+  min-width: 0;
+  display: grid;
+  grid-template-columns: 72px minmax(0, 1fr);
+  gap: 14px;
+  align-items: start;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  padding: 14px;
+  background: white;
+  color: var(--deep);
+  transition: border-color 180ms ease, box-shadow 180ms ease, transform 180ms ease;
+}
+
+.professional-option:hover {
+  transform: translateY(-1px);
+  border-color: rgba(11, 74, 83, 0.34);
+}
+
+.professional-option.is-active {
+  border-color: rgba(11, 74, 83, 0.62);
+  box-shadow: 0 0 0 3px rgba(104, 199, 189, 0.22);
+}
+
+.professional-option img,
+.professional-admin-card img,
+.selected-professional img,
+.professional-detail-media img {
+  width: 100%;
+  aspect-ratio: 1;
+  border-radius: 8px;
+  object-fit: cover;
+  background: rgba(20, 53, 56, 0.08);
+}
+
+.professional-avatar {
+  width: 72px;
+  height: 72px;
+  display: inline-grid;
+  place-items: center;
+  border-radius: 8px;
+  background:
+    linear-gradient(135deg, transparent 46%, rgba(255, 253, 248, 0.75) 47%, rgba(255, 253, 248, 0.75) 53%, transparent 54%),
+    linear-gradient(135deg, var(--petrol), var(--sage));
+  color: white;
+  font-size: 1.7rem;
+  font-weight: 800;
+}
+
+.professional-avatar.large {
+  width: 100%;
+  height: auto;
+  aspect-ratio: 1;
+  font-size: clamp(4rem, 12vw, 7rem);
+}
+
+.professional-option-body,
+.professional-admin-card div {
+  min-width: 0;
+  display: grid;
+  gap: 6px;
+}
+
+.professional-option-body strong,
+.professional-admin-card strong,
+.selected-professional strong {
+  color: var(--deep);
+  font-size: 1.06rem;
+}
+
+.professional-option-body span,
+.professional-option-body small,
+.professional-admin-card span,
+.professional-admin-card small,
+.selected-professional span,
+.selected-professional small {
+  color: var(--muted);
+  line-height: 1.45;
+  overflow-wrap: anywhere;
+}
+
+.professional-meta,
+.professional-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 7px;
+}
+
+.professional-meta small {
+  border-radius: 999px;
+  padding: 4px 8px;
+  background: rgba(20, 53, 56, 0.06);
+  color: var(--deep);
+  font-weight: 800;
+}
+
+.professional-actions {
+  margin-top: 4px;
+}
+
+.professional-actions button,
+.professional-actions a {
+  min-height: 34px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  padding: 0 11px;
+  background: rgba(255, 253, 248, 0.8);
+  color: var(--deep);
+  font-size: 0.86rem;
+  font-weight: 800;
+}
+
+.professional-actions button {
+  background: var(--petrol);
+  color: white;
+}
+
 .specialist-option,
 .month-tab,
 .calendar-day,
@@ -768,6 +901,24 @@ h3 {
   top: 92px;
 }
 
+.selected-professional {
+  display: grid;
+  grid-template-columns: 60px minmax(0, 1fr);
+  gap: 12px;
+  align-items: center;
+  margin-bottom: 18px;
+  padding: 12px;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  background: white;
+}
+
+.selected-professional img,
+.selected-professional .professional-avatar {
+  width: 60px;
+  height: 60px;
+}
+
 .booking-summary h2 {
   margin-bottom: 18px;
 }
@@ -825,6 +976,121 @@ h3 {
 .booking-login-box {
   display: grid;
   gap: 12px;
+}
+
+.booking-review-box {
+  display: grid;
+  gap: 6px;
+  padding: 14px;
+  border: 1px solid rgba(11, 74, 83, 0.18);
+  border-radius: 8px;
+  background: rgba(104, 199, 189, 0.12);
+}
+
+.booking-review-box p {
+  margin: 0;
+  color: var(--muted);
+  line-height: 1.5;
+}
+
+.booking-form-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+
+.booking-success {
+  margin-bottom: 20px;
+}
+
+.booking-success dl {
+  display: grid;
+  grid-template-columns: repeat(5, minmax(0, 1fr));
+  gap: 10px;
+  margin: 0;
+}
+
+.booking-success dl div {
+  display: grid;
+  gap: 4px;
+  padding: 12px;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  background: white;
+}
+
+.booking-success dt {
+  color: var(--muted);
+  font-size: 0.78rem;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+}
+
+.booking-success dd {
+  margin: 0;
+  color: var(--deep);
+  font-weight: 800;
+}
+
+.professional-detail {
+  display: grid;
+  grid-template-columns: minmax(260px, 0.7fr) minmax(0, 1.3fr);
+  gap: 28px;
+  align-items: start;
+}
+
+.professional-detail-media {
+  position: sticky;
+  top: 96px;
+}
+
+.professional-detail-media img {
+  box-shadow: var(--shadow);
+}
+
+.professional-detail-body h1 {
+  font-size: clamp(3rem, 7vw, 6rem);
+}
+
+.professional-detail-tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-bottom: 20px;
+}
+
+.professional-detail-tags span {
+  border-radius: 999px;
+  padding: 7px 11px;
+  background: rgba(20, 53, 56, 0.08);
+  color: var(--deep);
+  font-weight: 800;
+}
+
+.professional-info-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 14px;
+  margin-top: 24px;
+}
+
+.professional-info-grid p {
+  color: var(--muted);
+  line-height: 1.65;
+}
+
+.professional-cta {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  margin-top: 16px;
+}
+
+.professional-cta strong {
+  color: var(--deep);
+  font-size: 1.5rem;
 }
 
 .catalog-toolbar {
@@ -1071,9 +1337,16 @@ h3 {
   .admin-layout,
   .booking-layout,
   .product-detail,
+  .professional-detail,
+  .professional-info-grid,
+  .booking-success dl,
   .account-grid,
   .account-row {
     grid-template-columns: 1fr;
+  }
+
+  .professional-detail-media {
+    position: static;
   }
 
   .account-actions,
@@ -1160,8 +1433,29 @@ h3 {
   .booking-layout,
   .month-tabs,
   .slot-grid,
+  .professional-option,
+  .professional-admin-card,
   .stats-strip {
     grid-template-columns: 1fr;
+  }
+
+  .professional-option img,
+  .professional-admin-card img,
+  .professional-option .professional-avatar,
+  .professional-admin-card .professional-avatar {
+    width: 88px;
+    height: 88px;
+  }
+
+  .professional-cta,
+  .booking-form-actions {
+    align-items: stretch;
+    flex-direction: column;
+  }
+
+  .professional-cta .button,
+  .booking-form-actions .button {
+    width: 100%;
   }
 
   .calendar-grid,

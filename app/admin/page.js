@@ -59,7 +59,8 @@ export default async function AdminPage({ searchParams }) {
       .order("position", { ascending: true }),
     supabase
       .from("appointment_specialists")
-      .select("id,name,role,focus,session,price,status,created_at")
+      .select("id,name,role,professional_license,focus,short_bio,education,years_experience,duration_minutes,session,price,status,display_order,slug,photo_url,created_at")
+      .order("display_order", { ascending: true })
       .order("created_at", { ascending: false }),
     supabase
       .from("appointment_slots")
@@ -109,19 +110,51 @@ export default async function AdminPage({ searchParams }) {
 
         <div className="admin-layout">
           <section className="panel">
-            <h2>Cargar especialista</h2>
-            <form className="admin-form" action="/admin/specialists/create" method="post">
+            <h2>Crear o actualizar profesional</h2>
+            <form className="admin-form" action="/admin/specialists/create" method="post" encType="multipart/form-data">
               <label>
-                Nombre
+                Nombre y apellido
                 <input name="name" required placeholder="Ej: Lic. Valentina Rivas" />
               </label>
               <label>
-                Rol
+                Profesion
                 <input name="role" required defaultValue="Psicologia" />
+              </label>
+              <label>
+                Matricula
+                <input name="professionalLicense" placeholder="Ej: M.P. 12345" />
+              </label>
+              <label>
+                Slug unico
+                <input name="slug" placeholder="ej: valentina-rivas" />
+              </label>
+              <label>
+                Foto de perfil
+                <input name="photo" type="file" accept="image/png,image/jpeg,image/webp" />
+              </label>
+              <label>
+                Orden
+                <input name="displayOrder" type="number" min="0" step="1" defaultValue="100" />
               </label>
               <label className="wide-field">
                 Enfoque
                 <textarea name="focus" rows="3" placeholder="Ej: Ansiedad, estres y acompanamiento en crisis" />
+              </label>
+              <label className="wide-field">
+                Biografia corta
+                <textarea name="shortBio" rows="3" placeholder="Texto breve para la card y el perfil publico" />
+              </label>
+              <label className="wide-field">
+                Formacion
+                <textarea name="education" rows="3" placeholder="Formacion relevante, si corresponde" />
+              </label>
+              <label>
+                Anos de experiencia
+                <input name="yearsExperience" type="number" min="0" step="1" placeholder="5" />
+              </label>
+              <label>
+                Duracion en minutos
+                <input name="durationMinutes" type="number" min="0" step="5" placeholder="50" />
               </label>
               <label>
                 Sesion
@@ -140,6 +173,9 @@ export default async function AdminPage({ searchParams }) {
               </label>
               <button className="button" type="submit">Guardar especialista</button>
             </form>
+            <p className="muted">
+              Si repetis un slug existente, el perfil se actualiza. Si no cargas foto nueva, conserva la foto actual.
+            </p>
           </section>
 
           <section className="panel">
@@ -183,12 +219,22 @@ export default async function AdminPage({ searchParams }) {
         <div className="admin-layout spaced-panel">
           <section className="panel">
             <h2>Especialistas cargados</h2>
-            <div className="compact-list">
+            <div className="professional-admin-list">
               {specialists?.length ? specialists.map((specialist) => (
-                <article key={specialist.id}>
-                  <strong>{specialist.name}</strong>
-                  <span>{specialist.role} - {formatPrice(specialist.price)}</span>
-                  <small>{specialist.status} - {specialist.focus || "Sin enfoque cargado"}</small>
+                <article className="professional-admin-card" key={specialist.id}>
+                  {specialist.photo_url ? (
+                    <img alt="" src={specialist.photo_url} />
+                  ) : (
+                    <span className="professional-avatar" aria-hidden="true">{specialist.name?.slice(0, 1) || "L"}</span>
+                  )}
+                  <div>
+                    <strong>{specialist.name}</strong>
+                    <span>{specialist.role} - {formatPrice(specialist.price)}</span>
+                    <small>
+                      {specialist.status} - {specialist.professional_license || "Sin matricula"} - {specialist.slug || "Sin slug"}
+                    </small>
+                    <small>{specialist.focus || "Sin enfoque cargado"}</small>
+                  </div>
                 </article>
               )) : (
                 <p className="muted">Todavia no hay especialistas cargados.</p>

@@ -37,6 +37,14 @@ function formatTime(value) {
   return value?.slice(0, 5) || "";
 }
 
+function formatPrice(value) {
+  return new Intl.NumberFormat("es-AR", {
+    style: "currency",
+    currency: "ARS",
+    maximumFractionDigits: 0,
+  }).format(value || 0);
+}
+
 function slotLabel(count) {
   if (!count) {
     return "Sin turnos";
@@ -45,11 +53,19 @@ function slotLabel(count) {
   return count === 1 ? "1 turno" : `${count} turnos`;
 }
 
-export default function BookingPicker({ specialists, slots, userEmail }) {
-  const [selectedSpecialistId, setSelectedSpecialistId] = useState(specialists[0]?.id);
+function getInitialSpecialistId(specialists, initialSpecialistSlug) {
+  const matchedSpecialist = specialists.find((specialist) => specialist.slug === initialSpecialistSlug);
+  return matchedSpecialist?.id || specialists[0]?.id;
+}
+
+export default function BookingPicker({ specialists, slots, userEmail, initialSpecialistSlug }) {
+  const [selectedSpecialistId, setSelectedSpecialistId] = useState(
+    getInitialSpecialistId(specialists, initialSpecialistSlug)
+  );
   const [selectedMonthIndex, setSelectedMonthIndex] = useState(0);
   const [selectedDate, setSelectedDate] = useState("");
   const [selectedSlotId, setSelectedSlotId] = useState("");
+  const [isReviewing, setIsReviewing] = useState(false);
 
   const months = useMemo(() => [buildMonth(0), buildMonth(1)], []);
 
@@ -78,11 +94,13 @@ export default function BookingPicker({ specialists, slots, userEmail }) {
     setSelectedSpecialistId(id);
     setSelectedDate("");
     setSelectedSlotId("");
+    setIsReviewing(false);
   }
 
   function selectDay(day) {
     setSelectedDate(day.iso);
     setSelectedSlotId("");
+    setIsReviewing(false);
   }
 
   if (!specialists.length) {
@@ -100,18 +118,36 @@ export default function BookingPicker({ specialists, slots, userEmail }) {
     <div className="booking-layout">
       <section className="panel booking-panel">
         <p className="eyebrow">1. Elegi especialista</p>
-        <div className="specialist-list">
+        <div className="professional-card-list">
           {specialists.map((specialist) => (
-            <button
-              className={`specialist-option ${specialist.id === selectedSpecialistId ? "is-active" : ""}`}
+            <article
+              className={`professional-option ${specialist.id === selectedSpecialistId ? "is-active" : ""}`}
               key={specialist.id}
-              type="button"
-              onClick={() => selectSpecialist(specialist.id)}
             >
-              <strong>{specialist.name}</strong>
-              <span>{specialist.role}</span>
-              <small>{specialist.focus}</small>
-            </button>
+              {specialist.photo_url ? (
+                <img alt="" src={specialist.photo_url} />
+              ) : (
+                <span className="professional-avatar" aria-hidden="true">{specialist.name?.slice(0, 1) || "L"}</span>
+              )}
+              <span className="professional-option-body">
+                <strong>{specialist.name}</strong>
+                <span>{specialist.role}</span>
+                {specialist.professional_license ? <small>{specialist.professional_license}</small> : null}
+                {specialist.focus ? <small>{specialist.focus}</small> : null}
+                <span className="professional-meta">
+                  <small>{specialist.duration_minutes ? `${specialist.duration_minutes} min` : specialist.session}</small>
+                  <small>{formatPrice(specialist.price)}</small>
+                  <small>{specialist.status === "active" ? "Activo" : "Inactivo"}</small>
+                </span>
+                {specialist.short_bio ? <small>{specialist.short_bio}</small> : null}
+                <span className="professional-actions">
+                  <button type="button" onClick={() => selectSpecialist(specialist.id)}>
+                    {specialist.id === selectedSpecialistId ? "Seleccionado" : "Ver disponibilidad"}
+                  </button>
+                  {specialist.slug ? <a href={`/profesionales/${specialist.slug}`}>Ver perfil</a> : null}
+                </span>
+              </span>
+            </article>
           ))}
         </div>
       </section>
@@ -128,6 +164,7 @@ export default function BookingPicker({ specialists, slots, userEmail }) {
                 setSelectedMonthIndex(index);
                 setSelectedDate("");
                 setSelectedSlotId("");
+                setIsReviewing(false);
               }}
             >
               {month.label}
@@ -171,23 +208,38 @@ export default function BookingPicker({ specialists, slots, userEmail }) {
                   className={`slot-option ${slot.id === selectedSlotId ? "is-active" : ""}`}
                   key={slot.id}
                   type="button"
-                  onClick={() => setSelectedSlotId(slot.id)}
+                  onClick={() => {
+                    setSelectedSlotId(slot.id);
+                    setIsReviewing(false);
+                  }}
                 >
                   {formatTime(slot.slot_time)}
                 </button>
               ))}
             </div>
           ) : (
-            <p className="muted">Ese dia no tiene horarios disponibles.</p>
+            <p className="muted">No hay horarios disponibles para este dia.</p>
           )
         ) : (
-          <p className="muted">Primero selecciona un dia con horarios disponibles.</p>
+          <p className="muted">Elegi un dia para continuar.</p>
         )}
       </section>
 
       <aside className="panel booking-summary">
         <p className="eyebrow">Resumen</p>
         <h2>Reserva de atencion psicologica</h2>
+        <div className="selected-professional">
+          {selectedSpecialist.photo_url ? (
+            <img alt="" src={selectedSpecialist.photo_url} />
+          ) : (
+            <span className="professional-avatar" aria-hidden="true">{selectedSpecialist.name?.slice(0, 1) || "L"}</span>
+          )}
+          <div>
+            <strong>{selectedSpecialist.name}</strong>
+            <span>{selectedSpecialist.role}</span>
+            {selectedSpecialist.professional_license ? <small>{selectedSpecialist.professional_license}</small> : null}
+          </div>
+        </div>
         <dl>
           <div>
             <dt>Especialista</dt>
@@ -195,7 +247,7 @@ export default function BookingPicker({ specialists, slots, userEmail }) {
           </div>
           <div>
             <dt>Modalidad</dt>
-            <dd>{selectedSpecialist.session}</dd>
+            <dd>Online</dd>
           </div>
           <div>
             <dt>Fecha</dt>
@@ -205,24 +257,47 @@ export default function BookingPicker({ specialists, slots, userEmail }) {
             <dt>Horario</dt>
             <dd>{selectedSlot ? formatTime(selectedSlot.slot_time) : "Sin seleccionar"}</dd>
           </div>
+          <div>
+            <dt>Duracion</dt>
+            <dd>{selectedSpecialist.duration_minutes ? `${selectedSpecialist.duration_minutes} minutos` : selectedSpecialist.session}</dd>
+          </div>
         </dl>
-        <p className="price">$ {selectedSpecialist.price.toLocaleString("es-AR")}</p>
+        <p className="price">{formatPrice(selectedSpecialist.price)}</p>
         {userEmail ? (
-          <form className="booking-confirm-form" action="/turnos/reservar" method="post">
-            <input name="slotId" type="hidden" value={selectedSlot?.id || ""} />
-            <label>
-              Nombre del paciente
-              <input name="patientName" placeholder="Nombre y apellido" />
-            </label>
-            <label>
-              Email de confirmacion
-              <input readOnly value={userEmail} />
-            </label>
-            <button className="button" disabled={!selectedSlot} type="submit">Confirmar reserva</button>
-          </form>
+          isReviewing ? (
+            <form className="booking-confirm-form" action="/turnos/reservar" method="post">
+              <input name="slotId" type="hidden" value={selectedSlot?.id || ""} />
+              <label>
+                Nombre del paciente
+                <input name="patientName" placeholder="Nombre y apellido" />
+              </label>
+              <label>
+                Email de confirmacion
+                <input readOnly value={userEmail} />
+              </label>
+              <div className="booking-review-box">
+                <strong>Confirmacion previa</strong>
+                <p>La reserva quedara registrada en tu cuenta.</p>
+                <p>El pago todavia no esta integrado en esta version.</p>
+              </div>
+              <div className="booking-form-actions">
+                <button className="button" disabled={!selectedSlot} type="submit">Confirmar reserva</button>
+                <button className="button secondary" type="button" onClick={() => setIsReviewing(false)}>Volver</button>
+              </div>
+            </form>
+          ) : (
+            <div className="booking-confirm-form">
+              <button className="button" disabled={!selectedSlot} type="button" onClick={() => setIsReviewing(true)}>
+                Revisar reserva
+              </button>
+              <p className="muted">
+                {selectedSlot ? "Revisa los datos antes de confirmar." : "Elegi un dia y horario para continuar."}
+              </p>
+            </div>
+          )
         ) : (
           <div className="booking-login-box">
-            <p className="muted">Para confirmar la reserva necesitás iniciar sesión.</p>
+            <p className="muted">Para confirmar la reserva necesitas iniciar sesion.</p>
             <a className="button" href="/login">Ingresar</a>
           </div>
         )}
