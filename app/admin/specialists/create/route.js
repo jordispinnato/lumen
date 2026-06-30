@@ -51,6 +51,7 @@ export async function POST(request) {
   }
 
   const name = String(formData.get("name") || "").trim();
+  const specialistId = String(formData.get("specialistId") || "").trim();
   const role = String(formData.get("role") || "Psicologia").trim();
   const professionalLicense = String(formData.get("professionalLicense") || "").trim();
   const focus = String(formData.get("focus") || "").trim();
@@ -128,11 +129,31 @@ export async function POST(request) {
     payload.photo_url = photoUrl;
   }
 
-  const { data: existing } = await supabase
-    .from("appointment_specialists")
-    .select("id")
-    .eq("slug", requestedSlug)
-    .maybeSingle();
+  let existing = null;
+
+  if (specialistId) {
+    const { data } = await supabase
+      .from("appointment_specialists")
+      .select("id")
+      .eq("id", specialistId)
+      .maybeSingle();
+
+    existing = data;
+
+    if (!existing) {
+      return NextResponse.redirect(`${origin}/admin?error=${encodeURIComponent("No se encontró el especialista a editar")}`, {
+        status: 303,
+      });
+    }
+  } else {
+    const { data } = await supabase
+      .from("appointment_specialists")
+      .select("id")
+      .eq("slug", requestedSlug)
+      .maybeSingle();
+
+    existing = data;
+  }
 
   const { error } = existing
     ? await supabase.from("appointment_specialists").update(payload).eq("id", existing.id)

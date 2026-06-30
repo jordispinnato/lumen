@@ -508,6 +508,73 @@ export default async function AdminPage({ searchParams }) {
                     </small>
                     <small>{specialist.focus || "Sin enfoque cargado"}</small>
                   </div>
+                  <details className="admin-inline-editor">
+                    <summary>Editar especialista</summary>
+                    <form className="admin-form" action="/admin/specialists/create" method="post" encType="multipart/form-data">
+                      <input name="specialistId" type="hidden" defaultValue={specialist.id} />
+                      <label>
+                        Nombre y apellido
+                        <input name="name" required defaultValue={specialist.name || ""} />
+                      </label>
+                      <label>
+                        Profesion
+                        <input name="role" required defaultValue={specialist.role || "Psicologia"} />
+                      </label>
+                      <label>
+                        Matricula
+                        <input name="professionalLicense" defaultValue={specialist.professional_license || ""} />
+                      </label>
+                      <label>
+                        Slug unico
+                        <input name="slug" required defaultValue={specialist.slug || ""} />
+                      </label>
+                      <label>
+                        Foto de perfil
+                        <input name="photo" type="file" accept="image/png,image/jpeg,image/webp" />
+                      </label>
+                      <label>
+                        Orden
+                        <input name="displayOrder" type="number" min="0" step="1" defaultValue={specialist.display_order || 100} />
+                      </label>
+                      <label className="wide-field">
+                        Enfoque
+                        <textarea name="focus" rows="3" defaultValue={specialist.focus || ""} />
+                      </label>
+                      <label className="wide-field">
+                        Biografia corta
+                        <textarea name="shortBio" rows="3" defaultValue={specialist.short_bio || ""} />
+                      </label>
+                      <label className="wide-field">
+                        Formacion
+                        <textarea name="education" rows="3" defaultValue={specialist.education || ""} />
+                      </label>
+                      <label>
+                        Anos de experiencia
+                        <input name="yearsExperience" type="number" min="0" step="1" defaultValue={specialist.years_experience || ""} />
+                      </label>
+                      <label>
+                        Duracion en minutos
+                        <input name="durationMinutes" type="number" min="0" step="5" defaultValue={specialist.duration_minutes || ""} />
+                      </label>
+                      <label>
+                        Sesion
+                        <input name="session" required defaultValue={specialist.session || "Consulta online de 50 minutos"} />
+                      </label>
+                      <label>
+                        Precio en ARS
+                        <input name="price" type="number" min="0" step="1" required defaultValue={specialist.price || 0} />
+                      </label>
+                      <label>
+                        Estado
+                        <select name="status" defaultValue={specialist.status || "active"}>
+                          <option value="active">Activo</option>
+                          <option value="inactive">Inactivo</option>
+                        </select>
+                      </label>
+                      <button className="button" type="submit">Guardar cambios</button>
+                    </form>
+                    <p className="muted">Si no cargás una foto nueva, se conserva la foto actual.</p>
+                  </details>
                 </article>
               )) : (
                 <p className="muted">Todavia no hay especialistas cargados.</p>

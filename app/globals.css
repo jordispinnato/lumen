@@ -2373,6 +2373,22 @@ body:has(.admin-cms-shell) {
   color: white;
 }
 
+.admin-inline-editor {
+  grid-column: 1 / -1;
+  border-top: 1px solid var(--line);
+  padding-top: 12px;
+}
+
+.admin-inline-editor summary {
+  cursor: pointer;
+  color: var(--petrol);
+  font-weight: 900;
+}
+
+.admin-inline-editor .admin-form {
+  margin-top: 12px;
+}
+
 .specialist-option,
 .month-tab,
 .calendar-day,
