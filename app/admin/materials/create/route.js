@@ -14,6 +14,7 @@ function safeFileName(value) {
 export async function POST(request) {
   const origin = new URL(request.url).origin;
   const formData = await request.formData();
+  const materialId = String(formData.get("materialId") || "").trim();
   const courseId = String(formData.get("courseId") || "").trim();
   const lessonId = String(formData.get("lessonId") || "").trim();
   const title = String(formData.get("title") || "").trim();
@@ -47,7 +48,7 @@ export async function POST(request) {
     });
   }
 
-  if (!hasFile && !externalUrl) {
+  if (!materialId && !hasFile && !externalUrl) {
     return NextResponse.redirect(`${origin}/admin?error=${encodeURIComponent("Selecciona un archivo o carga un link")}`, {
       status: 303,
     });
@@ -96,19 +97,26 @@ export async function POST(request) {
     }
   }
 
-  const { error } = await supabase.from("course_materials").insert({
+  const payload = {
     course_id: courseId,
     lesson_id: lessonId || null,
     title,
-    file_path: filePath,
-    file_name: hasFile ? file.name : null,
-    file_type: hasFile ? file.type || null : null,
-    file_size: hasFile ? file.size : null,
     material_type: materialType,
     external_url: externalUrl || null,
     status,
     position: Number.isFinite(position) ? Math.max(0, Math.round(position)) : 0,
-  });
+  };
+
+  if (hasFile) {
+    payload.file_path = filePath;
+    payload.file_name = file.name;
+    payload.file_type = file.type || null;
+    payload.file_size = file.size;
+  }
+
+  const { error } = materialId
+    ? await supabase.from("course_materials").update(payload).eq("id", materialId)
+    : await supabase.from("course_materials").insert(payload);
 
   if (error) {
     if (filePath) {

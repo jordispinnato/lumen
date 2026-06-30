@@ -24,6 +24,7 @@ function safeFileName(value) {
 export async function POST(request) {
   const origin = new URL(request.url).origin;
   const formData = await request.formData();
+  const courseId = String(formData.get("courseId") || "").trim();
   const title = String(formData.get("title") || "").trim();
   const requestedSlug = String(formData.get("slug") || "").trim();
   const summary = String(formData.get("summary") || "").trim();
@@ -123,9 +124,11 @@ export async function POST(request) {
     payload.cover_image_url = coverImageUrl;
   }
 
-  const { error } = await supabase.from("courses").upsert(payload, {
-    onConflict: "slug",
-  });
+  const { error } = courseId
+    ? await supabase.from("courses").update(payload).eq("id", courseId)
+    : await supabase.from("courses").upsert(payload, {
+        onConflict: "slug",
+      });
 
   if (error) {
     if (coverImagePath) {

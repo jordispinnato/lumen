@@ -590,6 +590,40 @@ export default async function AdminPage({ searchParams }) {
                   <strong>{slot.appointment_specialists?.name || "Especialista"} - {slot.slot_time?.slice(0, 5)}</strong>
                   <span>{new Date(`${slot.slot_date}T00:00:00`).toLocaleDateString("es-AR")}</span>
                   <small>{slot.status}</small>
+                  <details className="admin-inline-editor">
+                    <summary>Editar horario</summary>
+                    <form className="admin-form" action="/admin/appointment-slots/create" method="post">
+                      <input name="slotId" type="hidden" defaultValue={slot.id} />
+                      <label className="wide-field">
+                        Especialista
+                        <select name="specialistId" required defaultValue={slot.appointment_specialists?.id || ""}>
+                          <option value="">Seleccionar especialista</option>
+                          {specialists?.map((specialist) => (
+                            <option value={specialist.id} key={specialist.id}>
+                              {specialist.name}
+                            </option>
+                          ))}
+                        </select>
+                      </label>
+                      <label>
+                        Dia
+                        <input name="slotDate" type="date" required defaultValue={slot.slot_date || ""} />
+                      </label>
+                      <label>
+                        Horario
+                        <input name="slotTime" type="time" min="08:00" max="20:00" step="900" required defaultValue={slot.slot_time?.slice(0, 5) || ""} />
+                      </label>
+                      <label>
+                        Estado
+                        <select name="status" defaultValue={slot.status || "available"}>
+                          <option value="available">Disponible</option>
+                          <option value="blocked">Bloqueado</option>
+                          <option value="booked">Reservado</option>
+                        </select>
+                      </label>
+                      <button className="button" type="submit">Guardar cambios</button>
+                    </form>
+                  </details>
                 </article>
               )) : (
                 <p className="muted">Todavia no hay horarios cargados.</p>
@@ -693,6 +727,61 @@ export default async function AdminPage({ searchParams }) {
                     {product.product_type === "digital" && product.digital_file_name ? ` - Archivo: ${product.digital_file_name}` : ""}
                     {product.product_type === "digital" && !product.digital_file_name && product.digital_url ? " - URL cargada" : ""}
                   </small>
+                  <details className="admin-inline-editor">
+                    <summary>Editar producto</summary>
+                    <form className="admin-form" action="/admin/catalog-products/create" method="post" encType="multipart/form-data">
+                      <input name="productId" type="hidden" defaultValue={product.id} />
+                      <label>
+                        Nombre
+                        <input name="title" required defaultValue={product.title || ""} />
+                      </label>
+                      <label>
+                        Tipo
+                        <select name="productType" defaultValue={product.product_type || "physical"}>
+                          <option value="physical">Fisico</option>
+                          <option value="digital">Digital</option>
+                        </select>
+                      </label>
+                      <label>
+                        Categoria
+                        <input name="category" required defaultValue={product.category || ""} />
+                      </label>
+                      <label>
+                        Precio en ARS
+                        <input name="price" type="number" min="0" step="1" required defaultValue={product.price || 0} />
+                      </label>
+                      <label>
+                        Stock fisico
+                        <input name="stock" type="number" min="0" step="1" defaultValue={product.stock ?? ""} />
+                      </label>
+                      <label>
+                        Estado
+                        <select name="status" defaultValue={product.status || "published"}>
+                          <option value="published">Publicado</option>
+                          <option value="draft">Borrador</option>
+                          <option value="archived">Archivado</option>
+                        </select>
+                      </label>
+                      <label className="wide-field">
+                        URL digital opcional
+                        <input name="digitalUrl" type="url" defaultValue={product.digital_url || ""} />
+                      </label>
+                      <label className="wide-field">
+                        Archivo digital opcional
+                        <input
+                          name="digitalFile"
+                          type="file"
+                          accept=".pdf,.doc,.docx,.xls,.xlsx,.ppt,.pptx,.png,.jpg,.jpeg,.txt,.zip"
+                        />
+                      </label>
+                      <label className="wide-field">
+                        Descripcion
+                        <textarea name="summary" rows="4" defaultValue={product.summary || ""} />
+                      </label>
+                      <button className="button" type="submit">Guardar cambios</button>
+                    </form>
+                    <p className="muted">Si no subis un archivo nuevo, se conserva el archivo actual.</p>
+                  </details>
                 </article>
               )) : (
                 <p className="muted">Todavia no hay productos cargados.</p>
@@ -871,6 +960,105 @@ export default async function AdminPage({ searchParams }) {
             </form>
           </section>
         </div>
+
+        <section className="panel spaced-panel">
+          <h2>Cursos cargados</h2>
+          <div className="compact-list">
+            {courses?.length ? courses.map((course) => (
+              <article key={course.id}>
+                <strong>{course.title}</strong>
+                <span>{formatPrice(course.price || 0)} - {course.category || "Sin categoria"}</span>
+                <small>{course.status || "Sin estado"} - {course.slug || "Sin slug"}</small>
+                <details className="admin-inline-editor">
+                  <summary>Editar curso</summary>
+                  <form className="admin-form" action="/admin/courses/create" method="post" encType="multipart/form-data">
+                    <input name="courseId" type="hidden" defaultValue={course.id} />
+                    <label>
+                      Titulo
+                      <input name="title" required defaultValue={course.title || ""} />
+                    </label>
+                    <label>
+                      Slug
+                      <input name="slug" required defaultValue={course.slug || ""} />
+                    </label>
+                    <label>
+                      Precio en ARS
+                      <input name="price" type="number" min="0" step="1" required defaultValue={course.price || 0} />
+                    </label>
+                    <label>
+                      Estado
+                      <select name="status" defaultValue={course.status || "draft"}>
+                        <option value="published">Publicado</option>
+                        <option value="draft">Borrador</option>
+                        <option value="archived">Archivado</option>
+                      </select>
+                    </label>
+                    <label>
+                      Instructor
+                      <input name="instructor" defaultValue={course.instructor || ""} />
+                    </label>
+                    <label>
+                      Nivel
+                      <input name="level" defaultValue={course.level || ""} />
+                    </label>
+                    <label>
+                      Duracion total
+                      <input name="totalDuration" defaultValue={course.total_duration || ""} />
+                    </label>
+                    <label>
+                      Categoria
+                      <input name="category" defaultValue={course.category || ""} />
+                    </label>
+                    <label>
+                      Orden
+                      <input name="displayOrder" type="number" min="0" step="1" defaultValue={course.display_order || 100} />
+                    </label>
+                    <label>
+                      Portada
+                      <input name="coverImage" type="file" accept="image/png,image/jpeg,image/webp" />
+                    </label>
+                    <label className="wide-field">
+                      Video de presentacion opcional
+                      <input name="introVideoUrl" type="url" defaultValue={course.intro_video_url || ""} />
+                    </label>
+                    <label className="wide-field">
+                      Resumen
+                      <textarea name="summary" rows="4" required defaultValue={course.summary || ""} />
+                    </label>
+                    <label className="wide-field">
+                      Descripcion completa
+                      <textarea name="description" rows="5" defaultValue={course.description || ""} />
+                    </label>
+                    <label className="wide-field">
+                      Que aprendera
+                      <textarea name="learningOutcomes" rows="4" defaultValue={course.learning_outcomes || ""} />
+                    </label>
+                    <label className="wide-field">
+                      A quien esta dirigido
+                      <textarea name="audience" rows="4" defaultValue={course.audience || ""} />
+                    </label>
+                    <label className="wide-field">
+                      Requisitos
+                      <textarea name="requirements" rows="3" defaultValue={course.requirements || ""} />
+                    </label>
+                    <label className="wide-field">
+                      Preguntas frecuentes
+                      <textarea name="faq" rows="3" defaultValue={course.faq || ""} />
+                    </label>
+                    <label className="check-field wide-field">
+                      <input name="featured" type="checkbox" defaultChecked={Boolean(course.featured)} />
+                      Curso destacado
+                    </label>
+                    <button className="button" type="submit">Guardar cambios</button>
+                  </form>
+                  <p className="muted">Si no subis una portada nueva, se conserva la portada actual.</p>
+                </details>
+              </article>
+            )) : (
+              <p className="muted">Todavia no hay cursos cargados.</p>
+            )}
+          </div>
+        </section>
 
         <div className="admin-layout spaced-panel">
           <section className="panel">
@@ -1066,6 +1254,43 @@ export default async function AdminPage({ searchParams }) {
                   <strong>{moduleItem.position}. {moduleItem.title}</strong>
                   <span>{moduleItem.courses?.title}</span>
                   <small>{moduleItem.status} - {moduleItem.description || "Sin descripcion"}</small>
+                  <details className="admin-inline-editor">
+                    <summary>Editar modulo</summary>
+                    <form className="admin-form" action="/admin/modules/create" method="post">
+                      <input name="moduleId" type="hidden" defaultValue={moduleItem.id} />
+                      <label>
+                        Curso
+                        <select name="courseId" required defaultValue={moduleItem.courses?.id || ""}>
+                          <option value="">Seleccionar curso</option>
+                          {courses?.map((course) => (
+                            <option value={course.id} key={course.id}>
+                              {course.title}
+                            </option>
+                          ))}
+                        </select>
+                      </label>
+                      <label>
+                        Orden
+                        <input name="position" type="number" min="0" step="1" required defaultValue={moduleItem.position || 0} />
+                      </label>
+                      <label>
+                        Estado
+                        <select name="status" defaultValue={moduleItem.status || "published"}>
+                          <option value="published">Publicado</option>
+                          <option value="hidden">Oculto</option>
+                        </select>
+                      </label>
+                      <label className="wide-field">
+                        Titulo del modulo
+                        <input name="title" required defaultValue={moduleItem.title || ""} />
+                      </label>
+                      <label className="wide-field">
+                        Descripcion
+                        <textarea name="description" rows="3" defaultValue={moduleItem.description || ""} />
+                      </label>
+                      <button className="button" type="submit">Guardar cambios</button>
+                    </form>
+                  </details>
                 </article>
               )) : (
                 <p className="muted">Todavia no hay modulos cargados.</p>
@@ -1081,6 +1306,72 @@ export default async function AdminPage({ searchParams }) {
                   <strong>{material.position}. {material.title}</strong>
                   <span>{material.courses?.title}{material.lessons?.title ? ` - ${material.lessons.title}` : ""}</span>
                   <small>{material.status} - {material.material_type} - {material.file_name || material.external_url || "Sin archivo"}</small>
+                  <details className="admin-inline-editor">
+                    <summary>Editar material</summary>
+                    <form className="admin-form" action="/admin/materials/create" method="post" encType="multipart/form-data">
+                      <input name="materialId" type="hidden" defaultValue={material.id} />
+                      <label>
+                        Curso
+                        <select name="courseId" required defaultValue={material.courses?.id || ""}>
+                          <option value="">Seleccionar curso</option>
+                          {courses?.map((course) => (
+                            <option value={course.id} key={course.id}>
+                              {course.title}
+                            </option>
+                          ))}
+                        </select>
+                      </label>
+                      <label>
+                        Leccion
+                        <select name="lessonId" defaultValue={material.lessons?.id || ""}>
+                          <option value="">Material general del curso</option>
+                          {lessons?.map((lesson) => (
+                            <option value={lesson.id} key={lesson.id}>
+                              {lesson.courses?.title} - {lesson.title}
+                            </option>
+                          ))}
+                        </select>
+                      </label>
+                      <label>
+                        Orden
+                        <input name="position" type="number" min="1" step="1" required defaultValue={material.position || 1} />
+                      </label>
+                      <label>
+                        Tipo
+                        <select name="materialType" defaultValue={material.material_type || "file"}>
+                          <option value="file">Archivo</option>
+                          <option value="pdf">PDF</option>
+                          <option value="audio">Audio</option>
+                          <option value="link">Link externo</option>
+                        </select>
+                      </label>
+                      <label>
+                        Estado
+                        <select name="status" defaultValue={material.status || "published"}>
+                          <option value="published">Publicado</option>
+                          <option value="hidden">Oculto</option>
+                        </select>
+                      </label>
+                      <label className="wide-field">
+                        Titulo del material
+                        <input name="title" required defaultValue={material.title || ""} />
+                      </label>
+                      <label className="wide-field">
+                        Link externo opcional
+                        <input name="externalUrl" type="url" defaultValue={material.external_url || ""} />
+                      </label>
+                      <label className="wide-field">
+                        Archivo opcional
+                        <input
+                          name="file"
+                          type="file"
+                          accept=".pdf,.doc,.docx,.xls,.xlsx,.ppt,.pptx,.png,.jpg,.jpeg,.txt,.mp3,.wav,.zip"
+                        />
+                      </label>
+                      <button className="button" type="submit">Guardar cambios</button>
+                    </form>
+                    <p className="muted">Si no subis un archivo nuevo, se conserva el archivo actual.</p>
+                  </details>
                 </article>
               )) : (
                 <p className="muted">Todavía no hay materiales cargados.</p>
@@ -1096,6 +1387,71 @@ export default async function AdminPage({ searchParams }) {
                   <strong>{lesson.position}. {lesson.title}</strong>
                   <span>{lesson.courses?.title}{lesson.course_modules?.title ? ` - ${lesson.course_modules.title}` : ""}</span>
                   <small>{lesson.status} - {lesson.duration_minutes || 0} min - {lesson.video_url || "Sin video"}</small>
+                  <details className="admin-inline-editor">
+                    <summary>Editar leccion</summary>
+                    <form className="admin-form" action="/admin/lessons/create" method="post">
+                      <input name="lessonId" type="hidden" defaultValue={lesson.id} />
+                      <label>
+                        Curso
+                        <select name="courseId" required defaultValue={lesson.courses?.id || ""}>
+                          <option value="">Seleccionar curso</option>
+                          {courses?.map((course) => (
+                            <option value={course.id} key={course.id}>
+                              {course.title}
+                            </option>
+                          ))}
+                        </select>
+                      </label>
+                      <label>
+                        Modulo
+                        <select name="moduleId" defaultValue={lesson.course_modules?.id || ""}>
+                          <option value="">Sin modulo</option>
+                          {courseModules?.map((moduleItem) => (
+                            <option value={moduleItem.id} key={moduleItem.id}>
+                              {moduleItem.courses?.title} - {moduleItem.title}
+                            </option>
+                          ))}
+                        </select>
+                      </label>
+                      <label>
+                        Orden
+                        <input name="position" type="number" min="1" step="1" required defaultValue={lesson.position || 1} />
+                      </label>
+                      <label>
+                        Duracion en minutos
+                        <input name="durationMinutes" type="number" min="0" step="1" defaultValue={lesson.duration_minutes || 0} />
+                      </label>
+                      <label>
+                        Estado
+                        <select name="status" defaultValue={lesson.status || "published"}>
+                          <option value="published">Publicado</option>
+                          <option value="draft">Borrador</option>
+                          <option value="hidden">Oculto</option>
+                        </select>
+                      </label>
+                      <label className="wide-field">
+                        Titulo de la leccion
+                        <input name="title" required defaultValue={lesson.title || ""} />
+                      </label>
+                      <label className="wide-field">
+                        Descripcion
+                        <textarea name="description" rows="3" defaultValue={lesson.description || ""} />
+                      </label>
+                      <label className="wide-field">
+                        URL del video
+                        <input name="videoUrl" type="url" defaultValue={lesson.video_url || ""} />
+                      </label>
+                      <label className="wide-field">
+                        Objetivos
+                        <textarea name="objectives" rows="3" defaultValue={lesson.objectives || ""} />
+                      </label>
+                      <label className="check-field wide-field">
+                        <input name="isPreview" type="checkbox" defaultChecked={Boolean(lesson.is_preview)} />
+                        Clase con vista previa
+                      </label>
+                      <button className="button" type="submit">Guardar cambios</button>
+                    </form>
+                  </details>
                 </article>
               )) : (
                 <p className="muted">Todavía no hay lecciones cargadas.</p>

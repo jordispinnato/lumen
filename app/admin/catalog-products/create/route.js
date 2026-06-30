@@ -21,6 +21,7 @@ export async function POST(request) {
     return NextResponse.redirect(`${origin}/admin?error=No autorizado`, { status: 303 });
   }
 
+  const productId = String(formData.get("productId") || "").trim();
   const title = String(formData.get("title") || "").trim();
   const productType = String(formData.get("productType") || "physical");
   const category = String(formData.get("category") || "").trim();
@@ -61,7 +62,7 @@ export async function POST(request) {
     }
   }
 
-  const { error } = await supabase.from("catalog_products").insert({
+  const payload = {
     title,
     product_type: productType,
     category,
@@ -69,12 +70,19 @@ export async function POST(request) {
     price: Number.isFinite(price) ? Math.max(0, Math.round(price)) : 0,
     stock: Number.isFinite(stock) ? Math.max(0, Math.round(stock)) : null,
     digital_url: digitalUrl || null,
-    digital_file_path: digitalFilePath,
-    digital_file_name: digitalFileName,
-    digital_file_type: digitalFileType,
-    digital_file_size: digitalFileSize,
     status,
-  });
+  };
+
+  if (digitalFilePath) {
+    payload.digital_file_path = digitalFilePath;
+    payload.digital_file_name = digitalFileName;
+    payload.digital_file_type = digitalFileType;
+    payload.digital_file_size = digitalFileSize;
+  }
+
+  const { error } = productId
+    ? await supabase.from("catalog_products").update(payload).eq("id", productId)
+    : await supabase.from("catalog_products").insert(payload);
 
   if (error) {
     return NextResponse.redirect(`${origin}/admin?error=${encodeURIComponent(error.message)}`, { status: 303 });

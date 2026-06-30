@@ -25,6 +25,7 @@ function isValidBusinessSlot(dateValue, timeValue) {
 export async function POST(request) {
   const origin = new URL(request.url).origin;
   const formData = await request.formData();
+  const slotId = String(formData.get("slotId") || "").trim();
   const specialistId = String(formData.get("specialistId") || "").trim();
   const slotDate = String(formData.get("slotDate") || "").trim();
   const slotTime = String(formData.get("slotTime") || "").trim();
@@ -59,17 +60,18 @@ export async function POST(request) {
     );
   }
 
-  const { error } = await supabase.from("appointment_slots").upsert(
-    {
-      specialist_id: specialistId,
-      slot_date: slotDate,
-      slot_time: slotTime,
-      status,
-    },
-    {
-      onConflict: "specialist_id,slot_date,slot_time",
-    }
-  );
+  const payload = {
+    specialist_id: specialistId,
+    slot_date: slotDate,
+    slot_time: slotTime,
+    status,
+  };
+
+  const { error } = slotId
+    ? await supabase.from("appointment_slots").update(payload).eq("id", slotId)
+    : await supabase.from("appointment_slots").upsert(payload, {
+        onConflict: "specialist_id,slot_date,slot_time",
+      });
 
   if (error) {
     return NextResponse.redirect(`${origin}/admin?error=${encodeURIComponent(error.message)}`, { status: 303 });
