@@ -22,9 +22,9 @@ export default function SiteNav({ isAdmin, isLoggedIn }) {
       </button>
       <nav className="site-nav" id="site-nav" aria-label="Principal">
         <div className="site-nav-links">
-          <a href="/quienes-somos" onClick={closeMenu}>Quienes somos</a>
+          <a href="/quienes-somos" onClick={closeMenu}>Quiénes somos</a>
           <a href="/cursos" onClick={closeMenu}>Cursos</a>
-          <a href="/catalogo" onClick={closeMenu}>Catalogo</a>
+          <a href="/catalogo" onClick={closeMenu}>Catálogo</a>
           <a href="/turnos" onClick={closeMenu}>Turnos</a>
         </div>
         <div className="site-nav-actions">
@@ -38,7 +38,7 @@ export default function SiteNav({ isAdmin, isLoggedIn }) {
             </>
           ) : (
             <>
-              <a className="secondary-button" href="/login" onClick={closeMenu}>Iniciar sesion</a>
+              <a className="secondary-button" href="/login" onClick={closeMenu}>Iniciar sesión</a>
               <a className="button" href="/registro" onClick={closeMenu}>Registrarse</a>
             </>
           )}

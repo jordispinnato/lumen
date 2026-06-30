@@ -751,10 +751,9 @@ h3 {
 .landing-page {
   overflow: hidden;
   background:
-    linear-gradient(180deg, #f5f7fb 0%, #ffffff 42%, #f7f4ee 100%);
+    linear-gradient(180deg, #edf3eb 0%, #f7f5ee 42%, #eef4f1 100%);
 }
 
-.landing-hero,
 .landing-section,
 .landing-final-cta,
 .about-hero {
@@ -763,26 +762,30 @@ h3 {
 }
 
 .landing-hero {
-  min-height: calc(100svh - 74px);
+  width: 100%;
+  min-height: min(760px, calc(100svh - 74px));
   display: grid;
-  grid-template-columns: minmax(0, 0.95fr) minmax(360px, 0.8fr);
-  gap: clamp(28px, 6vw, 76px);
   align-items: center;
-  padding: clamp(72px, 10vw, 118px) 0 56px;
+  padding: clamp(78px, 10vw, 124px) max(18px, calc((100vw - 1180px) / 2)) clamp(92px, 11vw, 138px);
+  background:
+    linear-gradient(90deg, rgba(237, 243, 235, 0.98) 0%, rgba(237, 243, 235, 0.9) 38%, rgba(237, 243, 235, 0.3) 72%, rgba(237, 243, 235, 0.04) 100%),
+    linear-gradient(0deg, rgba(237, 243, 235, 0.96), rgba(237, 243, 235, 0.08) 30%),
+    url("/assets/lumen-hero-v2.png") center right / cover;
+  border-bottom: 1px solid rgba(15, 23, 42, 0.08);
 }
 
 .landing-hero-copy h1,
 .about-hero h1 {
-  max-width: 760px;
+  max-width: 720px;
   margin-bottom: 18px;
   color: #101d38;
-  font-size: clamp(3.2rem, 7vw, 6.8rem);
-  line-height: 0.96;
+  font-size: clamp(3rem, 5.4vw, 5.4rem);
+  line-height: 1.02;
 }
 
 .landing-hero-copy .lead {
-  max-width: 620px;
-  color: #53627d;
+  max-width: 570px;
+  color: #43524b;
 }
 
 .landing-actions {
@@ -792,91 +795,12 @@ h3 {
   margin-top: 28px;
 }
 
-.landing-hero-visual {
-  position: relative;
-  min-height: 500px;
-  display: grid;
-  place-items: center;
-  border: 1px solid rgba(37, 99, 235, 0.12);
-  border-radius: var(--ds-radius);
-  overflow: hidden;
-  background:
-    linear-gradient(135deg, rgba(238, 244, 255, 0.92), rgba(255, 255, 255, 0.78)),
-    url("/assets/lumen-hero-v2.png") center / cover;
-  box-shadow: 0 26px 80px rgba(15, 23, 42, 0.12);
-}
-
-.landing-hero-visual::after {
-  content: "";
-  position: absolute;
-  inset: auto 0 0;
-  height: 42%;
-  background: linear-gradient(180deg, transparent, rgba(255, 255, 255, 0.86));
-}
-
-.landing-visual-core {
-  position: relative;
-  z-index: 1;
-  width: min(280px, 70%);
-  aspect-ratio: 1;
-  display: grid;
-  place-items: center;
-  border: 1px solid rgba(37, 99, 235, 0.14);
-  border-radius: var(--ds-radius);
-  background: rgba(255, 255, 255, 0.62);
-  backdrop-filter: blur(10px);
-}
-
-.landing-visual-core span {
-  color: #101d38;
-  font-size: clamp(1.8rem, 4vw, 3.4rem);
-  font-weight: 900;
-}
-
-.landing-person-card,
-.landing-floating-card {
-  position: absolute;
-  z-index: 2;
-  display: grid;
-  gap: 6px;
-  width: min(230px, 62%);
-  border: 1px solid rgba(37, 99, 235, 0.12);
-  border-radius: var(--ds-radius);
-  padding: 18px;
-  background: rgba(255, 255, 255, 0.88);
-  box-shadow: var(--ds-shadow-md);
-  backdrop-filter: blur(12px);
-}
-
-.landing-person-card {
-  left: 26px;
-  bottom: 34px;
-}
-
-.landing-floating-card {
-  right: 26px;
-  top: 36px;
-}
-
-.landing-person-card span,
-.landing-floating-card span {
-  color: #6d28d9;
-  font-size: 0.78rem;
-  font-weight: 900;
-  text-transform: uppercase;
-}
-
-.landing-person-card strong,
-.landing-floating-card strong {
-  color: #101d38;
-}
-
 .landing-feature-grid {
   width: min(960px, calc(100% - 36px));
   display: grid;
   grid-template-columns: repeat(3, minmax(0, 1fr));
   gap: 18px;
-  margin: -18px auto 74px;
+  margin: -58px auto 74px;
   position: relative;
   z-index: 3;
 }
@@ -888,11 +812,12 @@ h3 {
   min-width: 0;
   display: grid;
   gap: 14px;
-  border: 1px solid rgba(15, 23, 42, 0.08);
+  border: 1px solid rgba(19, 54, 58, 0.1);
   border-radius: var(--ds-radius);
   padding: 24px;
-  background: rgba(255, 255, 255, 0.92);
+  background: rgba(255, 255, 255, 0.9);
   box-shadow: var(--ds-shadow-sm);
+  backdrop-filter: blur(10px);
   transition: transform 180ms ease, border-color 180ms ease, box-shadow 180ms ease;
 }
 
@@ -3771,13 +3696,11 @@ body:has(.account-app-shell) .site-footer {
 
 @media (max-width: 980px) {
   .landing-hero {
-    min-height: auto;
-    grid-template-columns: 1fr;
-    padding-top: 48px;
-  }
-
-  .landing-hero-visual {
-    min-height: 420px;
+    min-height: 620px;
+    background:
+      linear-gradient(90deg, rgba(237, 243, 235, 0.98) 0%, rgba(237, 243, 235, 0.82) 54%, rgba(237, 243, 235, 0.25) 100%),
+      linear-gradient(0deg, rgba(237, 243, 235, 0.98), rgba(237, 243, 235, 0.12) 42%),
+      url("/assets/lumen-hero-v2.png") center / cover;
   }
 
   .landing-feature-grid,
@@ -3982,14 +3905,18 @@ body:has(.account-app-shell) .site-footer {
   }
 
   .landing-hero {
-    gap: 24px;
-    padding: 34px 0 36px;
+    width: 100%;
+    min-height: 620px;
+    padding: 54px 14px 92px;
+    background:
+      linear-gradient(180deg, rgba(237, 243, 235, 0.98) 0%, rgba(237, 243, 235, 0.86) 48%, rgba(237, 243, 235, 0.22) 100%),
+      url("/assets/lumen-hero-v2.png") 58% center / cover;
   }
 
   .landing-hero-copy h1,
   .about-hero h1 {
-    font-size: clamp(2.7rem, 12vw, 4rem);
-    line-height: 1;
+    font-size: clamp(2.45rem, 11vw, 3.6rem);
+    line-height: 1.03;
   }
 
   .landing-actions,
@@ -4000,26 +3927,6 @@ body:has(.account-app-shell) .site-footer {
 
   .landing-actions {
     flex-direction: column;
-  }
-
-  .landing-hero-visual {
-    min-height: auto;
-    display: grid;
-    gap: 12px;
-    place-items: stretch;
-    padding: 16px;
-  }
-
-  .landing-visual-core {
-    width: 100%;
-    min-height: 170px;
-    aspect-ratio: auto;
-  }
-
-  .landing-person-card,
-  .landing-floating-card {
-    position: static;
-    width: 100%;
   }
 
   .landing-feature-grid,

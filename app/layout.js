@@ -4,7 +4,7 @@ import SiteNav from "./SiteNav";
 
 export const metadata = {
   title: "LUMEN | Plataforma interdisciplinaria",
-  description: "Orientacion profesional, formacion y recursos para transformar informacion en acciones concretas.",
+  description: "Orientación profesional, formación y recursos para transformar información en acciones concretas.",
 };
 
 export default async function RootLayout({ children }) {
@@ -39,19 +39,19 @@ export default async function RootLayout({ children }) {
               <span className="brand-mark" aria-hidden="true" />
               <span>LUMEN</span>
             </a>
-            <p className="muted">Cursos, turnos online y recursos terapeuticos para acompanar tu bienestar.</p>
+            <p className="muted">Cursos, turnos online y recursos terapéuticos para acompañar tu bienestar.</p>
           </div>
-          <nav aria-label="Navegacion del pie">
-            <strong>Navegacion</strong>
-            <a href="/quienes-somos">Quienes somos</a>
+          <nav aria-label="Navegación del pie">
+            <strong>Navegación</strong>
+            <a href="/quienes-somos">Quiénes somos</a>
             <a href="/cursos">Cursos</a>
-            <a href="/catalogo">Catalogo</a>
+            <a href="/catalogo">Catálogo</a>
             <a href="/turnos">Turnos</a>
           </nav>
           <nav aria-label="Legal">
             <strong>Legal</strong>
-            <a href="#">Terminos y condiciones</a>
-            <a href="#">Politica de privacidad</a>
+            <a href="#">Términos y condiciones</a>
+            <a href="#">Política de privacidad</a>
           </nav>
           <nav aria-label="Redes sociales">
             <strong>Seguinos</strong>

@@ -1,8 +1,8 @@
 import { createSupabaseServerClient } from "../../lib/supabase/server";
 
 export const metadata = {
-  title: "Quienes somos | LUMEN",
-  description: "Conoce el espacio LUMEN y el equipo profesional.",
+  title: "Quiénes somos | LUMEN",
+  description: "Conocé el espacio LUMEN y el equipo profesional.",
 };
 
 function getInitials(name) {
@@ -26,10 +26,10 @@ export default async function QuienesSomosPage() {
     <main className="landing-page">
       <section className="about-hero">
         <p className="eyebrow">LUMEN</p>
-        <h1>Quienes somos</h1>
+        <h1>Quiénes somos</h1>
         <p className="lead">
-          LUMEN es un espacio interdisciplinario en construccion, pensado para acercar acompanamiento profesional,
-          formacion online y recursos terapeuticos de una manera clara, calida y accesible.
+          LUMEN es un espacio interdisciplinario en construcción, pensado para acercar acompañamiento profesional,
+          formación online y recursos terapéuticos de una manera clara, cálida y accesible.
         </p>
       </section>
 
@@ -37,7 +37,7 @@ export default async function QuienesSomosPage() {
         <div className="landing-section-head">
           <div>
             <p className="eyebrow">Nuestro equipo</p>
-            <h2>Profesionales que acompanan procesos.</h2>
+            <h2>Profesionales que acompañan procesos.</h2>
           </div>
           <a className="secondary-button" href="/turnos">Reservar turno</a>
         </div>
@@ -56,7 +56,7 @@ export default async function QuienesSomosPage() {
                   <p>{specialist.role || "Profesional LUMEN"}</p>
                   {specialist.professional_license ? <small>{specialist.professional_license}</small> : null}
                 </div>
-                <p>{specialist.short_bio || specialist.focus || "Perfil profesional preparado para acompanar procesos de bienestar."}</p>
+                <p>{specialist.short_bio || specialist.focus || "Perfil profesional preparado para acompañar procesos de bienestar."}</p>
                 <a className="secondary-button" href={specialist.slug ? `/profesionales/${specialist.slug}` : "/turnos"}>Ver perfil</a>
               </article>
             ))}
@@ -64,8 +64,8 @@ export default async function QuienesSomosPage() {
         ) : (
           <div className="ds-empty-state">
             <span aria-hidden="true">+</span>
-            <h3>El equipo se mostrara proximamente</h3>
-            <p>Cuando haya profesionales activos cargados en el sistema, sus perfiles van a aparecer en esta seccion.</p>
+            <h3>El equipo se mostrará próximamente</h3>
+            <p>Cuando haya profesionales activos cargados en el sistema, sus perfiles van a aparecer en esta sección.</p>
           </div>
         )}
       </section>
