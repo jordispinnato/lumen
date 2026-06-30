@@ -53,6 +53,13 @@ function slotLabel(count) {
   return count === 1 ? "1 turno" : `${count} turnos`;
 }
 
+function formatShortDate(value) {
+  return new Date(`${value}T00:00:00`).toLocaleDateString("es-AR", {
+    day: "numeric",
+    month: "short",
+  });
+}
+
 function getInitialSpecialistId(specialists, initialSpecialistSlug) {
   const matchedSpecialist = specialists.find((specialist) => specialist.slug === initialSpecialistSlug);
   return matchedSpecialist?.id || specialists[0]?.id;
@@ -67,7 +74,7 @@ export default function BookingPicker({ specialists, slots, userEmail, initialSp
   const [selectedSlotId, setSelectedSlotId] = useState("");
   const [isReviewing, setIsReviewing] = useState(false);
 
-  const months = useMemo(() => [buildMonth(0), buildMonth(1)], []);
+  const months = useMemo(() => Array.from({ length: 6 }, (_, index) => buildMonth(index)), []);
 
   const selectedSpecialist = useMemo(
     () => specialists.find((specialist) => specialist.id === selectedSpecialistId) || specialists[0],
@@ -89,6 +96,15 @@ export default function BookingPicker({ specialists, slots, userEmail, initialSp
 
   const selectedDateSlots = selectedDate ? slotsByDate[selectedDate] || [] : [];
   const selectedSlot = selectedDateSlots.find((slot) => slot.id === selectedSlotId);
+  const nextAvailableDates = useMemo(() => {
+    const todayIso = toISODate(new Date());
+
+    return Object.entries(slotsByDate)
+      .filter(([date, dateSlots]) => date >= todayIso && dateSlots.length > 0)
+      .sort(([dateA], [dateB]) => dateA.localeCompare(dateB))
+      .slice(0, 6)
+      .map(([date, dateSlots]) => ({ date, count: dateSlots.length }));
+  }, [slotsByDate]);
 
   function selectSpecialist(id) {
     setSelectedSpecialistId(id);
@@ -99,6 +115,18 @@ export default function BookingPicker({ specialists, slots, userEmail, initialSp
 
   function selectDay(day) {
     setSelectedDate(day.iso);
+    setSelectedSlotId("");
+    setIsReviewing(false);
+  }
+
+  function selectDateValue(dateValue) {
+    const monthIndex = months.findIndex((month) => month.days.some((day) => day.iso === dateValue));
+
+    if (monthIndex >= 0) {
+      setSelectedMonthIndex(monthIndex);
+    }
+
+    setSelectedDate(dateValue);
     setSelectedSlotId("");
     setIsReviewing(false);
   }
@@ -171,8 +199,28 @@ export default function BookingPicker({ specialists, slots, userEmail, initialSp
             </button>
           ))}
         </div>
+        {nextAvailableDates.length ? (
+          <div className="next-available-dates" aria-label="Próximas fechas disponibles">
+            <span>Próximos disponibles</span>
+            <div>
+              {nextAvailableDates.map((item) => (
+                <button
+                  className={item.date === selectedDate ? "is-active" : ""}
+                  key={item.date}
+                  type="button"
+                  onClick={() => selectDateValue(item.date)}
+                >
+                  {formatShortDate(item.date)}
+                  <small>{slotLabel(item.count)}</small>
+                </button>
+              ))}
+            </div>
+          </div>
+        ) : (
+          <p className="muted">Todavía no hay fechas disponibles para esta especialista.</p>
+        )}
         <div className="calendar-weekdays" aria-hidden="true">
-          {["Lun", "Mar", "Mie", "Jue", "Vie", "Sab", "Dom"].map((day) => (
+          {["Lun", "Mar", "Mié", "Jue", "Vie", "Sáb", "Dom"].map((day) => (
             <span key={day}>{day}</span>
           ))}
         </div>
@@ -192,6 +240,7 @@ export default function BookingPicker({ specialists, slots, userEmail, initialSp
                 type="button"
                 onClick={() => selectDay(day)}
               >
+                <span>{day.weekday}</span>
                 <strong>{day.dayNumber}</strong>
                 <small>{slotLabel(daySlots.length)}</small>
               </button>
