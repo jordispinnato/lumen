@@ -47,6 +47,30 @@ function getInitials(name, email) {
     .join("") || "A";
 }
 
+function getViewFromHash(hash) {
+  const key = String(hash || "#dashboard").replace("#", "") || "dashboard";
+  const viewMap = {
+    dashboard: "dashboard",
+    profesionales: "turnos",
+    turnos: "turnos",
+    cursos: "cursos",
+    modulos: "modulos",
+    lecciones: "lecciones",
+    materiales: "materiales",
+    catalogo: "catalogo",
+    productos: "catalogo",
+    categorias: "catalogo",
+    solicitudes: "catalogo",
+    usuarios: "usuarios",
+    inscripciones: "inscripciones",
+    contenido: "contenido",
+    biblioteca: "contenido",
+    configuracion: "configuracion",
+  };
+
+  return viewMap[key] || "dashboard";
+}
+
 export default function AdminCmsShell({ adminName, adminEmail, children }) {
   const flatMenu = useMemo(() => menuGroups.flat(), []);
   const [isCollapsed, setIsCollapsed] = useState(false);
@@ -54,6 +78,7 @@ export default function AdminCmsShell({ adminName, adminEmail, children }) {
   const [activeHash, setActiveHash] = useState("#dashboard");
   const initials = getInitials(adminName, adminEmail);
   const activeItem = flatMenu.find((item) => item.href === activeHash) || flatMenu[0];
+  const activeView = getViewFromHash(activeHash);
 
   useEffect(() => {
     const storedValue = window.localStorage.getItem("lumen-admin-sidebar-collapsed");
@@ -72,6 +97,18 @@ export default function AdminCmsShell({ adminName, adminEmail, children }) {
     return () => window.removeEventListener("hashchange", updateHash);
   }, []);
 
+  useEffect(() => {
+    const panels = document.querySelectorAll("[data-admin-view]");
+
+    panels.forEach((panel) => {
+      const views = String(panel.getAttribute("data-admin-view") || "")
+        .split(/\s+/)
+        .filter(Boolean);
+
+      panel.hidden = views.length ? !views.includes(activeView) : false;
+    });
+  }, [activeView]);
+
   function toggleCollapsed() {
     setIsCollapsed((current) => {
       const nextValue = !current;
@@ -85,7 +122,7 @@ export default function AdminCmsShell({ adminName, adminEmail, children }) {
   }
 
   return (
-    <div className={`admin-cms-shell ${isCollapsed ? "is-collapsed" : ""} ${isMobileOpen ? "is-mobile-open" : ""}`}>
+    <div className={`admin-cms-shell ${isCollapsed ? "is-collapsed" : ""} ${isMobileOpen ? "is-mobile-open" : ""}`} data-active-admin-view={activeView}>
       <button className="admin-cms-overlay" type="button" aria-label="Cerrar menu" onClick={closeMobileMenu} />
 
       <aside className="admin-cms-sidebar" aria-label="Navegacion del CMS">

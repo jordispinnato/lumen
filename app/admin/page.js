@@ -260,7 +260,7 @@ export default async function AdminPage({ searchParams }) {
   return (
     <AdminCmsShell adminName={profile?.full_name || profile?.email || userData.user.email} adminEmail={profile?.email || userData.user.email}>
       <div className="dashboard-shell admin-cms-inner">
-        <div className="section-head">
+        <div className="section-head" data-admin-view="dashboard">
           <p className="eyebrow">Panel admin</p>
           <h1>Gestión LUMEN</h1>
           <p className="lead">
@@ -270,7 +270,7 @@ export default async function AdminPage({ searchParams }) {
           {params?.message ? <p className="notice success">{params.message}</p> : null}
         </div>
 
-        <section className="admin-dashboard" id="dashboard">
+        <section className="admin-dashboard" id="dashboard" data-admin-view="dashboard">
           <div className="admin-metrics-grid">
             <MetricCard label="Turnos de hoy" value={todayBookings.length} helper="Reservas para la fecha actual" href="#turnos" />
             <MetricCard label="Proximos turnos" value={futureBookings.length} helper="Reservas futuras confirmadas" href="#turnos" />
@@ -374,7 +374,7 @@ export default async function AdminPage({ searchParams }) {
           </div>
         </section>
 
-        <section className="admin-section" id="turnos">
+        <section className="admin-section" id="turnos" data-admin-view="turnos">
           <div className="admin-section-head">
             <p className="eyebrow">Turnos</p>
             <h2>Especialistas, disponibilidad y reservas</h2>
@@ -652,7 +652,7 @@ export default async function AdminPage({ searchParams }) {
         </section>
         </section>
 
-        <section className="admin-section" id="catalogo">
+        <section className="admin-section" id="catalogo" data-admin-view="catalogo">
           <div className="admin-section-head">
             <p className="eyebrow">Catalogo</p>
             <h2>Productos fisicos y digitales</h2>
@@ -821,14 +821,14 @@ export default async function AdminPage({ searchParams }) {
         </section>
         </section>
 
-        <section className="admin-section" id="cursos">
+        <section className="admin-section" id="cursos" data-admin-view="cursos modulos lecciones materiales usuarios">
           <div className="admin-section-head">
             <p className="eyebrow">Cursos</p>
             <h2>Constructor academico</h2>
           </div>
 
         <div className="admin-layout spaced-panel">
-          <section className="panel">
+          <section className="panel" data-admin-view="cursos">
             <h2>Crear o actualizar curso</h2>
             <form className="admin-form" action="/admin/courses/create" method="post" encType="multipart/form-data">
               <label>
@@ -911,7 +911,7 @@ export default async function AdminPage({ searchParams }) {
             </form>
           </section>
 
-          <section className="panel">
+          <section className="panel" data-admin-view="modulos">
             <span className="admin-anchor-target" id="modulos" />
             <h2>Crear o actualizar modulo</h2>
             <form className="admin-form" action="/admin/modules/create" method="post">
@@ -961,7 +961,7 @@ export default async function AdminPage({ searchParams }) {
           </section>
         </div>
 
-        <section className="panel spaced-panel">
+        <section className="panel spaced-panel" data-admin-view="cursos">
           <h2>Cursos cargados</h2>
           <div className="compact-list">
             {courses?.length ? courses.map((course) => (
@@ -1061,7 +1061,7 @@ export default async function AdminPage({ searchParams }) {
         </section>
 
         <div className="admin-layout spaced-panel">
-          <section className="panel">
+          <section className="panel" data-admin-view="lecciones">
             <span className="admin-anchor-target" id="lecciones" />
             <h2>Agregar lección o video</h2>
             <form className="admin-form" action="/admin/lessons/create" method="post">
@@ -1140,7 +1140,7 @@ export default async function AdminPage({ searchParams }) {
         </div>
 
         <div className="admin-layout spaced-panel">
-          <section className="panel">
+          <section className="panel" data-admin-view="materiales">
             <span className="admin-anchor-target" id="materiales" />
             <h2>Subir material o link</h2>
             <form className="admin-form" action="/admin/materials/create" method="post" encType="multipart/form-data">
@@ -1206,7 +1206,7 @@ export default async function AdminPage({ searchParams }) {
             </form>
           </section>
 
-          <section className="panel">
+          <section className="panel" data-admin-view="usuarios">
             <span className="admin-anchor-target" id="usuarios" />
             <h2>Habilitar curso a un alumno</h2>
             <form className="admin-form" action="/admin/enrollments/create" method="post">
@@ -1238,14 +1238,14 @@ export default async function AdminPage({ searchParams }) {
         </div>
         </section>
 
-        <section className="admin-section" id="contenido">
+        <section className="admin-section" id="contenido" data-admin-view="contenido modulos materiales lecciones">
           <div className="admin-section-head">
             <p className="eyebrow">Contenido</p>
             <h2>Materiales y lecciones cargadas</h2>
           </div>
 
         <div className="admin-layout spaced-panel">
-          <section className="panel">
+          <section className="panel" data-admin-view="contenido modulos">
             <span className="admin-anchor-target" id="biblioteca" />
             <h2>Modulos cargados</h2>
             <div className="compact-list">
@@ -1298,7 +1298,7 @@ export default async function AdminPage({ searchParams }) {
             </div>
           </section>
 
-          <section className="panel">
+          <section className="panel" data-admin-view="contenido materiales">
             <h2>Materiales cargados</h2>
             <div className="compact-list">
               {materials?.length ? materials.map((material) => (
@@ -1379,7 +1379,7 @@ export default async function AdminPage({ searchParams }) {
             </div>
           </section>
 
-          <section className="panel">
+          <section className="panel" data-admin-view="contenido lecciones">
             <h2>Lecciones cargadas</h2>
             <div className="compact-list">
               {lessons?.length ? lessons.map((lesson) => (
@@ -1461,7 +1461,7 @@ export default async function AdminPage({ searchParams }) {
         </div>
         </section>
 
-        <section className="panel spaced-panel">
+        <section className="panel spaced-panel" data-admin-view="cursos">
           <EntityTable
             title="Cursos"
             description="Gestion comun de cursos con acciones preparadas."
@@ -1479,7 +1479,7 @@ export default async function AdminPage({ searchParams }) {
           />
         </section>
 
-        <section className="panel spaced-panel" id="inscripciones">
+        <section className="panel spaced-panel" id="inscripciones" data-admin-view="inscripciones usuarios">
           <EntityTable
             title="Inscripciones"
             description="Accesos habilitados a cursos."
@@ -1495,7 +1495,7 @@ export default async function AdminPage({ searchParams }) {
           />
         </section>
 
-        <section className="panel spaced-panel" id="configuracion">
+        <section className="panel spaced-panel" id="configuracion" data-admin-view="configuracion">
           <p className="eyebrow">Configuracion</p>
           <h2>Configuracion del CMS</h2>
           <p className="muted">
