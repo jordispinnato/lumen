@@ -280,17 +280,18 @@ export default async function MiCuentaPage() {
   ];
 
   return (
-    <AccountDashboardShell navItems={navItems} displayName={displayName} avatarInitials={avatarInitials}>
+    <AccountDashboardShell navItems={navItems} displayName={displayName} avatarInitials={avatarInitials} isAdmin={profile?.role === "admin"}>
         <div className="account-dashboard" id="inicio">
           <section className="account-hero">
             <div>
+              <span className="account-page-kicker">Mi Espacio</span>
               <h1>¡Hola, {firstName}!</h1>
               <p>Bienvenido a tu espacio personal. Aca tenes un resumen de tu actividad.</p>
             </div>
             <a className="account-primary-action" href="/turnos">Reservar turno</a>
           </section>
 
-          <section className="account-stats-grid" aria-label="Resumen de mi cuenta">
+          <section className="account-stats-grid" aria-label="Resumen de Mi Espacio">
             <StatCard
               icon="T"
               tone="blue"

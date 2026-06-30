@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 
-export default function AccountDashboardShell({ navItems, displayName, avatarInitials, children }) {
+export default function AccountDashboardShell({ navItems, displayName, avatarInitials, isAdmin = false, children }) {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
 
   function closeMenu() {
@@ -13,13 +13,26 @@ export default function AccountDashboardShell({ navItems, displayName, avatarIni
     <main className={`account-app-shell${isMenuOpen ? " is-menu-open" : ""}`}>
       <button className="account-app-overlay" type="button" aria-label="Cerrar menu" onClick={closeMenu} />
 
-      <aside className="account-sidebar" aria-label="Navegacion de mi cuenta">
-        <a className="account-brand" href="/mi-cuenta" onClick={closeMenu}>
+      <aside className="account-sidebar" aria-label="Navegacion de Mi Espacio">
+        <a className="account-brand" href="/" onClick={closeMenu}>
           <span className="account-brand-mark" aria-hidden="true" />
-          <strong>LUMEN</strong>
+          <span>
+            <strong>LUMEN</strong>
+            <small>Mi Espacio</small>
+          </span>
         </a>
 
         <nav className="account-sidebar-nav">
+          <a href="/" onClick={closeMenu}>
+            <span>H</span>
+            Sitio principal
+          </a>
+          {isAdmin ? (
+            <a href="/admin" onClick={closeMenu}>
+              <span>A</span>
+              Ir al Admin
+            </a>
+          ) : null}
           {navItems.map((item) => (
             <a className={item.href === "#inicio" ? "is-active" : ""} href={item.href} key={item.href} onClick={closeMenu}>
               <span>{item.icon}</span>
@@ -55,6 +68,8 @@ export default function AccountDashboardShell({ navItems, displayName, avatarIni
                 <strong>{displayName}</strong>
               </summary>
               <div>
+                <a href="/">Ir al sitio principal</a>
+                {isAdmin ? <a href="/admin">Ir al Admin</a> : null}
                 <a href="#configuracion">Ver perfil</a>
                 <form action="/auth/logout" method="post">
                   <button type="submit">Cerrar sesion</button>

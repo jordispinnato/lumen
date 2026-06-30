@@ -70,7 +70,7 @@ export default async function TurnosPage({ searchParams }) {
               </div>
             </dl>
             <div className="actions">
-              <a className="button" href="/mi-cuenta">Ir a Mi Cuenta</a>
+              <a className="button" href="/mi-cuenta">Ir a Mi Espacio</a>
               <a className="button secondary" href="/turnos">Reservar otro turno</a>
             </div>
           </section>

@@ -5,6 +5,8 @@ import { useEffect, useMemo, useState } from "react";
 const menuGroups = [
   [
     { label: "Dashboard", href: "#dashboard", icon: "D" },
+    { label: "Sitio principal", href: "/", icon: "H" },
+    { label: "Mi Espacio", href: "/mi-cuenta", icon: "E" },
   ],
   [
     { label: "Profesionales", href: "#profesionales", icon: "P" },
@@ -146,6 +148,9 @@ export default function AdminCmsShell({ adminName, adminEmail, children }) {
             </summary>
             <div>
               <p>{adminEmail || "Usuario administrador"}</p>
+              <a href="/mi-cuenta">Mi Espacio</a>
+              <a href="/">Sitio principal</a>
+              <a href="#dashboard">Dashboard</a>
               <form action="/auth/logout" method="post">
                 <button type="submit">Cerrar sesion</button>
               </form>

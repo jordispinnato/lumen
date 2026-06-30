@@ -253,7 +253,7 @@ export default async function ClassroomPage({ searchParams }) {
               <p className="eyebrow">Curso finalizado</p>
               <h1>Felicitaciones, terminaste el curso.</h1>
               <p className="lead">La estructura para certificados queda preparada para una proxima etapa.</p>
-              <a className="button" href="/mi-cuenta#cursos">Volver a Mis Cursos</a>
+              <a className="button" href="/mi-cuenta#cursos">Volver a Mi Espacio</a>
             </section>
           ) : null}
 
