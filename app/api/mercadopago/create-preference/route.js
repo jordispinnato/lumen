@@ -1,11 +1,18 @@
 import { NextResponse } from "next/server";
 import { demoCourses } from "../../../../lib/courses";
 import { createMercadoPagoPreferenceClient } from "../../../../lib/mercadopago";
+import { createSupabaseServerClient } from "../../../../lib/supabase/server";
 
 export async function POST(request) {
   const formData = await request.formData();
-  const courseSlug = formData.get("courseSlug");
-  const course = demoCourses.find((item) => item.slug === courseSlug);
+  const courseSlug = String(formData.get("courseSlug") || "");
+  const supabase = await createSupabaseServerClient();
+  const { data } = await supabase
+    .from("courses")
+    .select("slug,title,price,status")
+    .eq("slug", courseSlug)
+    .maybeSingle();
+  const course = data || demoCourses.find((item) => item.slug === courseSlug);
 
   if (!course) {
     return NextResponse.json({ error: "Curso no encontrado" }, { status: 404 });
