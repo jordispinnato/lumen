@@ -1580,6 +1580,60 @@ body:has(.admin-cms-shell) {
   grid-column: 1 / -1;
 }
 
+.admin-fieldset {
+  min-width: 0;
+  display: grid;
+  gap: 10px;
+  margin: 0;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  padding: 14px;
+  background: rgba(255, 253, 248, 0.72);
+}
+
+.admin-fieldset legend {
+  padding: 0 6px;
+  color: var(--deep);
+  font-size: 0.86rem;
+  font-weight: 900;
+}
+
+.admin-checkbox-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(92px, 1fr));
+  gap: 8px;
+}
+
+.admin-checkbox-grid.compact {
+  grid-template-columns: repeat(auto-fit, minmax(72px, 1fr));
+}
+
+.admin-checkbox-grid .check-field {
+  min-height: 42px;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  padding: 8px 10px;
+  background: white;
+}
+
+.admin-secondary-details {
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  padding: 12px;
+  background: rgba(20, 53, 56, 0.03);
+}
+
+.admin-secondary-details summary {
+  cursor: pointer;
+  color: var(--petrol);
+  font-weight: 900;
+}
+
+.nested-form {
+  margin-top: 12px;
+  padding: 0;
+}
+
 .inline-actions {
   display: flex;
   flex-wrap: wrap;

@@ -32,6 +32,22 @@ function formatTime(value) {
   return value?.slice(0, 5) || "Sin hora";
 }
 
+function buildAdminTimeOptions() {
+  const options = [];
+
+  for (let hour = 8; hour <= 20; hour += 1) {
+    [0, 30].forEach((minute) => {
+      if (hour === 20 && minute > 0) {
+        return;
+      }
+
+      options.push(`${String(hour).padStart(2, "0")}:${String(minute).padStart(2, "0")}`);
+    });
+  }
+
+  return options;
+}
+
 function bookingSortValue(booking) {
   return `${booking.appointment_slots?.slot_date || ""} ${booking.appointment_slots?.slot_time || ""}`;
 }
@@ -152,6 +168,15 @@ export default async function AdminPage({ searchParams }) {
   ]);
 
   const today = new Date().toISOString().slice(0, 10);
+  const adminTimeOptions = buildAdminTimeOptions();
+  const adminWeekdays = [
+    { value: "1", label: "Lun" },
+    { value: "2", label: "Mar" },
+    { value: "3", label: "Mié" },
+    { value: "4", label: "Jue" },
+    { value: "5", label: "Vie" },
+    { value: "6", label: "Sáb" },
+  ];
   const bookings = appointmentBookings || [];
   const todayBookings = bookings.filter((booking) => booking.appointment_slots?.slot_date === today);
   const futureBookings = bookings
@@ -466,13 +491,49 @@ export default async function AdminPage({ searchParams }) {
                 </select>
               </label>
               <label>
-                Dia
-                <input name="slotDate" type="date" required />
+                Desde
+                <input name="slotStartDate" type="date" required defaultValue={today} />
               </label>
               <label>
-                Horario
-                <input name="slotTime" type="time" min="08:00" max="20:00" step="900" required />
+                Hasta
+                <input name="slotEndDate" type="date" required defaultValue={today} />
               </label>
+              <fieldset className="admin-fieldset wide-field">
+                <legend>Dias de atencion</legend>
+                <div className="admin-checkbox-grid compact">
+                  {adminWeekdays.map((weekday) => (
+                    <label className="check-field" key={weekday.value}>
+                      <input name="weekdays" type="checkbox" value={weekday.value} defaultChecked={weekday.value !== "6"} />
+                      {weekday.label}
+                    </label>
+                  ))}
+                </div>
+              </fieldset>
+              <fieldset className="admin-fieldset wide-field">
+                <legend>Horarios</legend>
+                <div className="admin-checkbox-grid">
+                  {adminTimeOptions.map((timeOption) => (
+                    <label className="check-field" key={timeOption}>
+                      <input name="slotTimes" type="checkbox" value={timeOption} />
+                      {timeOption}
+                    </label>
+                  ))}
+                </div>
+                <p className="muted">Podés seleccionar varios horarios. Los sábados solo se guardan horarios hasta las 13:00.</p>
+              </fieldset>
+              <details className="wide-field admin-secondary-details">
+                <summary>Cargar un solo horario</summary>
+                <div className="admin-form nested-form">
+                  <label>
+                    Día
+                    <input name="slotDate" type="date" defaultValue={today} />
+                  </label>
+                  <label>
+                    Horario
+                    <input name="slotTime" type="time" min="08:00" max="20:00" step="900" />
+                  </label>
+                </div>
+              </details>
               <label>
                 Estado
                 <select name="status" defaultValue="available">
@@ -481,10 +542,10 @@ export default async function AdminPage({ searchParams }) {
                   <option value="booked">Reservado</option>
                 </select>
               </label>
-              <button className="button" type="submit">Guardar horario</button>
+              <button className="button" type="submit">Guardar horarios</button>
             </form>
             <p className="muted">
-              Horarios permitidos: lunes a viernes de 08:00 a 20:00 y sabados de 08:00 a 13:00.
+              Horarios permitidos: lunes a viernes de 08:00 a 20:00 y sábados de 08:00 a 13:00.
             </p>
           </section>
         </div>
