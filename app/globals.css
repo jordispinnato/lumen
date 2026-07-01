@@ -797,6 +797,11 @@ h3 {
   color: var(--petrol);
 }
 
+.admin-global-notice {
+  display: grid;
+  gap: 10px;
+}
+
 .dashboard-grid {
   display: grid;
   grid-template-columns: 280px minmax(0, 1fr);

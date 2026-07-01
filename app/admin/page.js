@@ -1,4 +1,5 @@
 import { redirect } from "next/navigation";
+import { createSupabaseAdminClient } from "../../lib/supabase/admin";
 import { createSupabaseServerClient } from "../../lib/supabase/server";
 import { formatPrice } from "../../lib/courses";
 import AdminCmsShell from "./AdminCmsShell";
@@ -140,6 +141,8 @@ export default async function AdminPage({ searchParams }) {
     );
   }
 
+  const dataSupabase = createSupabaseAdminClient() || supabase;
+
   const [
     { data: courses },
     { data: courseModules },
@@ -154,51 +157,51 @@ export default async function AdminPage({ searchParams }) {
     { data: catalogOrders },
     { data: specialistCalendarConnections },
   ] = await Promise.all([
-    supabase
+    dataSupabase
       .from("courses")
       .select("id,slug,title,summary,description,cover_image_url,intro_video_url,instructor,level,total_duration,category,price,status,featured,display_order,learning_outcomes,audience,requirements,faq,created_at")
       .order("display_order", { ascending: true })
       .order("created_at", { ascending: false }),
-    supabase
+    dataSupabase
       .from("course_modules")
       .select("id,title,description,position,status,courses:course_id (id,title,slug)")
       .order("position", { ascending: true }),
-    supabase.from("profiles").select("id,full_name,email,role,created_at").order("created_at", { ascending: false }),
-    supabase
+    dataSupabase.from("profiles").select("id,full_name,email,role,created_at").order("created_at", { ascending: false }),
+    dataSupabase
       .from("enrollments")
       .select("id,user_id,course_id,created_at,profiles:user_id (id,full_name,email),courses:course_id (id,title,slug)")
       .order("created_at", { ascending: false }),
-    supabase
+    dataSupabase
       .from("lessons")
       .select("id,title,description,video_url,duration_minutes,position,status,is_preview,objectives,courses:course_id (id,title,slug),course_modules:module_id (id,title)")
       .order("position", { ascending: true }),
-    supabase
+    dataSupabase
       .from("course_materials")
       .select("id,title,file_name,file_type,file_size,material_type,external_url,status,position,courses:course_id (id,title,slug),lessons:lesson_id (id,title)")
       .order("position", { ascending: true }),
-    supabase
+    dataSupabase
       .from("appointment_specialists")
       .select("id,user_id,name,role,professional_license,professional_email,focus,short_bio,education,years_experience,duration_minutes,session,price,status,display_order,slug,photo_url,created_at")
       .order("display_order", { ascending: true })
       .order("created_at", { ascending: false }),
-    supabase
+    dataSupabase
       .from("appointment_slots")
       .select("id,slot_date,slot_time,status,appointment_specialists:specialist_id (id,name)")
       .order("slot_date", { ascending: true })
       .order("slot_time", { ascending: true }),
-    supabase
+    dataSupabase
       .from("appointment_bookings")
       .select("id,user_id,slot_id,patient_email,patient_name,status,created_at,appointment_specialists:specialist_id (name),appointment_slots:slot_id (slot_date,slot_time)")
       .order("created_at", { ascending: false }),
-    supabase
+    dataSupabase
       .from("catalog_products")
       .select("id,title,product_type,category,summary,price,stock,status,digital_url,digital_file_name,created_at")
       .order("created_at", { ascending: false }),
-    supabase
+    dataSupabase
       .from("catalog_orders")
       .select("id,user_id,customer_email,customer_name,product_type,amount,status,created_at,shipping_province,shipping_city,shipping_postal_code,shipping_street,shipping_number,shipping_floor_apartment,shipping_phone,shipping_notes,catalog_products:product_id (title)")
       .order("created_at", { ascending: false }),
-    supabase
+    dataSupabase
       .from("specialist_calendar_connections")
       .select("specialist_id,google_calendar_email,google_calendar_connected_at,calendar_sync_enabled"),
   ]);
@@ -372,14 +375,19 @@ export default async function AdminPage({ searchParams }) {
   return (
     <AdminCmsShell adminName={profile?.full_name || profile?.email || userData.user.email} adminEmail={profile?.email || userData.user.email}>
       <div className="dashboard-shell admin-cms-inner">
+        {params?.error || params?.message ? (
+          <div className="admin-global-notice">
+            {params?.error ? <p className="notice error">{params.error}</p> : null}
+            {params?.message ? <p className="notice success">{params.message}</p> : null}
+          </div>
+        ) : null}
+
         <div className="section-head" data-admin-view="dashboard">
           <p className="eyebrow">Panel admin</p>
           <h1>Gestión LUMEN</h1>
           <p className="lead">
             Bienvenido al panel de administracion de LUMEN. Gestiona turnos, profesionales, cursos, catalogo y contenidos desde un solo lugar.
           </p>
-          {params?.error ? <p className="notice error">{params.error}</p> : null}
-          {params?.message ? <p className="notice success">{params.message}</p> : null}
         </div>
 
         <section className="admin-dashboard" id="dashboard" data-admin-view="dashboard">

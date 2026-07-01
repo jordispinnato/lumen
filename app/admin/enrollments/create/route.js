@@ -2,6 +2,10 @@ import { NextResponse } from "next/server";
 import { createSupabaseAdminClient } from "../../../../lib/supabase/admin";
 import { createSupabaseServerClient } from "../../../../lib/supabase/server";
 
+function redirectToAdmin(origin, type, message) {
+  return NextResponse.redirect(`${origin}/admin?${type}=${encodeURIComponent(message)}#usuarios`, { status: 303 });
+}
+
 export async function POST(request) {
   const origin = new URL(request.url).origin;
   const formData = await request.formData();
@@ -21,56 +25,70 @@ export async function POST(request) {
     .maybeSingle();
 
   if (profile?.role !== "admin") {
-    return NextResponse.redirect(`${origin}/admin?error=No autorizado#usuarios`, { status: 303 });
+    return redirectToAdmin(origin, "error", "No autorizado");
   }
 
   if (!userId || !courseId) {
-    return NextResponse.redirect(`${origin}/admin?error=${encodeURIComponent("Falta seleccionar usuario y curso")}#usuarios`, {
-      status: 303,
-    });
+    return redirectToAdmin(origin, "error", "Falta seleccionar usuario y curso");
   }
 
-  const adminSupabase = createSupabaseAdminClient();
+  const writeSupabase = createSupabaseAdminClient() || supabase;
 
-  if (!adminSupabase) {
-    return NextResponse.redirect(
-      `${origin}/admin?error=${encodeURIComponent("Falta configurar SUPABASE_SERVICE_ROLE_KEY")}#usuarios`,
-      { status: 303 },
-    );
-  }
-
-  const { data: targetProfile } = await adminSupabase
+  const { data: targetProfile, error: targetProfileError } = await writeSupabase
     .from("profiles")
     .select("id")
     .eq("id", userId)
     .maybeSingle();
 
-  if (!targetProfile) {
-    return NextResponse.redirect(`${origin}/admin?error=${encodeURIComponent("No se encontro el usuario")}#usuarios`, {
-      status: 303,
-    });
+  if (targetProfileError) {
+    return redirectToAdmin(origin, "error", targetProfileError.message);
   }
 
-  const { data: course } = await adminSupabase.from("courses").select("id").eq("id", courseId).maybeSingle();
+  if (!targetProfile) {
+    return redirectToAdmin(origin, "error", "No se encontro el usuario");
+  }
+
+  const { data: course, error: courseError } = await writeSupabase
+    .from("courses")
+    .select("id,title")
+    .eq("id", courseId)
+    .maybeSingle();
+
+  if (courseError) {
+    return redirectToAdmin(origin, "error", courseError.message);
+  }
 
   if (!course) {
-    return NextResponse.redirect(`${origin}/admin?error=${encodeURIComponent("No se encontro el curso")}#usuarios`, {
-      status: 303,
-    });
+    return redirectToAdmin(origin, "error", "No se encontro el curso");
   }
 
-  const { error } = await adminSupabase.from("enrollments").upsert({
+  const { data: existingEnrollment, error: existingError } = await writeSupabase
+    .from("enrollments")
+    .select("id")
+    .eq("user_id", userId)
+    .eq("course_id", courseId)
+    .maybeSingle();
+
+  if (existingError) {
+    return redirectToAdmin(origin, "error", existingError.message);
+  }
+
+  if (existingEnrollment) {
+    return redirectToAdmin(origin, "message", `El curso ${course.title || ""} ya estaba habilitado`);
+  }
+
+  const { error } = await writeSupabase.from("enrollments").insert({
     user_id: userId,
     course_id: courseId,
-  }, {
-    onConflict: "user_id,course_id",
   });
 
   if (error) {
-    return NextResponse.redirect(`${origin}/admin?error=${encodeURIComponent(error.message)}#usuarios`, {
-      status: 303,
-    });
+    if (error.code === "23505") {
+      return redirectToAdmin(origin, "message", `El curso ${course.title || ""} ya estaba habilitado`);
+    }
+
+    return redirectToAdmin(origin, "error", error.message);
   }
 
-  return NextResponse.redirect(`${origin}/admin?message=Curso habilitado#usuarios`, { status: 303 });
+  return redirectToAdmin(origin, "message", `Curso habilitado: ${course.title || "curso"}`);
 }

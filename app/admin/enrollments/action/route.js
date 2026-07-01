@@ -2,6 +2,10 @@ import { NextResponse } from "next/server";
 import { createSupabaseAdminClient } from "../../../../lib/supabase/admin";
 import { createSupabaseServerClient } from "../../../../lib/supabase/server";
 
+function redirectToAdmin(origin, type, message) {
+  return NextResponse.redirect(`${origin}/admin?${type}=${encodeURIComponent(message)}#usuarios`, { status: 303 });
+}
+
 async function requireAdmin(supabase, origin) {
   const { data: userData } = await supabase.auth.getUser();
 
@@ -16,7 +20,7 @@ async function requireAdmin(supabase, origin) {
     .maybeSingle();
 
   if (profile?.role !== "admin") {
-    return { response: NextResponse.redirect(`${origin}/admin?error=No autorizado#usuarios`, { status: 303 }) };
+    return { response: redirectToAdmin(origin, "error", "No autorizado") };
   }
 
   return { user: userData.user };
@@ -35,25 +39,15 @@ export async function POST(request) {
   }
 
   if (!enrollmentId || action !== "delete") {
-    return NextResponse.redirect(`${origin}/admin?error=${encodeURIComponent("Accion de inscripcion incompleta")}#usuarios`, {
-      status: 303,
-    });
+    return redirectToAdmin(origin, "error", "Accion de inscripcion incompleta");
   }
 
-  const adminSupabase = createSupabaseAdminClient();
-
-  if (!adminSupabase) {
-    return NextResponse.redirect(
-      `${origin}/admin?error=${encodeURIComponent("Falta configurar SUPABASE_SERVICE_ROLE_KEY")}#usuarios`,
-      { status: 303 },
-    );
-  }
-
-  const { error } = await adminSupabase.from("enrollments").delete().eq("id", enrollmentId);
+  const writeSupabase = createSupabaseAdminClient() || supabase;
+  const { error } = await writeSupabase.from("enrollments").delete().eq("id", enrollmentId);
 
   if (error) {
-    return NextResponse.redirect(`${origin}/admin?error=${encodeURIComponent(error.message)}#usuarios`, { status: 303 });
+    return redirectToAdmin(origin, "error", error.message);
   }
 
-  return NextResponse.redirect(`${origin}/admin?message=Curso quitado del usuario#usuarios`, { status: 303 });
+  return redirectToAdmin(origin, "message", "Curso quitado del usuario");
 }
