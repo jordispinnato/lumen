@@ -66,18 +66,6 @@ export default async function SpecialistPage({ searchParams }) {
     .eq("id", userData.user.id)
     .maybeSingle();
 
-  if (profile?.role !== "specialist" && profile?.role !== "admin") {
-    return (
-      <main className="section">
-        <div className="form-card">
-          <p className="eyebrow">Panel de especialista</p>
-          <h1>Acceso restringido</h1>
-          <p className="muted">Tu usuario todavia no tiene rol de especialista.</p>
-        </div>
-      </main>
-    );
-  }
-
   const { data: specialist } = await supabase
     .from("appointment_specialists")
     .select(`
@@ -98,6 +86,18 @@ export default async function SpecialistPage({ searchParams }) {
     `)
     .eq("user_id", userData.user.id)
     .maybeSingle();
+
+  if (profile?.role !== "specialist" && profile?.role !== "admin" && !specialist) {
+    return (
+      <main className="section">
+        <div className="form-card">
+          <p className="eyebrow">Panel de especialista</p>
+          <h1>Acceso restringido</h1>
+          <p className="muted">Tu usuario todavia no esta vinculado a un perfil de especialista.</p>
+        </div>
+      </main>
+    );
+  }
 
   const { data: calendarConnection } = specialist
     ? await supabase

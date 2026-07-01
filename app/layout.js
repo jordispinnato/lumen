@@ -22,6 +22,16 @@ export default async function RootLayout({ children }) {
 
     isAdmin = profile?.role === "admin";
     isSpecialist = profile?.role === "specialist";
+
+    if (!isSpecialist) {
+      const { data: linkedSpecialist } = await supabase
+        .from("appointment_specialists")
+        .select("id")
+        .eq("user_id", userData.user.id)
+        .maybeSingle();
+
+      isSpecialist = Boolean(linkedSpecialist);
+    }
   }
 
   return (
