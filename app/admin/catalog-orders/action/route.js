@@ -25,6 +25,7 @@ export async function POST(request) {
   const origin = new URL(request.url).origin;
   const formData = await request.formData();
   const orderId = String(formData.get("orderId") || "").trim();
+  const action = String(formData.get("action") || "update").trim();
   const status = String(formData.get("status") || "").trim();
   const validStatuses = new Set(["pending_payment", "paid", "cancelled", "delivered"]);
   const supabase = await createSupabaseServerClient();
@@ -34,8 +35,24 @@ export async function POST(request) {
     return auth.response;
   }
 
-  if (!orderId || !validStatuses.has(status)) {
+  if (!orderId) {
     return NextResponse.redirect(`${origin}/admin?error=${encodeURIComponent("Accion de pedido incompleta")}`, {
+      status: 303,
+    });
+  }
+
+  if (action === "delete") {
+    const { error } = await supabase.from("catalog_orders").delete().eq("id", orderId);
+
+    if (error) {
+      return NextResponse.redirect(`${origin}/admin?error=${encodeURIComponent(error.message)}`, { status: 303 });
+    }
+
+    return NextResponse.redirect(`${origin}/admin?message=Pedido eliminado`, { status: 303 });
+  }
+
+  if (!validStatuses.has(status)) {
+    return NextResponse.redirect(`${origin}/admin?error=${encodeURIComponent("Estado de pedido invalido")}`, {
       status: 303,
     });
   }

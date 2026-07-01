@@ -166,7 +166,7 @@ export default async function AdminPage({ searchParams }) {
     supabase.from("profiles").select("id,full_name,email,role,created_at").order("created_at", { ascending: false }),
     supabase
       .from("enrollments")
-      .select("id,created_at,profiles:user_id (id,full_name,email),courses:course_id (id,title,slug)")
+      .select("id,user_id,course_id,created_at,profiles:user_id (id,full_name,email),courses:course_id (id,title,slug)")
       .order("created_at", { ascending: false }),
     supabase
       .from("lessons")
@@ -188,7 +188,7 @@ export default async function AdminPage({ searchParams }) {
       .order("slot_time", { ascending: true }),
     supabase
       .from("appointment_bookings")
-      .select("id,patient_email,patient_name,status,created_at,appointment_specialists:specialist_id (name),appointment_slots:slot_id (slot_date,slot_time)")
+      .select("id,user_id,slot_id,patient_email,patient_name,status,created_at,appointment_specialists:specialist_id (name),appointment_slots:slot_id (slot_date,slot_time)")
       .order("created_at", { ascending: false }),
     supabase
       .from("catalog_products")
@@ -196,7 +196,7 @@ export default async function AdminPage({ searchParams }) {
       .order("created_at", { ascending: false }),
     supabase
       .from("catalog_orders")
-      .select("id,customer_email,customer_name,product_type,amount,status,created_at,shipping_province,shipping_city,shipping_postal_code,shipping_street,shipping_number,shipping_floor_apartment,shipping_phone,shipping_notes,catalog_products:product_id (title)")
+      .select("id,user_id,customer_email,customer_name,product_type,amount,status,created_at,shipping_province,shipping_city,shipping_postal_code,shipping_street,shipping_number,shipping_floor_apartment,shipping_phone,shipping_notes,catalog_products:product_id (title)")
       .order("created_at", { ascending: false }),
     supabase
       .from("specialist_calendar_connections")
@@ -1396,41 +1396,108 @@ export default async function AdminPage({ searchParams }) {
             <span className="admin-anchor-target" id="usuarios" />
             <h2>Usuarios registrados</h2>
             <div className="compact-list">
-              {profiles?.length ? profiles.map((item) => (
-                <article key={item.id}>
-                  <strong>{item.full_name || item.email || "Usuario sin nombre"}</strong>
-                  <span>{item.email || "Sin email visible"}</span>
-                  <small>
-                    Rol: {item.role || "student"} - Alta: {formatDateTime(item.created_at)}
-                  </small>
-                  <details className="admin-inline-editor">
-                    <summary>Editar usuario</summary>
-                    <form className="admin-form" action="/admin/users/update" method="post">
-                      <input name="userId" type="hidden" defaultValue={item.id} />
-                      <label>
-                        Nombre
-                        <input name="fullName" defaultValue={item.full_name || ""} placeholder="Nombre y apellido" />
-                      </label>
-                      <label>
-                        Email
-                        <input name="email" type="email" defaultValue={item.email || ""} placeholder="usuario@email.com" />
-                      </label>
-                      <label>
-                        Rol
-                        <select name="role" defaultValue={item.role || "student"}>
-                          <option value="student">Estudiante</option>
-                          <option value="specialist">Especialista</option>
-                          <option value="admin">Admin</option>
-                        </select>
-                      </label>
-                      <button className="button" type="submit">Guardar usuario</button>
-                    </form>
-                    <p className="muted">
-                      Si cambias el email, tambien se intenta actualizar el email de inicio de sesion.
-                    </p>
-                  </details>
-                </article>
-              )) : (
+              {profiles?.length ? profiles.map((item) => {
+                const userEnrollments = (enrollments || []).filter((enrollment) => enrollment.user_id === item.id || enrollment.profiles?.id === item.id);
+                const userBookings = bookings.filter((booking) => booking.user_id === item.id || booking.patient_email === item.email);
+                const userOrders = (catalogOrders || []).filter((order) => order.user_id === item.id || order.customer_email === item.email);
+
+                return (
+                  <article key={item.id}>
+                    <strong>{item.full_name || item.email || "Usuario sin nombre"}</strong>
+                    <span>{item.email || "Sin email visible"}</span>
+                    <small>
+                      Rol: {item.role || "student"} - Cursos: {userEnrollments.length} - Turnos: {userBookings.length} - Pedidos: {userOrders.length}
+                    </small>
+                    <details className="admin-inline-editor">
+                      <summary>Administrar usuario</summary>
+                      <form className="admin-form" action="/admin/users/update" method="post">
+                        <input name="userId" type="hidden" defaultValue={item.id} />
+                        <label>
+                          Nombre
+                          <input name="fullName" defaultValue={item.full_name || ""} placeholder="Nombre y apellido" />
+                        </label>
+                        <label>
+                          Email
+                          <input name="email" type="email" defaultValue={item.email || ""} placeholder="usuario@email.com" />
+                        </label>
+                        <label>
+                          Rol
+                          <select name="role" defaultValue={item.role || "student"}>
+                            <option value="student">Estudiante</option>
+                            <option value="specialist">Especialista</option>
+                            <option value="admin">Admin</option>
+                          </select>
+                        </label>
+                        <button className="button" type="submit">Guardar usuario</button>
+                      </form>
+                      <div className="admin-user-detail-grid">
+                        <section>
+                          <h3>Cursos habilitados</h3>
+                          <form className="admin-mini-form" action="/admin/enrollments/create" method="post">
+                            <input name="userId" type="hidden" value={item.id} />
+                            <select name="courseId" required defaultValue="">
+                              <option value="">Agregar curso</option>
+                              {courses?.map((course) => (
+                                <option value={course.id} key={course.id}>
+                                  {course.title}
+                                </option>
+                              ))}
+                            </select>
+                            <button type="submit">Agregar</button>
+                          </form>
+                          {userEnrollments.length ? userEnrollments.map((enrollment) => (
+                            <form className="admin-mini-row" action="/admin/enrollments/action" method="post" key={enrollment.id}>
+                              <input name="enrollmentId" type="hidden" value={enrollment.id} />
+                              <input name="action" type="hidden" value="delete" />
+                              <span>{enrollment.courses?.title || "Curso"}</span>
+                              <button type="submit">Quitar</button>
+                            </form>
+                          )) : <p className="muted">Sin cursos habilitados.</p>}
+                        </section>
+
+                        <section>
+                          <h3>Turnos</h3>
+                          {userBookings.length ? userBookings.map((booking) => (
+                            <form className="admin-mini-row" action="/admin/bookings/action" method="post" key={booking.id}>
+                              <input name="bookingId" type="hidden" value={booking.id} />
+                              <span>
+                                {booking.appointment_specialists?.name || "Especialista"} - {formatDate(booking.appointment_slots?.slot_date)} {formatTime(booking.appointment_slots?.slot_time)}
+                              </span>
+                              <select name="status" defaultValue={booking.status || "confirmed"}>
+                                <option value="confirmed">Confirmado</option>
+                                <option value="cancelled">Cancelado</option>
+                                <option value="completed">Realizado</option>
+                              </select>
+                              <button type="submit">Guardar</button>
+                              <button name="action" value="delete" type="submit">Eliminar</button>
+                            </form>
+                          )) : <p className="muted">Sin turnos registrados.</p>}
+                        </section>
+
+                        <section>
+                          <h3>Pedidos y recursos</h3>
+                          {userOrders.length ? userOrders.map((order) => (
+                            <form className="admin-mini-row" action="/admin/catalog-orders/action" method="post" key={order.id}>
+                              <input name="orderId" type="hidden" value={order.id} />
+                              <span>
+                                {order.catalog_products?.title || "Producto"} - {formatPrice(order.amount || 0)}
+                              </span>
+                              <select name="status" defaultValue={order.status || "pending_payment"}>
+                                <option value="pending_payment">Pendiente</option>
+                                <option value="paid">Pagado</option>
+                                <option value="delivered">Entregado</option>
+                                <option value="cancelled">Cancelado</option>
+                              </select>
+                              <button type="submit">Guardar</button>
+                              <button name="action" value="delete" type="submit">Eliminar</button>
+                            </form>
+                          )) : <p className="muted">Sin pedidos registrados.</p>}
+                        </section>
+                      </div>
+                    </details>
+                  </article>
+                );
+              }) : (
                 <p className="muted">Todavia no hay usuarios registrados.</p>
               )}
             </div>

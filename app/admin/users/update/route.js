@@ -55,26 +55,30 @@ export async function POST(request) {
     role,
   };
 
-  const { error: profileError } = await supabase.from("profiles").update(payload).eq("id", userId);
+  const adminSupabase = createSupabaseAdminClient();
+
+  if (!adminSupabase) {
+    return NextResponse.redirect(`${origin}/admin?error=${encodeURIComponent("Falta SUPABASE_SERVICE_ROLE_KEY en Vercel")}`, {
+      status: 303,
+    });
+  }
+
+  const { error: profileError } = await adminSupabase.from("profiles").update(payload).eq("id", userId);
 
   if (profileError) {
     return NextResponse.redirect(`${origin}/admin?error=${encodeURIComponent(profileError.message)}`, { status: 303 });
   }
 
   if (email) {
-    const adminSupabase = createSupabaseAdminClient();
+    const { error: authError } = await adminSupabase.auth.admin.updateUserById(userId, {
+      email,
+      user_metadata: {
+        full_name: fullName || null,
+      },
+    });
 
-    if (adminSupabase) {
-      const { error: authError } = await adminSupabase.auth.admin.updateUserById(userId, {
-        email,
-        user_metadata: {
-          full_name: fullName || null,
-        },
-      });
-
-      if (authError) {
-        return NextResponse.redirect(`${origin}/admin?error=${encodeURIComponent(authError.message)}`, { status: 303 });
-      }
+    if (authError) {
+      return NextResponse.redirect(`${origin}/admin?error=${encodeURIComponent(authError.message)}`, { status: 303 });
     }
   }
 

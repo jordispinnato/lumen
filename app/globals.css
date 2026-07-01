@@ -2572,6 +2572,70 @@ body:has(.admin-cms-shell) {
   margin-top: 12px;
 }
 
+.admin-user-detail-grid {
+  display: grid;
+  gap: 14px;
+  margin-top: 14px;
+}
+
+.admin-user-detail-grid section {
+  display: grid;
+  gap: 8px;
+  border: 1px solid rgba(11, 74, 83, 0.12);
+  border-radius: 8px;
+  padding: 12px;
+  background: rgba(247, 244, 238, 0.48);
+}
+
+.admin-user-detail-grid h3 {
+  margin: 0;
+  color: var(--deep);
+  font-size: 0.95rem;
+}
+
+.admin-mini-form,
+.admin-mini-row {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  gap: 8px;
+  align-items: center;
+}
+
+.admin-mini-row {
+  grid-template-columns: minmax(0, 1fr) minmax(120px, 160px) auto auto;
+  border-top: 1px solid rgba(11, 74, 83, 0.08);
+  padding-top: 8px;
+}
+
+.admin-mini-form select,
+.admin-mini-row select {
+  width: 100%;
+  min-height: 38px;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  padding: 0 10px;
+  background: white;
+  color: var(--deep);
+  font-weight: 800;
+}
+
+.admin-mini-form button,
+.admin-mini-row button {
+  min-height: 38px;
+  border: 1px solid rgba(11, 74, 83, 0.16);
+  border-radius: 8px;
+  padding: 0 12px;
+  background: white;
+  color: var(--petrol);
+  font-weight: 900;
+  cursor: pointer;
+}
+
+.admin-mini-row span {
+  color: var(--deep);
+  font-weight: 800;
+}
+
 .specialist-option,
 .month-tab,
 .calendar-day,
@@ -4101,6 +4165,11 @@ body:has(.account-app-shell) .site-footer {
 
   .admin-cms-shell.is-collapsed .admin-cms-sidebar-head {
     justify-content: space-between;
+  }
+
+  .admin-mini-form,
+  .admin-mini-row {
+    grid-template-columns: 1fr;
   }
 
   .admin-cms-shell.is-collapsed .admin-cms-collapse {
