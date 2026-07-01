@@ -10,10 +10,15 @@ function toISODate(date) {
   return `${date.getFullYear()}-${pad(date.getMonth() + 1)}-${pad(date.getDate())}`;
 }
 
-function buildMonth(offset) {
+const MONTH_OPTIONS = Array.from({ length: 12 }, (_, index) => ({
+  value: index,
+  label: new Date(2026, index, 1).toLocaleDateString("es-AR", { month: "long" }),
+}));
+
+function buildMonth(year, monthIndex) {
   const today = new Date();
-  const monthStart = new Date(today.getFullYear(), today.getMonth() + offset, 1);
-  const monthEnd = new Date(today.getFullYear(), today.getMonth() + offset + 1, 0);
+  const monthStart = new Date(year, monthIndex, 1);
+  const monthEnd = new Date(year, monthIndex + 1, 0);
   const firstVisibleDay = new Date(monthStart);
   const days = [];
 
@@ -41,6 +46,11 @@ function buildMonth(offset) {
     leadingBlanks,
     days,
   };
+}
+
+function getDateParts(dateValue) {
+  const [year, month, day] = dateValue.split("-").map(Number);
+  return { year, monthIndex: month - 1, day };
 }
 
 function formatTime(value) {
@@ -80,15 +90,24 @@ function getInitialSpecialistId(specialists, initialSpecialistSlug) {
 }
 
 export default function BookingPicker({ specialists, slots, userEmail, initialSpecialistSlug }) {
+  const currentDate = new Date();
   const [selectedSpecialistId, setSelectedSpecialistId] = useState(
     getInitialSpecialistId(specialists, initialSpecialistSlug)
   );
-  const [selectedMonthIndex, setSelectedMonthIndex] = useState(0);
+  const [selectedMonthIndex, setSelectedMonthIndex] = useState(currentDate.getMonth());
+  const [selectedYear, setSelectedYear] = useState(currentDate.getFullYear());
   const [selectedDate, setSelectedDate] = useState("");
   const [selectedSlotId, setSelectedSlotId] = useState("");
   const [isReviewing, setIsReviewing] = useState(false);
 
-  const months = useMemo(() => Array.from({ length: 6 }, (_, index) => buildMonth(index)), []);
+  const selectedMonth = useMemo(() => buildMonth(selectedYear, selectedMonthIndex), [selectedMonthIndex, selectedYear]);
+  const yearOptions = useMemo(() => {
+    const currentYear = new Date().getFullYear();
+    const slotYears = slots.map((slot) => Number(slot.slot_date?.slice(0, 4))).filter(Boolean);
+
+    return [...new Set([currentYear, currentYear + 1, currentYear + 2, selectedYear, ...slotYears])]
+      .sort((a, b) => a - b);
+  }, [selectedYear, slots]);
 
   const selectedSpecialist = useMemo(
     () => specialists.find((specialist) => specialist.id === selectedSpecialistId) || specialists[0],
@@ -134,12 +153,10 @@ export default function BookingPicker({ specialists, slots, userEmail, initialSp
   }
 
   function selectDateValue(dateValue) {
-    const monthIndex = months.findIndex((month) => month.days.some((day) => day.iso === dateValue));
+    const dateParts = getDateParts(dateValue);
 
-    if (monthIndex >= 0) {
-      setSelectedMonthIndex(monthIndex);
-    }
-
+    setSelectedYear(dateParts.year);
+    setSelectedMonthIndex(dateParts.monthIndex);
     setSelectedDate(dateValue);
     setSelectedSlotId("");
     setIsReviewing(false);
@@ -196,22 +213,43 @@ export default function BookingPicker({ specialists, slots, userEmail, initialSp
 
       <section className="panel booking-panel">
         <p className="eyebrow">2. Elegí un día</p>
-        <div className="month-tabs">
-          {months.map((month, index) => (
-            <button
-              className={`month-tab ${index === selectedMonthIndex ? "is-active" : ""}`}
-              key={month.label}
-              type="button"
-              onClick={() => {
-                setSelectedMonthIndex(index);
+        <div className="calendar-selectors">
+          <label>
+            Mes
+            <select
+              value={selectedMonthIndex}
+              onChange={(event) => {
+                setSelectedMonthIndex(Number(event.target.value));
                 setSelectedDate("");
                 setSelectedSlotId("");
                 setIsReviewing(false);
               }}
             >
-              {month.label}
-            </button>
-          ))}
+              {MONTH_OPTIONS.map((month) => (
+                <option key={month.value} value={month.value}>
+                  {month.label}
+                </option>
+              ))}
+            </select>
+          </label>
+          <label>
+            Año
+            <select
+              value={selectedYear}
+              onChange={(event) => {
+                setSelectedYear(Number(event.target.value));
+                setSelectedDate("");
+                setSelectedSlotId("");
+                setIsReviewing(false);
+              }}
+            >
+              {yearOptions.map((year) => (
+                <option key={year} value={year}>
+                  {year}
+                </option>
+              ))}
+            </select>
+          </label>
         </div>
         {nextAvailableDates.length ? (
           <div className="next-available-dates" aria-label="Próximas fechas disponibles">
@@ -239,10 +277,10 @@ export default function BookingPicker({ specialists, slots, userEmail, initialSp
           ))}
         </div>
         <div className="calendar-grid" aria-label="Calendario de turnos disponibles">
-          {Array.from({ length: months[selectedMonthIndex].leadingBlanks }).map((_, index) => (
+          {Array.from({ length: selectedMonth.leadingBlanks }).map((_, index) => (
             <span className="calendar-empty" key={`empty-${index}`} />
           ))}
-          {months[selectedMonthIndex].days.map((day) => {
+          {selectedMonth.days.map((day) => {
             const daySlots = slotsByDate[day.iso] || [];
             const isSelectable = !day.isPast && daySlots.length > 0;
 
