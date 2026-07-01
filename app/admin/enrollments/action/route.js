@@ -1,4 +1,5 @@
 import { NextResponse } from "next/server";
+import { createSupabaseAdminClient } from "../../../../lib/supabase/admin";
 import { createSupabaseServerClient } from "../../../../lib/supabase/server";
 
 async function requireAdmin(supabase, origin) {
@@ -15,7 +16,7 @@ async function requireAdmin(supabase, origin) {
     .maybeSingle();
 
   if (profile?.role !== "admin") {
-    return { response: NextResponse.redirect(`${origin}/admin?error=No autorizado`, { status: 303 }) };
+    return { response: NextResponse.redirect(`${origin}/admin?error=No autorizado#usuarios`, { status: 303 }) };
   }
 
   return { user: userData.user };
@@ -34,16 +35,25 @@ export async function POST(request) {
   }
 
   if (!enrollmentId || action !== "delete") {
-    return NextResponse.redirect(`${origin}/admin?error=${encodeURIComponent("Accion de inscripcion incompleta")}`, {
+    return NextResponse.redirect(`${origin}/admin?error=${encodeURIComponent("Accion de inscripcion incompleta")}#usuarios`, {
       status: 303,
     });
   }
 
-  const { error } = await supabase.from("enrollments").delete().eq("id", enrollmentId);
+  const adminSupabase = createSupabaseAdminClient();
 
-  if (error) {
-    return NextResponse.redirect(`${origin}/admin?error=${encodeURIComponent(error.message)}`, { status: 303 });
+  if (!adminSupabase) {
+    return NextResponse.redirect(
+      `${origin}/admin?error=${encodeURIComponent("Falta configurar SUPABASE_SERVICE_ROLE_KEY")}#usuarios`,
+      { status: 303 },
+    );
   }
 
-  return NextResponse.redirect(`${origin}/admin?message=Curso quitado del usuario`, { status: 303 });
+  const { error } = await adminSupabase.from("enrollments").delete().eq("id", enrollmentId);
+
+  if (error) {
+    return NextResponse.redirect(`${origin}/admin?error=${encodeURIComponent(error.message)}#usuarios`, { status: 303 });
+  }
+
+  return NextResponse.redirect(`${origin}/admin?message=Curso quitado del usuario#usuarios`, { status: 303 });
 }
