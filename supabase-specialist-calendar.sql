@@ -2,6 +2,17 @@ alter table public.appointment_specialists
   add column if not exists user_id uuid references public.profiles(id) on delete set null,
   add column if not exists professional_email text;
 
+alter table public.profiles
+  drop constraint if exists profiles_role_check;
+
+alter table public.profiles
+  add constraint profiles_role_check
+  check (role in ('student', 'admin', 'specialist', 'professional'));
+
+update public.profiles
+set role = 'specialist'
+where role = 'professional';
+
 create unique index if not exists appointment_specialists_user_id_unique
   on public.appointment_specialists(user_id)
   where user_id is not null;
