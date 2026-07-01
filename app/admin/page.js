@@ -1394,6 +1394,49 @@ export default async function AdminPage({ searchParams }) {
 
           <section className="panel" data-admin-view="usuarios">
             <span className="admin-anchor-target" id="usuarios" />
+            <h2>Usuarios registrados</h2>
+            <div className="compact-list">
+              {profiles?.length ? profiles.map((item) => (
+                <article key={item.id}>
+                  <strong>{item.full_name || item.email || "Usuario sin nombre"}</strong>
+                  <span>{item.email || "Sin email visible"}</span>
+                  <small>
+                    Rol: {item.role || "student"} - Alta: {formatDateTime(item.created_at)}
+                  </small>
+                  <details className="admin-inline-editor">
+                    <summary>Editar usuario</summary>
+                    <form className="admin-form" action="/admin/users/update" method="post">
+                      <input name="userId" type="hidden" defaultValue={item.id} />
+                      <label>
+                        Nombre
+                        <input name="fullName" defaultValue={item.full_name || ""} placeholder="Nombre y apellido" />
+                      </label>
+                      <label>
+                        Email
+                        <input name="email" type="email" defaultValue={item.email || ""} placeholder="usuario@email.com" />
+                      </label>
+                      <label>
+                        Rol
+                        <select name="role" defaultValue={item.role || "student"}>
+                          <option value="student">Estudiante</option>
+                          <option value="specialist">Especialista</option>
+                          <option value="admin">Admin</option>
+                        </select>
+                      </label>
+                      <button className="button" type="submit">Guardar usuario</button>
+                    </form>
+                    <p className="muted">
+                      Si cambias el email, tambien se intenta actualizar el email de inicio de sesion.
+                    </p>
+                  </details>
+                </article>
+              )) : (
+                <p className="muted">Todavia no hay usuarios registrados.</p>
+              )}
+            </div>
+          </section>
+
+          <section className="panel" data-admin-view="usuarios inscripciones">
             <h2>Habilitar curso a un alumno</h2>
             <form className="admin-form" action="/admin/enrollments/create" method="post">
               <label>
