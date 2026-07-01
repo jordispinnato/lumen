@@ -5,6 +5,9 @@ import { formatPrice } from "../../lib/courses";
 import AdminCmsShell from "./AdminCmsShell";
 import EntityTable from "./cms/EntityTable";
 
+export const dynamic = "force-dynamic";
+export const revalidate = 0;
+
 function formatDate(value) {
   if (!value) {
     return "Sin fecha";
@@ -169,7 +172,7 @@ export default async function AdminPage({ searchParams }) {
     dataSupabase.from("profiles").select("id,full_name,email,role,created_at").order("created_at", { ascending: false }),
     dataSupabase
       .from("enrollments")
-      .select("id,user_id,course_id,created_at,profiles:user_id (id,full_name,email),courses:course_id (id,title,slug)")
+      .select("id,user_id,course_id,created_at")
       .order("created_at", { ascending: false }),
     dataSupabase
       .from("lessons")
@@ -365,10 +368,12 @@ export default async function AdminPage({ searchParams }) {
     value,
     label: value,
   }));
+  const profileById = new Map((profiles || []).map((item) => [item.id, item]));
+  const courseById = new Map((courses || []).map((course) => [course.id, course]));
   const enrollmentRows = (enrollments || []).map((enrollment) => ({
     id: enrollment.id,
-    student: enrollment.profiles?.email || enrollment.profiles?.full_name || enrollment.profiles?.id || "Alumno",
-    course: enrollment.courses?.title || "Curso",
+    student: profileById.get(enrollment.user_id)?.email || profileById.get(enrollment.user_id)?.full_name || enrollment.user_id || "Alumno",
+    course: enrollment.courses?.title || courseById.get(enrollment.course_id)?.title || "Curso",
     date: formatDateTime(enrollment.created_at),
   }));
 
@@ -1405,7 +1410,7 @@ export default async function AdminPage({ searchParams }) {
             <h2>Usuarios registrados</h2>
             <div className="compact-list">
               {profiles?.length ? profiles.map((item) => {
-                const userEnrollments = (enrollments || []).filter((enrollment) => enrollment.user_id === item.id || enrollment.profiles?.id === item.id);
+                const userEnrollments = (enrollments || []).filter((enrollment) => enrollment.user_id === item.id);
                 const userBookings = bookings.filter((booking) => booking.user_id === item.id || booking.patient_email === item.email);
                 const userOrders = (catalogOrders || []).filter((order) => order.user_id === item.id || order.customer_email === item.email);
 
@@ -1457,7 +1462,7 @@ export default async function AdminPage({ searchParams }) {
                             <form className="admin-mini-row" action="/admin/enrollments/action" method="post" key={enrollment.id}>
                               <input name="enrollmentId" type="hidden" value={enrollment.id} />
                               <input name="action" type="hidden" value="delete" />
-                              <span>{enrollment.courses?.title || "Curso"}</span>
+                              <span>{enrollment.courses?.title || courseById.get(enrollment.course_id)?.title || "Curso"}</span>
                               <button type="submit">Quitar</button>
                             </form>
                           )) : <p className="muted">Sin cursos habilitados.</p>}
