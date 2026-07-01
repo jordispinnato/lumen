@@ -96,6 +96,37 @@ function getCourseTone(progress) {
   return "pending";
 }
 
+function getOrderStatusLabel(status) {
+  const labels = {
+    pending_payment: "Pendiente de pago",
+    paid: "Pagado",
+    cancelled: "Cancelado",
+    delivered: "Entregado",
+  };
+
+  return labels[status] || status || "Sin estado";
+}
+
+function getOrderTypeLabel(type) {
+  return type === "digital" ? "Digital" : "Físico";
+}
+
+function getShippingSummary(order) {
+  if (order.product_type !== "physical") {
+    return "Entrega digital";
+  }
+
+  const address = [
+    `${order.shipping_street || ""} ${order.shipping_number || ""}`.trim(),
+    order.shipping_floor_apartment ? `Piso/depto ${order.shipping_floor_apartment}` : "",
+    order.shipping_city,
+    order.shipping_province,
+    order.shipping_postal_code ? `CP ${order.shipping_postal_code}` : "",
+  ].filter(Boolean);
+
+  return address.length ? address.join(", ") : "Dirección pendiente";
+}
+
 export default async function MiCuentaPage() {
   const supabase = await createSupabaseServerClient();
   const { data: userData } = await supabase.auth.getUser();
@@ -110,7 +141,7 @@ export default async function MiCuentaPage() {
     { data: profile },
     { data: bookings },
     { data: enrollments },
-    { data: digitalOrders },
+    { data: catalogOrders },
   ] = await Promise.all([
     supabase
       .from("profiles")
@@ -146,20 +177,27 @@ export default async function MiCuentaPage() {
       .from("catalog_orders")
       .select(`
         id,
+        product_type,
         status,
         amount,
         created_at,
+        shipping_province,
+        shipping_city,
+        shipping_postal_code,
+        shipping_street,
+        shipping_number,
+        shipping_floor_apartment,
         catalog_products:product_id (
           id,
           title,
           summary,
           product_type,
           digital_file_name,
+          digital_file_path,
           digital_url
         )
       `)
       .eq("user_id", userData.user.id)
-      .eq("product_type", "digital")
       .order("created_at", { ascending: false }),
   ]);
 
@@ -178,7 +216,9 @@ export default async function MiCuentaPage() {
       return bValue.localeCompare(aValue);
     });
   const nextBooking = upcomingBookings[0];
-  const approvedDigitalOrders = (digitalOrders || []).filter((order) => order.status === "paid" || order.status === "delivered");
+  const catalogOrderList = catalogOrders || [];
+  const digitalOrders = catalogOrderList.filter((order) => order.product_type === "digital");
+  const approvedDigitalOrders = digitalOrders.filter((order) => order.status === "paid" || order.status === "delivered");
   const displayName = profile?.full_name || userData.user.email;
   const firstName = profile?.full_name?.split(" ")?.[0] || userData.user.email?.split("@")?.[0] || "LUMEN";
   const avatarInitials = initialsFromName(displayName);
@@ -471,6 +511,13 @@ export default async function MiCuentaPage() {
                     <p>{order.catalog_products?.summary || "Recurso digital disponible en tu cuenta."}</p>
                     <small>{order.catalog_products?.digital_file_name || order.catalog_products?.digital_url || "Recurso pendiente de descarga"}</small>
                     <strong>{formatPrice(order.amount)}</strong>
+                    {order.catalog_products?.digital_file_name || order.catalog_products?.digital_url ? (
+                      <a className="account-secondary-action" href={`/catalogo/resources/${order.id}/download`}>
+                        Descargar recurso
+                      </a>
+                    ) : (
+                      <small>La descarga está en preparación.</small>
+                    )}
                   </article>
                 ))}
               </div>
@@ -492,13 +539,16 @@ export default async function MiCuentaPage() {
                   <h2>Mis pedidos</h2>
                 </div>
               </div>
-              {(digitalOrders || []).length ? (
+              {catalogOrderList.length ? (
                 <div className="account-history-list">
-                  {(digitalOrders || []).map((order) => (
+                  {catalogOrderList.map((order) => (
                     <article key={order.id}>
-                      <span>{order.status}</span>
+                      <span>{getOrderStatusLabel(order.status)}</span>
                       <strong>{order.catalog_products?.title || "Pedido"}</strong>
-                      <small>{formatPrice(order.amount)} · {formatDateTime(order.created_at)}</small>
+                      <small>
+                        {getOrderTypeLabel(order.product_type)} · {formatPrice(order.amount)} · {formatDateTime(order.created_at)}
+                      </small>
+                      <small>{getShippingSummary(order)}</small>
                     </article>
                   ))}
                 </div>

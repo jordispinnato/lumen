@@ -32,6 +32,38 @@ function formatTime(value) {
   return value?.slice(0, 5) || "Sin hora";
 }
 
+function getOrderStatusLabel(status) {
+  const labels = {
+    pending_payment: "Pendiente de pago",
+    paid: "Pagado",
+    cancelled: "Cancelado",
+    delivered: "Entregado",
+  };
+
+  return labels[status] || status || "Sin estado";
+}
+
+function getOrderTypeLabel(type) {
+  return type === "digital" ? "Digital" : "Físico";
+}
+
+function getShippingSummary(order) {
+  if (order.product_type !== "physical") {
+    return "Entrega digital";
+  }
+
+  const address = [
+    `${order.shipping_street || ""} ${order.shipping_number || ""}`.trim(),
+    order.shipping_floor_apartment ? `Piso/depto ${order.shipping_floor_apartment}` : "",
+    order.shipping_city,
+    order.shipping_province,
+    order.shipping_postal_code ? `CP ${order.shipping_postal_code}` : "",
+  ].filter(Boolean);
+
+  const base = address.length ? address.join(", ") : "Direccion pendiente";
+  return order.shipping_phone ? `${base} - Tel: ${order.shipping_phone}` : base;
+}
+
 function buildAdminTimeOptions() {
   const options = [];
 
@@ -163,7 +195,7 @@ export default async function AdminPage({ searchParams }) {
       .order("created_at", { ascending: false }),
     supabase
       .from("catalog_orders")
-      .select("id,customer_email,customer_name,product_type,amount,status,created_at,shipping_province,shipping_city,shipping_postal_code,shipping_street,shipping_number,catalog_products:product_id (title)")
+      .select("id,customer_email,customer_name,product_type,amount,status,created_at,shipping_province,shipping_city,shipping_postal_code,shipping_street,shipping_number,shipping_floor_apartment,shipping_phone,shipping_notes,catalog_products:product_id (title)")
       .order("created_at", { ascending: false }),
   ]);
 
@@ -219,13 +251,56 @@ export default async function AdminPage({ searchParams }) {
     id: order.id,
     customer: order.customer_name || order.customer_email || "Cliente sin datos",
     product: order.catalog_products?.title || "Producto",
-    type: order.product_type === "digital" ? "Digital" : "Físico",
+    type: getOrderTypeLabel(order.product_type),
     amount: formatPrice(order.amount || 0),
-    shipping:
-      order.product_type === "physical"
-        ? `${order.shipping_street || ""} ${order.shipping_number || ""}, ${order.shipping_city || ""}, ${order.shipping_province || ""} (${order.shipping_postal_code || ""})`
-        : "Entrega digital",
-    status: order.status || "Sin estado",
+    shipping: getShippingSummary(order),
+    status: getOrderStatusLabel(order.status),
+    actions: [
+      ...(order.status !== "pending_payment"
+        ? [
+            {
+              label: "Marcar pendiente",
+              endpoint: "/admin/catalog-orders/action",
+              fields: { orderId: order.id, status: "pending_payment" },
+              confirmTitle: "Actualizar pedido",
+              confirmText: "El pedido volvera a pendiente de pago.",
+            },
+          ]
+        : []),
+      ...(order.status !== "paid"
+        ? [
+            {
+              label: "Marcar pagado",
+              endpoint: "/admin/catalog-orders/action",
+              fields: { orderId: order.id, status: "paid" },
+              confirmTitle: "Marcar pedido pagado",
+              confirmText: "Si es digital, el recurso quedara disponible en Mi Cuenta.",
+            },
+          ]
+        : []),
+      ...(order.status !== "delivered"
+        ? [
+            {
+              label: "Entregado",
+              endpoint: "/admin/catalog-orders/action",
+              fields: { orderId: order.id, status: "delivered" },
+              confirmTitle: "Marcar pedido entregado",
+              confirmText: "El pedido quedara como entregado.",
+            },
+          ]
+        : []),
+      ...(order.status !== "cancelled"
+        ? [
+            {
+              label: "Cancelar",
+              endpoint: "/admin/catalog-orders/action",
+              fields: { orderId: order.id, status: "cancelled" },
+              confirmTitle: "Cancelar pedido",
+              confirmText: "El pedido quedara cancelado.",
+            },
+          ]
+        : []),
+    ],
   }));
   const catalogOrderStatusOptions = [...new Set(catalogOrderRows.map((row) => row.status))].map((value) => ({
     value,
