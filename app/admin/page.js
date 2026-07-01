@@ -198,7 +198,7 @@ export default async function AdminPage({ searchParams }) {
   const recentProducts = (catalogProducts || []).slice(0, 5);
   const recentProfiles = (profiles || []).slice(0, 5);
   const alerts = [
-    productsWithoutStock.length ? `${productsWithoutStock.length} productos fisicos publicados sin stock.` : "",
+    productsWithoutStock.length ? `${productsWithoutStock.length} productos físicos publicados sin stock.` : "",
     draftCourses.length ? `${draftCourses.length} cursos en borrador.` : "",
     inactiveProfessionals.length ? `${inactiveProfessionals.length} profesionales inactivos.` : "",
     orphanBookings.length ? `${orphanBookings.length} reservas sin profesional asociado.` : "",
@@ -219,7 +219,7 @@ export default async function AdminPage({ searchParams }) {
     id: order.id,
     customer: order.customer_name || order.customer_email || "Cliente sin datos",
     product: order.catalog_products?.title || "Producto",
-    type: order.product_type === "digital" ? "Digital" : "Fisico",
+    type: order.product_type === "digital" ? "Digital" : "Físico",
     amount: formatPrice(order.amount || 0),
     shipping:
       order.product_type === "physical"
@@ -298,7 +298,7 @@ export default async function AdminPage({ searchParams }) {
         <section className="admin-dashboard" id="dashboard" data-admin-view="dashboard">
           <div className="admin-metrics-grid">
             <MetricCard label="Turnos de hoy" value={todayBookings.length} helper="Reservas para la fecha actual" href="#turnos" />
-            <MetricCard label="Proximos turnos" value={futureBookings.length} helper="Reservas futuras confirmadas" href="#turnos" />
+            <MetricCard label="Próximos turnos" value={futureBookings.length} helper="Reservas futuras confirmadas" href="#turnos" />
             <MetricCard label="Profesionales activos" value={activeProfessionals.length} helper="Perfiles disponibles para reservar" href="#turnos" />
             <MetricCard label="Cursos publicados" value={publishedCourses.length} helper="Cursos visibles en la web" href="#cursos" />
             <MetricCard label="Inscripciones" value={enrollments?.length || 0} helper="Accesos habilitados a cursos" href="#inscripciones" />
@@ -317,7 +317,7 @@ export default async function AdminPage({ searchParams }) {
           </nav>
 
           <div className="admin-dashboard-grid">
-            <DashboardList title="Proximos turnos" emptyText="No hay turnos proximos registrados.">
+            <DashboardList title="Próximos turnos" emptyText="No hay turnos próximos registrados.">
               {futureBookings.slice(0, 5).length ? (
                 <div className="admin-dashboard-items">
                   {futureBookings.slice(0, 5).map((booking) => (
@@ -331,7 +331,7 @@ export default async function AdminPage({ searchParams }) {
               ) : null}
             </DashboardList>
 
-            <DashboardList title="Ultimas reservas" emptyText="Todavia no hay reservas creadas.">
+            <DashboardList title="Últimas reservas" emptyText="Todavía no hay reservas creadas.">
               {latestBookings.length ? (
                 <div className="admin-dashboard-items">
                   {latestBookings.map((booking) => (
@@ -345,7 +345,7 @@ export default async function AdminPage({ searchParams }) {
               ) : null}
             </DashboardList>
 
-            <DashboardList title="Ultimos usuarios registrados" emptyText="Todavia no hay usuarios registrados.">
+            <DashboardList title="Últimos usuarios registrados" emptyText="Todavía no hay usuarios registrados.">
               {recentProfiles.length ? (
                 <div className="admin-dashboard-items">
                   {recentProfiles.map((item) => (
@@ -359,7 +359,7 @@ export default async function AdminPage({ searchParams }) {
               ) : null}
             </DashboardList>
 
-            <DashboardList title="Cursos recientes" emptyText="Todavia no hay cursos cargados.">
+            <DashboardList title="Cursos recientes" emptyText="Todavía no hay cursos cargados.">
               {recentCourses.length ? (
                 <div className="admin-dashboard-items">
                   {recentCourses.map((course) => (
@@ -373,13 +373,13 @@ export default async function AdminPage({ searchParams }) {
               ) : null}
             </DashboardList>
 
-            <DashboardList title="Productos recientes" emptyText="Todavia no hay productos cargados.">
+            <DashboardList title="Productos recientes" emptyText="Todavía no hay productos cargados.">
               {recentProducts.length ? (
                 <div className="admin-dashboard-items">
                   {recentProducts.map((product) => (
                     <article key={product.id}>
                       <strong>{product.title}</strong>
-                      <span>{product.product_type === "digital" ? "Digital" : "Fisico"} - {formatPrice(product.price)}</span>
+                      <span>{product.product_type === "digital" ? "Digital" : "Físico"} - {formatPrice(product.price)}</span>
                       <small>{product.status} - {product.category || "Sin categoria"}</small>
                     </article>
                   ))}
@@ -499,7 +499,7 @@ export default async function AdminPage({ searchParams }) {
                 <input name="slotEndDate" type="date" required defaultValue={today} />
               </label>
               <fieldset className="admin-fieldset wide-field">
-                <legend>Dias de atencion</legend>
+                <legend>Días de atención</legend>
                 <div className="admin-checkbox-grid compact">
                   {adminWeekdays.map((weekday) => (
                     <label className="check-field" key={weekday.value}>
@@ -638,7 +638,7 @@ export default async function AdminPage({ searchParams }) {
                   </details>
                 </article>
               )) : (
-                <p className="muted">Todavia no hay especialistas cargados.</p>
+                <p className="muted">Todavía no hay especialistas cargados.</p>
               )}
             </div>
           </section>
@@ -687,7 +687,7 @@ export default async function AdminPage({ searchParams }) {
                   </details>
                 </article>
               )) : (
-                <p className="muted">Todavia no hay horarios cargados.</p>
+                <p className="muted">Todavía no hay horarios cargados.</p>
               )}
             </div>
           </section>
@@ -706,7 +706,7 @@ export default async function AdminPage({ searchParams }) {
             ]}
             rows={bookingRows}
             filters={bookingStatusOptions.length ? [{ key: "status", label: "Estado", options: bookingStatusOptions }] : []}
-            emptyTitle="Todavia no hay reservas confirmadas."
+            emptyTitle="Todavía no hay reservas confirmadas."
             emptyText="Cuando se registren turnos, van a aparecer aca."
             searchPlaceholder="Buscar por paciente, profesional o estado"
           />
@@ -715,8 +715,8 @@ export default async function AdminPage({ searchParams }) {
 
         <section className="admin-section" id="catalogo" data-admin-view="catalogo">
           <div className="admin-section-head">
-            <p className="eyebrow">Catalogo</p>
-            <h2>Productos fisicos y digitales</h2>
+            <p className="eyebrow">Catálogo</p>
+            <h2>Productos físicos y digitales</h2>
           </div>
 
           <span className="admin-anchor-target" id="productos" />
@@ -732,7 +732,7 @@ export default async function AdminPage({ searchParams }) {
               <label>
                 Tipo
                 <select name="productType" defaultValue="physical">
-                  <option value="physical">Fisico</option>
+                  <option value="physical">Físico</option>
                   <option value="digital">Digital</option>
                 </select>
               </label>
@@ -745,7 +745,7 @@ export default async function AdminPage({ searchParams }) {
                 <input name="price" type="number" min="0" step="1" required placeholder="12000" />
               </label>
               <label>
-                Stock fisico
+                Stock físico
                 <input name="stock" type="number" min="0" step="1" placeholder="8" />
               </label>
               <label>
@@ -769,7 +769,7 @@ export default async function AdminPage({ searchParams }) {
                 />
               </label>
               <label className="wide-field">
-                Descripcion
+                Descripción
                 <textarea name="summary" rows="4" placeholder="Breve descripcion del producto o recurso" />
               </label>
               <button className="button" type="submit">Guardar producto</button>
@@ -782,7 +782,7 @@ export default async function AdminPage({ searchParams }) {
               {catalogProducts?.length ? catalogProducts.map((product) => (
                 <article key={product.id}>
                   <strong>{product.title}</strong>
-                  <span>{product.product_type === "digital" ? "Digital" : "Fisico"} - {formatPrice(product.price)}</span>
+                  <span>{product.product_type === "digital" ? "Digital" : "Físico"} - {formatPrice(product.price)}</span>
                   <small>
                     {product.status} - {product.category}
                     {product.product_type === "digital" && product.digital_file_name ? ` - Archivo: ${product.digital_file_name}` : ""}
@@ -799,7 +799,7 @@ export default async function AdminPage({ searchParams }) {
                       <label>
                         Tipo
                         <select name="productType" defaultValue={product.product_type || "physical"}>
-                          <option value="physical">Fisico</option>
+                          <option value="physical">Físico</option>
                           <option value="digital">Digital</option>
                         </select>
                       </label>
@@ -812,7 +812,7 @@ export default async function AdminPage({ searchParams }) {
                         <input name="price" type="number" min="0" step="1" required defaultValue={product.price || 0} />
                       </label>
                       <label>
-                        Stock fisico
+                        Stock físico
                         <input name="stock" type="number" min="0" step="1" defaultValue={product.stock ?? ""} />
                       </label>
                       <label>
@@ -836,7 +836,7 @@ export default async function AdminPage({ searchParams }) {
                         />
                       </label>
                       <label className="wide-field">
-                        Descripcion
+                        Descripción
                         <textarea name="summary" rows="4" defaultValue={product.summary || ""} />
                       </label>
                       <button className="button" type="submit">Guardar cambios</button>
@@ -845,7 +845,7 @@ export default async function AdminPage({ searchParams }) {
                   </details>
                 </article>
               )) : (
-                <p className="muted">Todavia no hay productos cargados.</p>
+                <p className="muted">Todavía no hay productos cargados.</p>
               )}
             </div>
           </section>
@@ -869,13 +869,13 @@ export default async function AdminPage({ searchParams }) {
                 key: "type",
                 label: "Tipo",
                 options: [
-                  { value: "Fisico", label: "Fisico" },
+                  { value: "Físico", label: "Físico" },
                   { value: "Digital", label: "Digital" },
                 ],
               },
               ...(catalogOrderStatusOptions.length ? [{ key: "status", label: "Estado", options: catalogOrderStatusOptions }] : []),
             ]}
-            emptyTitle="Todavia no hay solicitudes de compra."
+            emptyTitle="Todavía no hay solicitudes de compra."
             emptyText="Cuando una persona solicite un producto, el pedido aparecera aca."
             searchPlaceholder="Buscar por cliente, producto o estado"
           />
@@ -945,8 +945,8 @@ export default async function AdminPage({ searchParams }) {
                 <textarea name="summary" rows="4" required placeholder="Descripción breve del curso" />
               </label>
               <label className="wide-field">
-                Descripcion completa
-                <textarea name="description" rows="5" placeholder="Descripcion larga para la landing del curso" />
+                Descripción completa
+                <textarea name="description" rows="5" placeholder="Descripción larga para la landing del curso" />
               </label>
               <label className="wide-field">
                 Que aprendera
@@ -1014,7 +1014,7 @@ export default async function AdminPage({ searchParams }) {
                 <input name="title" required placeholder="Ej: Modulo 1 - Fundamentos" />
               </label>
               <label className="wide-field">
-                Descripcion
+                Descripción
                 <textarea name="description" rows="3" placeholder="Breve descripcion del modulo" />
               </label>
               <button className="button" type="submit">Guardar modulo</button>
@@ -1087,7 +1087,7 @@ export default async function AdminPage({ searchParams }) {
                       <textarea name="summary" rows="4" required defaultValue={course.summary || ""} />
                     </label>
                     <label className="wide-field">
-                      Descripcion completa
+                      Descripción completa
                       <textarea name="description" rows="5" defaultValue={course.description || ""} />
                     </label>
                     <label className="wide-field">
@@ -1116,7 +1116,7 @@ export default async function AdminPage({ searchParams }) {
                 </details>
               </article>
             )) : (
-              <p className="muted">Todavia no hay cursos cargados.</p>
+              <p className="muted">Todavía no hay cursos cargados.</p>
             )}
           </div>
         </section>
@@ -1180,7 +1180,7 @@ export default async function AdminPage({ searchParams }) {
                 <input name="title" required placeholder="Ej: Módulo 1 · Introducción" />
               </label>
               <label className="wide-field">
-                Descripcion
+                Descripción
                 <textarea name="description" rows="3" placeholder="Resumen de la clase" />
               </label>
               <label className="wide-field">
@@ -1346,7 +1346,7 @@ export default async function AdminPage({ searchParams }) {
                         <input name="title" required defaultValue={moduleItem.title || ""} />
                       </label>
                       <label className="wide-field">
-                        Descripcion
+                        Descripción
                         <textarea name="description" rows="3" defaultValue={moduleItem.description || ""} />
                       </label>
                       <button className="button" type="submit">Guardar cambios</button>
@@ -1354,7 +1354,7 @@ export default async function AdminPage({ searchParams }) {
                   </details>
                 </article>
               )) : (
-                <p className="muted">Todavia no hay modulos cargados.</p>
+                <p className="muted">Todavía no hay módulos cargados.</p>
               )}
             </div>
           </section>
@@ -1495,7 +1495,7 @@ export default async function AdminPage({ searchParams }) {
                         <input name="title" required defaultValue={lesson.title || ""} />
                       </label>
                       <label className="wide-field">
-                        Descripcion
+                        Descripción
                         <textarea name="description" rows="3" defaultValue={lesson.description || ""} />
                       </label>
                       <label className="wide-field">
@@ -1534,7 +1534,7 @@ export default async function AdminPage({ searchParams }) {
             ]}
             rows={courseRows}
             filters={courseStatusOptions.length ? [{ key: "status", label: "Estado", options: courseStatusOptions }] : []}
-            emptyTitle="Todavia no existen cursos."
+            emptyTitle="Todavía no existen cursos."
             emptyText="Crea un curso desde el constructor academico."
             searchPlaceholder="Buscar cursos"
           />
@@ -1550,15 +1550,15 @@ export default async function AdminPage({ searchParams }) {
               { key: "date", header: "Fecha" },
             ]}
             rows={enrollmentRows}
-            emptyTitle="Todavia no hay inscripciones."
+            emptyTitle="Todavía no hay inscripciones."
             emptyText="Cuando habilites un curso a un alumno, se vera aca."
             searchPlaceholder="Buscar alumno o curso"
           />
         </section>
 
         <section className="panel spaced-panel" id="configuracion" data-admin-view="configuracion">
-          <p className="eyebrow">Configuracion</p>
-          <h2>Configuracion del CMS</h2>
+          <p className="eyebrow">Configuración</p>
+          <h2>Configuración del CMS</h2>
           <p className="muted">
             Esta area queda preparada para futuras opciones administrativas, como pagos, emails, reportes y configuracion avanzada.
           </p>

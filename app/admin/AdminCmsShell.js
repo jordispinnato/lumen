@@ -14,12 +14,12 @@ const menuGroups = [
   ],
   [
     { label: "Cursos", href: "#cursos", icon: "C" },
-    { label: "Modulos", href: "#modulos", icon: "M" },
+    { label: "Módulos", href: "#modulos", icon: "M" },
     { label: "Lecciones", href: "#lecciones", icon: "L" },
     { label: "Materiales", href: "#materiales", icon: "A" },
   ],
   [
-    { label: "Catalogo", href: "#catalogo", icon: "G" },
+    { label: "Catálogo", href: "#catalogo", icon: "G" },
     { label: "Productos", href: "#productos", icon: "R" },
     { label: "Categorias", href: "#categorias", icon: "K" },
     { label: "Solicitudes", href: "#solicitudes", icon: "S" },
@@ -33,7 +33,7 @@ const menuGroups = [
     { label: "Biblioteca", href: "#biblioteca", icon: "B" },
   ],
   [
-    { label: "Configuracion", href: "#configuracion", icon: "O" },
+    { label: "Configuración", href: "#configuracion", icon: "O" },
   ],
 ];
 
@@ -189,7 +189,7 @@ export default function AdminCmsShell({ adminName, adminEmail, children }) {
               <a href="/">Sitio principal</a>
               <a href="#dashboard">Dashboard</a>
               <form action="/auth/logout" method="post">
-                <button type="submit">Cerrar sesion</button>
+                <button type="submit">Cerrar sesión</button>
               </form>
             </div>
           </details>
@@ -201,7 +201,7 @@ export default function AdminCmsShell({ adminName, adminEmail, children }) {
 
         <footer className="admin-cms-footer">
           <span>LUMEN CMS</span>
-          <span>Arquitectura preparada para nuevos modulos.</span>
+          <span>Arquitectura preparada para nuevos módulos.</span>
         </footer>
       </div>
     </div>

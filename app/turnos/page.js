@@ -3,7 +3,7 @@ import { createSupabaseServerClient } from "../../lib/supabase/server";
 
 export const metadata = {
   title: "Reservar turno | LUMEN",
-  description: "Reserva de turnos para atencion psicologica online.",
+  description: "Reserva de turnos para atención psicológica online.",
 };
 
 export default async function TurnosPage({ searchParams }) {
@@ -30,9 +30,9 @@ export default async function TurnosPage({ searchParams }) {
       <div className="dashboard-shell">
         <div className="section-head">
           <p className="eyebrow">Reservar turno</p>
-          <h1>Atencion psicologica online.</h1>
+          <h1>Atención psicológica online.</h1>
           <p className="lead">
-            Elegi una especialista, revisa los dias y horarios disponibles y deja preparada la reserva de tu consulta.
+            Elegí una especialista, revisá los días y horarios disponibles y dejá preparada la reserva de tu consulta.
           </p>
           {params?.error ? <p className="notice error">{params.error}</p> : null}
         </div>

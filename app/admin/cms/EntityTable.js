@@ -72,7 +72,7 @@ export function Pagination({ page, pageCount, onPageChange }) {
   );
 }
 
-export function EmptyState({ title = "Todavia no hay registros.", text, actionHref, actionLabel }) {
+export function EmptyState({ title = "Todavía no hay registros.", text, actionHref, actionLabel }) {
   return (
     <div className="cms-state cms-empty-state">
       <h3>{title}</h3>
@@ -82,11 +82,11 @@ export function EmptyState({ title = "Todavia no hay registros.", text, actionHr
   );
 }
 
-export function LoadingState({ text = "Cargando informacion..." }) {
+export function LoadingState({ text = "Cargando información..." }) {
   return <div className="cms-state">{text}</div>;
 }
 
-export function ErrorState({ text = "No se pudo cargar la informacion." }) {
+export function ErrorState({ text = "No se pudo cargar la información." }) {
   return <div className="cms-state cms-error-state">{text}</div>;
 }
 

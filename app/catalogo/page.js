@@ -3,8 +3,8 @@ import { createSupabaseServerClient } from "../../lib/supabase/server";
 import { demoProducts } from "../../lib/catalog";
 
 export const metadata = {
-  title: "Catalogo online | LUMEN",
-  description: "Productos fisicos y recursos digitales para bienestar, educacion y practica clinica.",
+  title: "Catálogo online | LUMEN",
+  description: "Productos físicos y recursos digitales para bienestar, educación y práctica clínica.",
 };
 
 export default async function CatalogoPage() {
@@ -21,10 +21,10 @@ export default async function CatalogoPage() {
     <main className="section">
       <div className="dashboard-shell">
         <div className="section-head">
-          <p className="eyebrow">Catalogo online</p>
-          <h1>Recursos fisicos y digitales para acompanar procesos.</h1>
+          <p className="eyebrow">Catálogo online</p>
+          <h1>Recursos físicos y digitales para acompañar procesos.</h1>
           <p className="lead">
-            Fidgets sensoriales, materiales de regulacion, recursos terapeuticos y cuadernillos descargables.
+            Fidgets sensoriales, materiales de regulación, recursos terapéuticos y cuadernillos descargables.
           </p>
         </div>
 

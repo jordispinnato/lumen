@@ -41,18 +41,18 @@ export default async function ProductDetailPage({ params, searchParams }) {
             <p className="lead">{product.summary}</p>
             <p className="price">{formatPrice(product.price)}</p>
             {isPhysical ? (
-              <p className="muted">Producto fisico con envio dentro de Argentina. Stock: {product.stock ?? "A confirmar"}.</p>
+              <p className="muted">Producto físico con envío dentro de Argentina. Stock: {product.stock ?? "A confirmar"}.</p>
             ) : (
               <p className="muted">
-                Recurso digital. {product.digital_file_name ? `Archivo cargado: ${product.digital_file_name}.` : "La descarga se habilitara cuando el pago este confirmado."}
+                Recurso digital. {product.digital_file_name ? `Archivo cargado: ${product.digital_file_name}.` : "La descarga se habilitará cuando el pago esté confirmado."}
               </p>
             )}
-            <a className="secondary-button" href="/catalogo">Volver al catalogo</a>
+            <a className="secondary-button" href="/catalogo">Volver al catálogo</a>
           </section>
 
           <aside className="panel">
             <p className="eyebrow">Compra</p>
-            <h2>{isPhysical ? "Datos para envio" : "Solicitar recurso digital"}</h2>
+            <h2>{isPhysical ? "Datos para envío" : "Solicitar recurso digital"}</h2>
             {query?.error ? <p className="notice error">{query.error}</p> : null}
             {query?.message ? <p className="notice success">{query.message}</p> : null}
 
@@ -69,7 +69,7 @@ export default async function ProductDetailPage({ params, searchParams }) {
                 {isPhysical ? (
                   <>
                     <label>
-                      Telefono de contacto
+                      Teléfono de contacto
                       <input name="shippingPhone" required placeholder="Ej: 11 1234 5678" />
                     </label>
                     <label>
@@ -81,7 +81,7 @@ export default async function ProductDetailPage({ params, searchParams }) {
                       <input name="shippingCity" required placeholder="Ej: CABA, La Plata, Rosario" />
                     </label>
                     <label>
-                      Codigo postal
+                      Código postal
                       <input name="shippingPostalCode" required placeholder="Ej: 1405" />
                     </label>
                     <label>
@@ -97,12 +97,12 @@ export default async function ProductDetailPage({ params, searchParams }) {
                       <input name="shippingFloorApartment" placeholder="Opcional" />
                     </label>
                     <label>
-                      Indicaciones para el envio
+                      Indicaciones para el envío
                       <textarea name="shippingNotes" rows="3" placeholder="Opcional" />
                     </label>
                   </>
                 ) : (
-                  <p className="muted">La descarga se habilitara automaticamente cuando conectemos pagos y el pago quede aprobado.</p>
+                  <p className="muted">La descarga se habilitará automáticamente cuando conectemos pagos y el pago quede aprobado.</p>
                 )}
 
                 <button className="button" type="submit">Registrar solicitud</button>

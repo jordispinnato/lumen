@@ -1027,10 +1027,24 @@ h3 {
 
 .landing-professional-card img,
 .landing-professional-card .professional-avatar {
-  width: 86px;
-  height: 86px;
+  justify-self: center;
+  width: min(190px, 78%);
+  height: auto;
+  aspect-ratio: 1;
   border-radius: var(--ds-radius);
   object-fit: cover;
+  box-shadow: 0 16px 34px rgba(20, 53, 56, 0.12);
+}
+
+.landing-professional-card {
+  justify-items: center;
+  text-align: center;
+}
+
+.landing-professional-card > div {
+  display: grid;
+  justify-items: center;
+  gap: 5px;
 }
 
 .landing-professional-card small,
@@ -2675,13 +2689,13 @@ body:has(.admin-cms-shell) {
 
 .calendar-grid {
   display: grid;
-  grid-template-columns: repeat(7, minmax(0, 1fr));
+  grid-template-columns: repeat(6, minmax(0, 1fr));
   gap: 10px;
 }
 
 .calendar-weekdays {
   display: grid;
-  grid-template-columns: repeat(7, minmax(0, 1fr));
+  grid-template-columns: repeat(6, minmax(0, 1fr));
   gap: 8px;
   color: var(--muted);
   font-size: 0.72rem;
@@ -2709,16 +2723,20 @@ body:has(.admin-cms-shell) {
 .calendar-day.has-slots {
   border-color: rgba(11, 74, 83, 0.24);
   background: linear-gradient(180deg, #ffffff, rgba(232, 245, 241, 0.92));
+  font-weight: 900;
+  opacity: 1;
 }
 
 .calendar-day strong {
   color: var(--deep);
   font-size: 1.28rem;
+  font-weight: 700;
   line-height: 1;
 }
 
 .calendar-day.has-slots strong {
   color: var(--petrol);
+  font-weight: 950;
 }
 
 .calendar-day small {
@@ -2739,6 +2757,8 @@ body:has(.admin-cms-shell) {
 
 .calendar-day:disabled {
   background: rgba(255, 255, 255, 0.58);
+  color: rgba(20, 53, 56, 0.46);
+  opacity: 0.52;
 }
 
 .calendar-day:disabled:hover {
@@ -2767,9 +2787,11 @@ body:has(.admin-cms-shell) {
 
 .selected-professional {
   display: grid;
-  grid-template-columns: 60px minmax(0, 1fr);
+  grid-template-columns: 1fr;
+  justify-items: center;
   gap: 12px;
   align-items: center;
+  text-align: center;
   margin-bottom: 18px;
   padding: 12px;
   border: 1px solid var(--line);
@@ -2779,8 +2801,9 @@ body:has(.admin-cms-shell) {
 
 .selected-professional img,
 .selected-professional .professional-avatar {
-  width: 60px;
-  height: 60px;
+  width: min(150px, 70%);
+  height: auto;
+  aspect-ratio: 1;
 }
 
 .booking-summary h2 {
@@ -2899,14 +2922,15 @@ body:has(.admin-cms-shell) {
 
 .professional-detail {
   display: grid;
-  grid-template-columns: minmax(260px, 0.7fr) minmax(0, 1.3fr);
+  grid-template-columns: 1fr;
   gap: 28px;
+  justify-items: center;
   align-items: start;
+  text-align: center;
 }
 
 .professional-detail-media {
-  position: sticky;
-  top: 96px;
+  width: min(320px, 78vw);
 }
 
 .professional-detail-media img {
@@ -2914,12 +2938,13 @@ body:has(.admin-cms-shell) {
 }
 
 .professional-detail-body h1 {
-  font-size: clamp(3rem, 7vw, 6rem);
+  font-size: clamp(2.8rem, 6vw, 5rem);
 }
 
 .professional-detail-tags {
   display: flex;
   flex-wrap: wrap;
+  justify-content: center;
   gap: 8px;
   margin-bottom: 20px;
 }
@@ -4480,7 +4505,7 @@ body:has(.account-app-shell) .site-footer {
 
   .calendar-grid,
   .calendar-weekdays {
-    grid-template-columns: repeat(7, minmax(34px, 1fr));
+    grid-template-columns: repeat(6, minmax(34px, 1fr));
     gap: 6px;
   }
 

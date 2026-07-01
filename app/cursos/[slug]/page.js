@@ -88,7 +88,7 @@ export default async function CourseDetailPage({ params }) {
               {course.instructor ? <span>{course.instructor}</span> : null}
               {course.level ? <span>{course.level}</span> : null}
               {course.totalDuration ? <span>{course.totalDuration}</span> : null}
-              <span>{totalModules} modulos</span>
+              <span>{totalModules} módulos</span>
               <span>{totalLessons} clases</span>
               {downloadableMaterials ? <span>{downloadableMaterials} materiales</span> : null}
             </div>
@@ -99,7 +99,7 @@ export default async function CourseDetailPage({ params }) {
               ) : (
                 <a className="button" href="/login">Ingresar para acceder</a>
               )}
-              <a className="secondary-button" href="/cursos">Comprar mas adelante</a>
+              <a className="secondary-button" href="/cursos">Comprar más adelante</a>
             </div>
           </div>
 
@@ -114,30 +114,30 @@ export default async function CourseDetailPage({ params }) {
 
         {course.description ? (
           <section className="panel spaced-panel">
-            <p className="eyebrow">Descripcion</p>
+            <p className="eyebrow">Descripción</p>
             <p className="muted large-text">{course.description}</p>
           </section>
         ) : null}
 
         <div className="course-info-layout spaced-panel">
           <section className="panel">
-            <h2>Que aprenderas</h2>
+            <h2>Qué aprenderás</h2>
             {learningOutcomes.length ? (
               <ul className="clean-list">
                 {learningOutcomes.map((item) => <li key={item}>{item}</li>)}
               </ul>
             ) : (
-              <p className="muted">El temario se esta preparando.</p>
+              <p className="muted">El temario se está preparando.</p>
             )}
           </section>
           <section className="panel">
-            <h2>A quien esta dirigido</h2>
+            <h2>A quién está dirigido</h2>
             {audience.length ? (
               <ul className="clean-list">
                 {audience.map((item) => <li key={item}>{item}</li>)}
               </ul>
             ) : (
-              <p className="muted">Personas interesadas en formacion y recursos LUMEN.</p>
+              <p className="muted">Personas interesadas en formación y recursos LUMEN.</p>
             )}
           </section>
         </div>
@@ -145,7 +145,7 @@ export default async function CourseDetailPage({ params }) {
         <section className="panel spaced-panel">
           <div className="admin-section-head">
             <p className="eyebrow">Programa completo</p>
-            <h2>Modulos y clases</h2>
+            <h2>Módulos y clases</h2>
           </div>
           {modules?.length ? (
             <div className="program-list">
@@ -167,7 +167,7 @@ export default async function CourseDetailPage({ params }) {
               ))}
             </div>
           ) : (
-            <p className="muted">El programa se vera aca cuando se carguen modulos y lecciones.</p>
+            <p className="muted">El programa se verá acá cuando se carguen módulos y lecciones.</p>
           )}
         </section>
 
@@ -189,7 +189,7 @@ export default async function CourseDetailPage({ params }) {
                 {faqItems.map((item) => <li key={item}>{item}</li>)}
               </ul>
             ) : (
-              <p className="muted">Estructura preparada para sumar preguntas frecuentes mas adelante.</p>
+              <p className="muted">Estructura preparada para sumar preguntas frecuentes más adelante.</p>
             )}
           </section>
         </div>

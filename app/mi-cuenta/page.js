@@ -250,7 +250,7 @@ export default async function MiCuentaPage() {
     ...courseCards.slice(0, 3).map((item) => ({
       id: `course-${item.id}`,
       icon: "C",
-      text: `Tenes acceso al curso ${item.course?.title || "Curso"}`,
+      text: `Tenés acceso al curso ${item.course?.title || "Curso"}`,
       date: item.enrolledAt,
     })),
     ...upcomingBookings.slice(0, 2).map((booking) => ({
@@ -262,7 +262,7 @@ export default async function MiCuentaPage() {
     ...approvedDigitalOrders.slice(0, 2).map((order) => ({
       id: `resource-${order.id}`,
       icon: "R",
-      text: `Tenes disponible el recurso ${order.catalog_products?.title || "digital"}`,
+      text: `Tenés disponible el recurso ${order.catalog_products?.title || "digital"}`,
       date: order.created_at,
     })),
   ]
@@ -276,7 +276,7 @@ export default async function MiCuentaPage() {
     { href: "#recursos", icon: "R", label: "Mis recursos" },
     { href: "#pedidos", icon: "P", label: "Mis pedidos" },
     { href: "#certificados", icon: "D", label: "Certificados" },
-    { href: "#configuracion", icon: "S", label: "Configuracion" },
+    { href: "#configuracion", icon: "S", label: "Configuración" },
   ];
 
   return (
@@ -295,7 +295,7 @@ export default async function MiCuentaPage() {
             <StatCard
               icon="T"
               tone="blue"
-              label="Proximo turno"
+              label="Próximo turno"
               value={nextBooking ? formatDate(nextBooking.appointment_slots?.slot_date) : "Sin turnos"}
               helper={nextBooking ? `${formatTime(nextBooking.appointment_slots?.slot_time)} hs` : "Reserva cuando quieras"}
               href="#turnos"
@@ -361,7 +361,7 @@ export default async function MiCuentaPage() {
                         <strong>{item.progress.percent}%</strong>
                       </div>
                       <div className="account-course-meta">
-                        <span>Ultima leccion: {item.progress.lastLessonTitle}</span>
+                      <span>Última lección: {item.progress.lastLessonTitle}</span>
                         <span>{item.progress.completed} de {item.progress.total} clases</span>
                       </div>
                       <div className="account-course-actions">
@@ -374,8 +374,8 @@ export default async function MiCuentaPage() {
               </div>
             ) : (
               <EmptyState
-                title="Todavia no tenes cursos habilitados"
-                text="Cuando compres o te habiliten un curso, lo vas a ver en esta seccion."
+                title="Todavía no tenés cursos habilitados"
+                text="Cuando compres o te habiliten un curso, lo vas a ver en esta sección."
                 href="/cursos"
                 action="Explorar cursos"
               />
@@ -387,7 +387,7 @@ export default async function MiCuentaPage() {
               <div className="account-panel-head">
                 <div>
                   <AccountIcon tone="blue">T</AccountIcon>
-                  <h2>Proximos turnos</h2>
+                  <h2>Próximos turnos</h2>
                 </div>
                 <a href="/turnos">Ver todos</a>
               </div>
@@ -397,7 +397,7 @@ export default async function MiCuentaPage() {
                     <article className="account-appointment-card" key={booking.id}>
                       <span className="account-avatar small">{initialsFromName(booking.appointment_specialists?.name)}</span>
                       <div>
-                        <strong>{booking.appointment_specialists?.session || "Sesion individual"}</strong>
+                        <strong>{booking.appointment_specialists?.session || "Sesión individual"}</strong>
                         <span>{booking.appointment_specialists?.name || "Profesional LUMEN"}</span>
                       </div>
                       <div>
@@ -408,7 +408,7 @@ export default async function MiCuentaPage() {
                   ))}
                 </div>
               ) : (
-                <EmptyState title="No tenes turnos proximos" text="Podes reservar un nuevo turno cuando lo necesites." href="/turnos" action="Reservar turno" />
+                <EmptyState title="No tenés turnos próximos" text="Podés reservar un nuevo turno cuando lo necesites." href="/turnos" action="Reservar turno" />
               )}
               <a className="account-wide-action" href="/turnos">Reservar nuevo turno</a>
 
@@ -425,7 +425,7 @@ export default async function MiCuentaPage() {
                     ))}
                   </div>
                 ) : (
-                  <p className="account-muted">Todavia no hay turnos en el historial.</p>
+                  <p className="account-muted">Todavía no hay turnos en el historial.</p>
                 )}
               </div>
             </section>
@@ -449,7 +449,7 @@ export default async function MiCuentaPage() {
                   ))}
                 </div>
               ) : (
-                <EmptyState title="Todavia no hay actividad reciente" text="A medida que uses la plataforma, tus movimientos importantes van a aparecer aca." />
+                <EmptyState title="Todavía no hay actividad reciente" text="A medida que uses la plataforma, tus movimientos importantes van a aparecer acá." />
               )}
             </section>
           </div>
@@ -460,7 +460,7 @@ export default async function MiCuentaPage() {
                 <AccountIcon tone="orange">R</AccountIcon>
                 <h2>Mis recursos</h2>
               </div>
-              <a href="/catalogo">Ir al catalogo</a>
+              <a href="/catalogo">Ir al catálogo</a>
             </div>
             {approvedDigitalOrders.length ? (
               <div className="account-resource-grid">
@@ -476,10 +476,10 @@ export default async function MiCuentaPage() {
               </div>
             ) : (
               <EmptyState
-                title="Todavia no tenes recursos digitales disponibles"
-                text="Cuando compres un recurso digital y el pago este aprobado, va a aparecer aca."
+                title="Todavía no tenés recursos digitales disponibles"
+                text="Cuando compres un recurso digital y el pago esté aprobado, va a aparecer acá."
                 href="/catalogo"
-                action="Ir al catalogo"
+                action="Ir al catálogo"
               />
             )}
           </section>
@@ -503,7 +503,7 @@ export default async function MiCuentaPage() {
                   ))}
                 </div>
               ) : (
-                <EmptyState title="Todavia no tenes pedidos" text="Cuando solicites un producto o recurso, el seguimiento va a aparecer aca." href="/catalogo" action="Explorar catalogo" />
+                <EmptyState title="Todavía no tenés pedidos" text="Cuando solicites un producto o recurso, el seguimiento va a aparecer acá." href="/catalogo" action="Explorar catálogo" />
               )}
             </section>
 
@@ -525,7 +525,7 @@ export default async function MiCuentaPage() {
             <div className="account-panel-head">
               <div>
                 <AccountIcon tone="green">S</AccountIcon>
-                <h2>Configuracion</h2>
+                <h2>Configuración</h2>
               </div>
             </div>
             <div className="account-profile-grid">
@@ -542,11 +542,11 @@ export default async function MiCuentaPage() {
                 <strong>{profile?.role || "student"}</strong>
               </div>
               <div>
-                <span>Fecha de creacion</span>
+                <span>Fecha de creación</span>
                 <strong>{formatDateTime(profile?.created_at || userData.user.created_at)}</strong>
               </div>
             </div>
-            <p className="account-muted">Por ahora esta informacion es de solo lectura.</p>
+            <p className="account-muted">Por ahora esta información es de solo lectura.</p>
           </section>
         </div>
     </AccountDashboardShell>

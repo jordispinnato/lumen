@@ -14,10 +14,20 @@ function buildMonth(offset) {
   const today = new Date();
   const monthStart = new Date(today.getFullYear(), today.getMonth() + offset, 1);
   const monthEnd = new Date(today.getFullYear(), today.getMonth() + offset + 1, 0);
+  const firstVisibleDay = new Date(monthStart);
   const days = [];
-  const leadingBlanks = monthStart.getDay() === 0 ? 6 : monthStart.getDay() - 1;
+
+  while (firstVisibleDay.getDay() === 0 && firstVisibleDay <= monthEnd) {
+    firstVisibleDay.setDate(firstVisibleDay.getDate() + 1);
+  }
+
+  const leadingBlanks = firstVisibleDay.getDay() === 0 ? 0 : firstVisibleDay.getDay() - 1;
 
   for (let date = new Date(monthStart); date <= monthEnd; date.setDate(date.getDate() + 1)) {
+    if (date.getDay() === 0) {
+      continue;
+    }
+
     days.push({
       iso: toISODate(date),
       dayNumber: date.getDate(),
@@ -60,6 +70,10 @@ function formatShortDate(value) {
   });
 }
 
+function isSunday(dateValue) {
+  return new Date(`${dateValue}T00:00:00`).getDay() === 0;
+}
+
 function getInitialSpecialistId(specialists, initialSpecialistSlug) {
   const matchedSpecialist = specialists.find((specialist) => specialist.slug === initialSpecialistSlug);
   return matchedSpecialist?.id || specialists[0]?.id;
@@ -100,7 +114,7 @@ export default function BookingPicker({ specialists, slots, userEmail, initialSp
     const todayIso = toISODate(new Date());
 
     return Object.entries(slotsByDate)
-      .filter(([date, dateSlots]) => date >= todayIso && dateSlots.length > 0)
+      .filter(([date, dateSlots]) => date >= todayIso && !isSunday(date) && dateSlots.length > 0)
       .sort(([dateA], [dateB]) => dateA.localeCompare(dateB))
       .slice(0, 6)
       .map(([date, dateSlots]) => ({ date, count: dateSlots.length }));
@@ -134,9 +148,9 @@ export default function BookingPicker({ specialists, slots, userEmail, initialSp
   if (!specialists.length) {
     return (
       <section className="panel">
-        <h2>Todavia no hay especialistas disponibles</h2>
+        <h2>Todavía no hay especialistas disponibles</h2>
         <p className="muted">
-          Cuando el equipo cargue especialistas y horarios desde el panel admin, vas a poder reservar desde aca.
+          Cuando el equipo cargue especialistas y horarios desde el panel admin, vas a poder reservar desde acá.
         </p>
       </section>
     );
@@ -145,7 +159,7 @@ export default function BookingPicker({ specialists, slots, userEmail, initialSp
   return (
     <div className="booking-layout">
       <section className="panel booking-panel">
-        <p className="eyebrow">1. Elegi especialista</p>
+        <p className="eyebrow">1. Elegí especialista</p>
         <div className="professional-card-list">
           {specialists.map((specialist) => (
             <article
@@ -181,7 +195,7 @@ export default function BookingPicker({ specialists, slots, userEmail, initialSp
       </section>
 
       <section className="panel booking-panel">
-        <p className="eyebrow">2. Elegi un dia</p>
+        <p className="eyebrow">2. Elegí un día</p>
         <div className="month-tabs">
           {months.map((month, index) => (
             <button
@@ -220,7 +234,7 @@ export default function BookingPicker({ specialists, slots, userEmail, initialSp
           <p className="muted">Todavía no hay fechas disponibles para esta especialista.</p>
         )}
         <div className="calendar-weekdays" aria-hidden="true">
-          {["Lun", "Mar", "Mié", "Jue", "Vie", "Sáb", "Dom"].map((day) => (
+          {["Lun", "Mar", "Mié", "Jue", "Vie", "Sáb"].map((day) => (
             <span key={day}>{day}</span>
           ))}
         </div>
@@ -248,7 +262,7 @@ export default function BookingPicker({ specialists, slots, userEmail, initialSp
           })}
         </div>
 
-        <p className="eyebrow">3. Elegi un horario</p>
+        <p className="eyebrow">3. Elegí un horario</p>
         {selectedDate ? (
           selectedDateSlots.length ? (
             <div className="slot-grid" aria-label="Horarios disponibles">
@@ -267,16 +281,16 @@ export default function BookingPicker({ specialists, slots, userEmail, initialSp
               ))}
             </div>
           ) : (
-            <p className="muted">No hay horarios disponibles para este dia.</p>
+            <p className="muted">No hay horarios disponibles para este día.</p>
           )
         ) : (
-          <p className="muted">Elegi un dia para continuar.</p>
+          <p className="muted">Elegí un día para continuar.</p>
         )}
       </section>
 
       <aside className="panel booking-summary">
         <p className="eyebrow">Resumen</p>
-        <h2>Reserva de atencion psicologica</h2>
+        <h2>Reserva de atención psicológica</h2>
         <div className="selected-professional">
           {selectedSpecialist.photo_url ? (
             <img alt="" src={selectedSpecialist.photo_url} />
@@ -307,7 +321,7 @@ export default function BookingPicker({ specialists, slots, userEmail, initialSp
             <dd>{selectedSlot ? formatTime(selectedSlot.slot_time) : "Sin seleccionar"}</dd>
           </div>
           <div>
-            <dt>Duracion</dt>
+            <dt>Duración</dt>
             <dd>{selectedSpecialist.duration_minutes ? `${selectedSpecialist.duration_minutes} minutos` : selectedSpecialist.session}</dd>
           </div>
         </dl>
@@ -321,13 +335,13 @@ export default function BookingPicker({ specialists, slots, userEmail, initialSp
                 <input name="patientName" placeholder="Nombre y apellido" />
               </label>
               <label>
-                Email de confirmacion
+                Email de confirmación
                 <input readOnly value={userEmail} />
               </label>
               <div className="booking-review-box">
-                <strong>Confirmacion previa</strong>
-                <p>La reserva quedara registrada en tu cuenta.</p>
-                <p>El pago todavia no esta integrado en esta version.</p>
+                <strong>Confirmación previa</strong>
+                <p>La reserva quedará registrada en tu cuenta.</p>
+                <p>El pago todavía no está integrado en esta versión.</p>
               </div>
               <div className="booking-form-actions">
                 <button className="button" disabled={!selectedSlot} type="submit">Confirmar reserva</button>
@@ -340,17 +354,17 @@ export default function BookingPicker({ specialists, slots, userEmail, initialSp
                 Revisar reserva
               </button>
               <p className="muted">
-                {selectedSlot ? "Revisa los datos antes de confirmar." : "Elegi un dia y horario para continuar."}
+                {selectedSlot ? "Revisá los datos antes de confirmar." : "Elegí un día y horario para continuar."}
               </p>
             </div>
           )
         ) : (
           <div className="booking-login-box">
-            <p className="muted">Para confirmar la reserva necesitas iniciar sesion.</p>
+            <p className="muted">Para confirmar la reserva necesitás iniciar sesión.</p>
             <a className="button" href="/login">Ingresar</a>
           </div>
         )}
-        <p className="muted">El pago se conectara en una etapa posterior.</p>
+        <p className="muted">El pago se conectará en una etapa posterior.</p>
       </aside>
     </div>
   );

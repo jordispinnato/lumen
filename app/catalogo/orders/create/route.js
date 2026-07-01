@@ -46,7 +46,7 @@ export async function POST(request) {
 
     if (missingShipping) {
       return NextResponse.redirect(
-        `${origin}/catalogo/${productId}?error=${encodeURIComponent("Completa los datos de envio")}`,
+        `${origin}/catalogo/${productId}?error=${encodeURIComponent("Completá los datos de envío")}`,
         { status: 303 }
       );
     }

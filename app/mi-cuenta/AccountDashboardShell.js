@@ -44,7 +44,7 @@ export default function AccountDashboardShell({ navItems, displayName, avatarIni
         <form className="account-logout-form" action="/auth/logout" method="post">
           <button type="submit">
             <span aria-hidden="true">X</span>
-            Cerrar sesion
+            Cerrar sesión
           </button>
         </form>
       </aside>
@@ -72,7 +72,7 @@ export default function AccountDashboardShell({ navItems, displayName, avatarIni
                 {isAdmin ? <a href="/admin">Ir al Admin</a> : null}
                 <a href="#configuracion">Ver perfil</a>
                 <form action="/auth/logout" method="post">
-                  <button type="submit">Cerrar sesion</button>
+                  <button type="submit">Cerrar sesión</button>
                 </form>
               </div>
             </details>

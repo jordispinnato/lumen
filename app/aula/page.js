@@ -90,9 +90,9 @@ export default async function ClassroomPage({ searchParams }) {
       <main className="section">
         <div className="dashboard-shell">
           <section className="panel">
-            <h2>Todavia no tenes cursos habilitados</h2>
+            <h2>Todavía no tenés cursos habilitados</h2>
             <p className="muted">
-              Cuando una compra o inscripcion sea aprobada, el curso aparecera en esta aula.
+              Cuando una compra o inscripción sea aprobada, el curso aparecerá en esta aula.
             </p>
             <a className="button" href="/cursos">Ver cursos</a>
           </section>
@@ -308,7 +308,7 @@ export default async function ClassroomPage({ searchParams }) {
                     ))}
                   </ul>
                 ) : (
-                  <p className="muted">Esta clase todavia no tiene materiales cargados.</p>
+                  <p className="muted">Esta clase todavía no tiene materiales cargados.</p>
                 )}
 
                 <div className="lesson-actions">
@@ -331,8 +331,8 @@ export default async function ClassroomPage({ searchParams }) {
             </>
           ) : (
             <section className="panel">
-              <h2>Este curso todavia no tiene clases publicadas</h2>
-              <p className="muted">Cuando se carguen modulos y lecciones, van a aparecer aca.</p>
+              <h2>Este curso todavía no tiene clases publicadas</h2>
+              <p className="muted">Cuando se carguen módulos y lecciones, van a aparecer acá.</p>
             </section>
           )}
         </section>

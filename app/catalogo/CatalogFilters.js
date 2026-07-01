@@ -6,7 +6,7 @@ import { getProductTypeLabel } from "../../lib/catalog";
 
 const filters = [
   { value: "all", label: "Todos" },
-  { value: "physical", label: "Fisicos" },
+  { value: "physical", label: "Físicos" },
   { value: "digital", label: "Digitales" },
 ];
 
@@ -23,7 +23,7 @@ export default function CatalogFilters({ products }) {
 
   return (
     <>
-      <div className="catalog-toolbar" aria-label="Filtros de catalogo">
+      <div className="catalog-toolbar" aria-label="Filtros de catálogo">
         {filters.map((filter) => (
           <button
             className={`filter-chip ${activeFilter === filter.value ? "is-active" : ""}`}

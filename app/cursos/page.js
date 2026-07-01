@@ -18,7 +18,7 @@ export default async function CoursesPage() {
         <p className="eyebrow">Academia LUMEN</p>
         <h1>Cursos disponibles</h1>
         <p className="lead">
-          Formaciones asincronicas organizadas por modulos, clases y materiales complementarios.
+          Formaciones asincrónicas organizadas por módulos, clases y materiales complementarios.
         </p>
       </div>
 
