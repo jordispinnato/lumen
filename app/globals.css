@@ -4007,6 +4007,32 @@ body:has(.account-app-shell) .site-footer {
   overflow-wrap: anywhere;
 }
 
+.specialist-dashboard .account-hero {
+  align-items: center;
+}
+
+.specialist-calendar-card {
+  display: grid;
+  gap: 14px;
+  border: 1px solid rgba(11, 74, 83, 0.12);
+  border-radius: 8px;
+  padding: 18px;
+  background:
+    linear-gradient(135deg, rgba(104, 199, 189, 0.12), rgba(255, 255, 255, 0.88)),
+    #fff;
+}
+
+.specialist-calendar-card strong {
+  color: var(--deep);
+  font-size: 1.05rem;
+}
+
+.specialist-calendar-card p {
+  margin: 0;
+  color: var(--muted);
+  line-height: 1.55;
+}
+
 @media (max-width: 980px) {
   .landing-hero {
     min-height: 620px;

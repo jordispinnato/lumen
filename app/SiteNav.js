@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 
-export default function SiteNav({ isAdmin, isLoggedIn }) {
+export default function SiteNav({ isAdmin, isSpecialist, isLoggedIn }) {
   const [isOpen, setIsOpen] = useState(false);
 
   function closeMenu() {
@@ -31,6 +31,7 @@ export default function SiteNav({ isAdmin, isLoggedIn }) {
           {isLoggedIn ? (
             <>
               <a className="secondary-button" href="/mi-cuenta" onClick={closeMenu}>Mi Espacio</a>
+              {isSpecialist ? <a className="secondary-button" href="/especialista" onClick={closeMenu}>Especialista</a> : null}
               {isAdmin ? <a className="secondary-button" href="/admin" onClick={closeMenu}>Admin</a> : null}
               <form action="/auth/logout" method="post">
                 <button className="nav-button" type="submit">Salir</button>

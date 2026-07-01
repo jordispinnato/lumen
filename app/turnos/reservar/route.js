@@ -1,6 +1,8 @@
 import { NextResponse } from "next/server";
 import { createSupabaseServerClient } from "../../../lib/supabase/server";
-import { sendAppointmentConfirmationEmail } from "../../../lib/email";
+import { createSupabaseAdminClient } from "../../../lib/supabase/admin";
+import { sendAppointmentConfirmationEmail, sendSpecialistAppointmentNotificationEmail } from "../../../lib/email";
+import { createGoogleCalendarEvent } from "../../../lib/googleCalendar";
 
 export async function POST(request) {
   const origin = new URL(request.url).origin;
@@ -22,7 +24,18 @@ export async function POST(request) {
 
   const { data: slot, error: slotError } = await supabase
     .from("appointment_slots")
-    .select("id,specialist_id,slot_date,slot_time,status,appointment_specialists:specialist_id (name)")
+    .select(`
+      id,
+      specialist_id,
+      slot_date,
+      slot_time,
+      status,
+      appointment_specialists:specialist_id (
+        id,
+        name,
+        duration_minutes
+      )
+    `)
     .eq("id", slotId)
     .eq("status", "available")
     .maybeSingle();
@@ -46,14 +59,20 @@ export async function POST(request) {
     });
   }
 
-  const { error: bookingError } = await supabase.from("appointment_bookings").insert({
+  const bookingPayload = {
     user_id: userData.user.id,
     slot_id: slot.id,
     specialist_id: slot.specialist_id,
     patient_email: userData.user.email,
     patient_name: patientName || null,
     status: "confirmed",
-  });
+  };
+
+  const { data: booking, error: bookingError } = await supabase
+    .from("appointment_bookings")
+    .insert(bookingPayload)
+    .select("id,patient_email,patient_name,status")
+    .maybeSingle();
 
   if (bookingError) {
     await supabase.from("appointment_slots").update({ status: "available" }).eq("id", slotId);
@@ -70,6 +89,49 @@ export async function POST(request) {
     });
   } catch (error) {
     console.error("Appointment confirmation email failed", error);
+  }
+
+  try {
+    const adminSupabase = createSupabaseAdminClient();
+    const { data: specialistDetails } = adminSupabase
+      ? await adminSupabase
+          .from("appointment_specialists")
+          .select("professional_email")
+          .eq("id", slot.specialist_id)
+          .maybeSingle()
+      : { data: null };
+
+    await sendSpecialistAppointmentNotificationEmail({
+      to: specialistDetails?.professional_email,
+      patientName,
+      patientEmail: userData.user.email,
+      specialistName: slot.appointment_specialists?.name || "Especialista LUMEN",
+      slotDate: slot.slot_date,
+      slotTime: slot.slot_time,
+    });
+  } catch (error) {
+    console.error("Specialist appointment notification failed", error);
+  }
+
+  try {
+    const adminSupabase = createSupabaseAdminClient();
+    const { data: calendarConnection } = adminSupabase
+      ? await adminSupabase
+          .from("specialist_calendar_connections")
+          .select("id,specialist_id,calendar_sync_enabled,google_calendar_id,google_calendar_access_token,google_calendar_refresh_token,google_calendar_token_expires_at")
+          .eq("specialist_id", slot.specialist_id)
+          .maybeSingle()
+      : { data: null };
+
+    await createGoogleCalendarEvent({
+      supabase: adminSupabase,
+      specialist: slot.appointment_specialists,
+      connection: calendarConnection,
+      slot,
+      booking: booking || bookingPayload,
+    });
+  } catch (error) {
+    console.error("Google Calendar event creation failed", error);
   }
 
   const successParams = new URLSearchParams({

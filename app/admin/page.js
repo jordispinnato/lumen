@@ -152,6 +152,7 @@ export default async function AdminPage({ searchParams }) {
     { data: appointmentBookings },
     { data: catalogProducts },
     { data: catalogOrders },
+    { data: specialistCalendarConnections },
   ] = await Promise.all([
     supabase
       .from("courses")
@@ -177,7 +178,7 @@ export default async function AdminPage({ searchParams }) {
       .order("position", { ascending: true }),
     supabase
       .from("appointment_specialists")
-      .select("id,name,role,professional_license,focus,short_bio,education,years_experience,duration_minutes,session,price,status,display_order,slug,photo_url,created_at")
+      .select("id,user_id,name,role,professional_license,professional_email,focus,short_bio,education,years_experience,duration_minutes,session,price,status,display_order,slug,photo_url,created_at")
       .order("display_order", { ascending: true })
       .order("created_at", { ascending: false }),
     supabase
@@ -197,6 +198,9 @@ export default async function AdminPage({ searchParams }) {
       .from("catalog_orders")
       .select("id,customer_email,customer_name,product_type,amount,status,created_at,shipping_province,shipping_city,shipping_postal_code,shipping_street,shipping_number,shipping_floor_apartment,shipping_phone,shipping_notes,catalog_products:product_id (title)")
       .order("created_at", { ascending: false }),
+    supabase
+      .from("specialist_calendar_connections")
+      .select("specialist_id,google_calendar_email,google_calendar_connected_at,calendar_sync_enabled"),
   ]);
 
   const today = new Date().toISOString().slice(0, 10);
@@ -217,6 +221,14 @@ export default async function AdminPage({ searchParams }) {
   const latestBookings = bookings.slice(0, 5);
   const activeProfessionals = (specialists || []).filter((specialist) => specialist.status === "active");
   const inactiveProfessionals = (specialists || []).filter((specialist) => specialist.status === "inactive");
+  const profileOptions = (profiles || []).map((item) => ({
+    id: item.id,
+    label: item.full_name || item.email || item.id,
+    email: item.email,
+  }));
+  const calendarConnectionBySpecialistId = new Map(
+    (specialistCalendarConnections || []).map((connection) => [connection.specialist_id, connection])
+  );
   const publishedCourses = (courses || []).filter((course) => course.status === "published");
   const draftCourses = (courses || []).filter((course) => course.status === "draft");
   const activeProducts = (catalogProducts || []).filter((product) => product.status === "published");
@@ -544,6 +556,21 @@ export default async function AdminPage({ searchParams }) {
                   <option value="inactive">Inactivo</option>
                 </select>
               </label>
+              <label className="wide-field">
+                Usuario vinculado
+                <select name="userId" defaultValue="">
+                  <option value="">Sin usuario vinculado</option>
+                  {profileOptions.map((item) => (
+                    <option value={item.id} key={item.id}>
+                      {item.label}
+                    </option>
+                  ))}
+                </select>
+              </label>
+              <label className="wide-field">
+                Email profesional para avisos
+                <input name="professionalEmail" type="email" placeholder="especialista@lumen.com" />
+              </label>
               <button className="button" type="submit">Guardar especialista</button>
             </form>
             <p className="muted">
@@ -642,6 +669,14 @@ export default async function AdminPage({ searchParams }) {
                     <small>
                       {specialist.status} - {specialist.professional_license || "Sin matricula"} - {specialist.slug || "Sin slug"}
                     </small>
+                    <small>
+                      Usuario: {profileOptions.find((item) => item.id === specialist.user_id)?.label || "Sin usuario vinculado"}
+                    </small>
+                    <small>
+                      Calendar: {calendarConnectionBySpecialistId.get(specialist.id)?.google_calendar_connected_at
+                        ? calendarConnectionBySpecialistId.get(specialist.id)?.google_calendar_email || "Conectado"
+                        : "Sin conectar"}
+                    </small>
                     <small>{specialist.focus || "Sin enfoque cargado"}</small>
                   </div>
                   <details className="admin-inline-editor">
@@ -706,6 +741,21 @@ export default async function AdminPage({ searchParams }) {
                           <option value="active">Activo</option>
                           <option value="inactive">Inactivo</option>
                         </select>
+                      </label>
+                      <label className="wide-field">
+                        Usuario vinculado
+                        <select name="userId" defaultValue={specialist.user_id || ""}>
+                          <option value="">Sin usuario vinculado</option>
+                          {profileOptions.map((item) => (
+                            <option value={item.id} key={item.id}>
+                              {item.label}
+                            </option>
+                          ))}
+                        </select>
+                      </label>
+                      <label className="wide-field">
+                        Email profesional para avisos
+                        <input name="professionalEmail" type="email" defaultValue={specialist.professional_email || ""} />
                       </label>
                       <button className="button" type="submit">Guardar cambios</button>
                     </form>

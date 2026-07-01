@@ -11,6 +11,7 @@ export default async function RootLayout({ children }) {
   const supabase = await createSupabaseServerClient();
   const { data: userData } = await supabase.auth.getUser();
   let isAdmin = false;
+  let isSpecialist = false;
 
   if (userData.user) {
     const { data: profile } = await supabase
@@ -20,6 +21,7 @@ export default async function RootLayout({ children }) {
       .maybeSingle();
 
     isAdmin = profile?.role === "admin";
+    isSpecialist = profile?.role === "specialist";
   }
 
   return (
@@ -30,7 +32,7 @@ export default async function RootLayout({ children }) {
             <span className="brand-mark" aria-hidden="true" />
             <span>LUMEN</span>
           </a>
-          <SiteNav isAdmin={isAdmin} isLoggedIn={Boolean(userData.user)} />
+          <SiteNav isAdmin={isAdmin} isSpecialist={isSpecialist} isLoggedIn={Boolean(userData.user)} />
         </header>
         {children}
         <footer className="site-footer">

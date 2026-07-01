@@ -52,8 +52,10 @@ export async function POST(request) {
 
   const name = String(formData.get("name") || "").trim();
   const specialistId = String(formData.get("specialistId") || "").trim();
+  const userId = String(formData.get("userId") || "").trim();
   const role = String(formData.get("role") || "Psicologia").trim();
   const professionalLicense = String(formData.get("professionalLicense") || "").trim();
+  const professionalEmail = String(formData.get("professionalEmail") || "").trim();
   const focus = String(formData.get("focus") || "").trim();
   const shortBio = String(formData.get("shortBio") || "").trim();
   const education = String(formData.get("education") || "").trim();
@@ -110,8 +112,10 @@ export async function POST(request) {
 
   const payload = {
     name,
+    user_id: userId || null,
     role,
     professional_license: professionalLicense || null,
+    professional_email: professionalEmail || null,
     focus,
     short_bio: shortBio || null,
     education: education || null,
@@ -134,7 +138,7 @@ export async function POST(request) {
   if (specialistId) {
     const { data } = await supabase
       .from("appointment_specialists")
-      .select("id")
+      .select("id,user_id")
       .eq("id", specialistId)
       .maybeSingle();
 
@@ -148,7 +152,7 @@ export async function POST(request) {
   } else {
     const { data } = await supabase
       .from("appointment_specialists")
-      .select("id")
+      .select("id,user_id")
       .eq("slug", requestedSlug)
       .maybeSingle();
 
@@ -165,6 +169,18 @@ export async function POST(request) {
     }
 
     return NextResponse.redirect(`${origin}/admin?error=${encodeURIComponent(error.message)}`, { status: 303 });
+  }
+
+  if (userId) {
+    const { data: linkedProfile } = await supabase
+      .from("profiles")
+      .select("role")
+      .eq("id", userId)
+      .maybeSingle();
+
+    if (linkedProfile?.role !== "admin") {
+      await supabase.from("profiles").update({ role: "specialist" }).eq("id", userId);
+    }
   }
 
   return NextResponse.redirect(`${origin}/admin?message=Especialista guardado`, { status: 303 });
