@@ -99,6 +99,7 @@ export default function BookingPicker({ specialists, slots, userEmail, initialSp
   const [selectedDate, setSelectedDate] = useState("");
   const [selectedSlotId, setSelectedSlotId] = useState("");
   const [isReviewing, setIsReviewing] = useState(false);
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
   const selectedMonth = useMemo(() => buildMonth(selectedYear, selectedMonthIndex), [selectedMonthIndex, selectedYear]);
   const yearOptions = useMemo(() => {
@@ -366,7 +367,7 @@ export default function BookingPicker({ specialists, slots, userEmail, initialSp
         <p className="price">{formatPrice(selectedSpecialist.price)}</p>
         {userEmail ? (
           isReviewing ? (
-            <form className="booking-confirm-form" action="/turnos/reservar" method="post">
+            <form className="booking-confirm-form" action="/turnos/reservar" method="post" onSubmit={() => setIsSubmitting(true)}>
               <input name="slotId" type="hidden" value={selectedSlot?.id || ""} />
               <label>
                 Nombre del paciente
@@ -382,7 +383,9 @@ export default function BookingPicker({ specialists, slots, userEmail, initialSp
                 <p>El pago todavía no está integrado en esta versión.</p>
               </div>
               <div className="booking-form-actions">
-                <button className="button" disabled={!selectedSlot} type="submit">Confirmar reserva</button>
+                <button className="button" disabled={!selectedSlot || isSubmitting} type="submit">
+                  {isSubmitting ? "Reservando..." : "Confirmar reserva"}
+                </button>
                 <button className="button secondary" type="button" onClick={() => setIsReviewing(false)}>Volver</button>
               </div>
             </form>

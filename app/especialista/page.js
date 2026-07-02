@@ -1,5 +1,7 @@
 import { redirect } from "next/navigation";
+import { createSupabaseAdminClient } from "../../lib/supabase/admin";
 import { createSupabaseServerClient } from "../../lib/supabase/server";
+import { hasGoogleCalendarConfig } from "../../lib/googleCalendar";
 import AccountDashboardShell from "../mi-cuenta/AccountDashboardShell";
 
 function formatDate(value) {
@@ -51,6 +53,16 @@ function statusLabel(status) {
   return labels[status] || status || "Sin estado";
 }
 
+function statusTone(status) {
+  const tones = {
+    confirmed: "is-confirmed",
+    cancelled: "is-cancelled",
+    completed: "is-completed",
+  };
+
+  return tones[status] || "is-pending";
+}
+
 export default async function SpecialistPage({ searchParams }) {
   const params = await searchParams;
   const supabase = await createSupabaseServerClient();
@@ -66,7 +78,9 @@ export default async function SpecialistPage({ searchParams }) {
     .eq("id", userData.user.id)
     .maybeSingle();
 
-  const { data: specialist } = await supabase
+  const dataSupabase = createSupabaseAdminClient() || supabase;
+
+  const { data: specialist } = await dataSupabase
     .from("appointment_specialists")
     .select(`
       id,
@@ -100,7 +114,7 @@ export default async function SpecialistPage({ searchParams }) {
   }
 
   const { data: calendarConnection } = specialist
-    ? await supabase
+    ? await dataSupabase
         .from("specialist_calendar_connections")
         .select("google_calendar_email,google_calendar_connected_at,calendar_sync_enabled")
         .eq("specialist_id", specialist.id)
@@ -108,10 +122,11 @@ export default async function SpecialistPage({ searchParams }) {
     : { data: null };
 
   const bookingsResult = specialist
-    ? await supabase
+    ? await dataSupabase
         .from("appointment_bookings")
         .select(`
           id,
+          user_id,
           patient_email,
           patient_name,
           status,
@@ -127,6 +142,9 @@ export default async function SpecialistPage({ searchParams }) {
 
   const bookings = bookingsResult.data || [];
   const today = new Date().toISOString().slice(0, 10);
+  const todayBookings = bookings
+    .filter((booking) => booking.appointment_slots?.slot_date === today && booking.status !== "cancelled")
+    .sort((a, b) => String(a.appointment_slots?.slot_time || "").localeCompare(String(b.appointment_slots?.slot_time || "")));
   const upcomingBookings = bookings
     .filter((booking) => booking.appointment_slots?.slot_date >= today && booking.status !== "cancelled")
     .sort((a, b) => {
@@ -135,8 +153,10 @@ export default async function SpecialistPage({ searchParams }) {
       return aValue.localeCompare(bValue);
     });
   const pastBookings = bookings.filter((booking) => booking.appointment_slots?.slot_date < today || booking.status === "cancelled");
+  const recentBookings = bookings.slice(0, 5);
   const nextBooking = upcomingBookings[0];
   const displayName = specialist?.name || profile?.full_name || userData.user.email;
+  const isCalendarConfigured = hasGoogleCalendarConfig();
   const navItems = [
     { href: "#inicio", label: "Inicio", icon: "I" },
     { href: "#turnos", label: "Mis turnos", icon: "T" },
@@ -171,6 +191,14 @@ export default async function SpecialistPage({ searchParams }) {
           <>
             <section className="account-stats-grid">
               <article className="account-stat-card">
+                <span className="account-icon is-orange">H</span>
+                <div>
+                  <span>Turnos de hoy</span>
+                  <strong>{todayBookings.length}</strong>
+                  <small>{todayBookings.length ? "Agenda activa para hoy" : "Sin reservas hoy"}</small>
+                </div>
+              </article>
+              <article className="account-stat-card">
                 <span className="account-icon is-blue">T</span>
                 <div>
                   <span>Proximo turno</span>
@@ -191,9 +219,42 @@ export default async function SpecialistPage({ searchParams }) {
                 <div>
                   <span>Calendar</span>
                   <strong>{calendarConnection?.google_calendar_connected_at ? "Conectado" : "Sin conectar"}</strong>
-                  <small>{calendarConnection?.google_calendar_email || "Pendiente de autorizacion"}</small>
+                  <small>{isCalendarConfigured ? calendarConnection?.google_calendar_email || "Pendiente de autorizacion" : "Faltan variables de Google"}</small>
                 </div>
               </article>
+            </section>
+
+            <section className="account-panel specialist-today-panel">
+              <div className="account-panel-head">
+                <div>
+                  <span className="account-icon is-orange">H</span>
+                  <h2>Agenda de hoy</h2>
+                </div>
+              </div>
+              {todayBookings.length ? (
+                <div className="specialist-booking-grid">
+                  {todayBookings.map((booking) => (
+                    <article className="specialist-booking-card is-today" key={booking.id}>
+                      <div className="specialist-booking-time">
+                        <strong>{formatTime(booking.appointment_slots?.slot_time)}</strong>
+                        <span>hs</span>
+                      </div>
+                      <div className="specialist-booking-main">
+                        <strong>{booking.patient_name || "Paciente sin nombre"}</strong>
+                        <a href={`mailto:${booking.patient_email}`}>{booking.patient_email}</a>
+                        <small>Reservado {formatDateTime(booking.created_at)}</small>
+                      </div>
+                      <span className={`specialist-status ${statusTone(booking.status)}`}>{statusLabel(booking.status)}</span>
+                    </article>
+                  ))}
+                </div>
+              ) : (
+                <div className="account-empty-state">
+                  <span className="account-empty-icon">H</span>
+                  <h3>No tenes turnos para hoy</h3>
+                  <p>Cuando haya reservas para la fecha actual, las vas a ver destacadas aca.</p>
+                </div>
+              )}
             </section>
 
             <section className="account-lower-grid" id="turnos">
@@ -211,12 +272,13 @@ export default async function SpecialistPage({ searchParams }) {
                         <span className="account-avatar small">{initialsFromName(booking.patient_name || booking.patient_email)}</span>
                         <div>
                           <strong>{booking.patient_name || "Paciente sin nombre"}</strong>
-                          <span>{booking.patient_email}</span>
-                          <small>{statusLabel(booking.status)}</small>
+                          <a href={`mailto:${booking.patient_email}`}>{booking.patient_email}</a>
+                          <small>Reservado {formatDateTime(booking.created_at)}</small>
                         </div>
                         <div>
                           <strong>{formatDate(booking.appointment_slots?.slot_date)}</strong>
                           <span>{formatTime(booking.appointment_slots?.slot_time)} hs</span>
+                          <small className={`specialist-status ${statusTone(booking.status)}`}>{statusLabel(booking.status)}</small>
                         </div>
                       </article>
                     ))}
@@ -238,18 +300,42 @@ export default async function SpecialistPage({ searchParams }) {
                   </div>
                 </div>
                 <div className="specialist-calendar-card">
-                  <strong>{calendarConnection?.google_calendar_connected_at ? "Calendario conectado" : "Conectar calendario"}</strong>
+                  <strong>
+                    {!isCalendarConfigured
+                      ? "Google Calendar pendiente de configurar"
+                      : calendarConnection?.google_calendar_connected_at
+                        ? "Calendario conectado"
+                        : "Conectar calendario"}
+                  </strong>
                   <p>
-                    {calendarConnection?.google_calendar_connected_at
+                    {!isCalendarConfigured
+                      ? "Faltan las variables GOOGLE_CLIENT_ID y GOOGLE_CLIENT_SECRET en Vercel para habilitar la conexion."
+                      : calendarConnection?.google_calendar_connected_at
                       ? `Los nuevos turnos se intentaran cargar en ${calendarConnection.google_calendar_email || "tu calendario principal"}.`
                       : "Conecta tu cuenta de Google para que LUMEN cree eventos automaticamente cuando recibas reservas."}
                   </p>
-                  {calendarConnection?.google_calendar_connected_at ? (
+                  {!isCalendarConfigured ? (
+                    <span className="account-secondary-action">Esperando configuracion</span>
+                  ) : calendarConnection?.google_calendar_connected_at ? (
                     <form action="/especialista/google/disconnect" method="post">
                       <button className="account-secondary-action" type="submit">Desconectar Google Calendar</button>
                     </form>
                   ) : (
                     <a className="account-primary-action" href="/especialista/google/connect">Conectar Google Calendar</a>
+                  )}
+                </div>
+                <div className="specialist-recent-list">
+                  <h3>Ultimas reservas recibidas</h3>
+                  {recentBookings.length ? recentBookings.map((booking) => (
+                    <article key={booking.id}>
+                      <span className={`specialist-status ${statusTone(booking.status)}`}>{statusLabel(booking.status)}</span>
+                      <strong>{booking.patient_name || booking.patient_email || "Paciente"}</strong>
+                      <small>
+                        {formatDate(booking.appointment_slots?.slot_date)} - {formatTime(booking.appointment_slots?.slot_time)} hs
+                      </small>
+                    </article>
+                  )) : (
+                    <p className="muted">Todavia no recibiste reservas.</p>
                   )}
                 </div>
               </div>

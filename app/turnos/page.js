@@ -41,6 +41,7 @@ export default async function TurnosPage({ searchParams }) {
           <section className="panel booking-success">
             <p className="eyebrow">Reserva exitosa</p>
             <h2>Tu turno fue reservado correctamente.</h2>
+            {params?.message ? <p className="muted">{params.message}</p> : null}
             <dl>
               {params?.specialist ? (
                 <div>
