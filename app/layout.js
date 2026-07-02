@@ -73,8 +73,8 @@ export default async function RootLayout({ children }) {
           </nav>
           <nav aria-label="Legal">
             <strong>Legal</strong>
-            <a href="#">Términos y condiciones</a>
-            <a href="#">Política de privacidad</a>
+            <a href="/terminos-condiciones">Términos y condiciones</a>
+            <a href="/politica-privacidad">Política de privacidad</a>
           </nav>
           <nav aria-label="Redes sociales">
             <strong>Seguinos</strong>
