@@ -1,0 +1,42 @@
+{
+  "name": "LUMEN",
+  "short_name": "LUMEN",
+  "description": "Cursos, turnos online y recursos terapeuticos para acompanarte.",
+  "start_url": "/",
+  "scope": "/",
+  "display": "standalone",
+  "orientation": "portrait",
+  "background_color": "#f4f7f2",
+  "theme_color": "#0b4a53",
+  "categories": ["education", "health", "lifestyle"],
+  "icons": [
+    {
+      "src": "/icons/lumen-icon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any"
+    },
+    {
+      "src": "/icons/lumen-maskable.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "maskable"
+    }
+  ],
+  "shortcuts": [
+    {
+      "name": "Reservar turno",
+      "short_name": "Turnos",
+      "description": "Ir a la reserva de turnos",
+      "url": "/turnos",
+      "icons": [{ "src": "/icons/lumen-icon.svg", "sizes": "any", "type": "image/svg+xml" }]
+    },
+    {
+      "name": "Mi Espacio",
+      "short_name": "Mi Espacio",
+      "description": "Abrir el area privada",
+      "url": "/mi-cuenta",
+      "icons": [{ "src": "/icons/lumen-icon.svg", "sizes": "any", "type": "image/svg+xml" }]
+    }
+  ]
+}

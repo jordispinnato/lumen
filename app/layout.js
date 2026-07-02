@@ -1,6 +1,7 @@
 import "./globals.css";
 import { createSupabaseServerClient } from "../lib/supabase/server";
 import SiteNav from "./SiteNav";
+import PWARegister from "./PWARegister";
 
 export const metadata = {
   title: "LUMEN | Plataforma interdisciplinaria",
@@ -36,7 +37,17 @@ export default async function RootLayout({ children }) {
 
   return (
     <html lang="es">
+      <head>
+        <link rel="manifest" href="/manifest.webmanifest" />
+        <link rel="icon" href="/icons/lumen-icon.svg" type="image/svg+xml" />
+        <link rel="apple-touch-icon" href="/icons/lumen-icon.svg" />
+        <meta name="application-name" content="LUMEN" />
+        <meta name="apple-mobile-web-app-capable" content="yes" />
+        <meta name="apple-mobile-web-app-title" content="LUMEN" />
+        <meta name="theme-color" content="#0b4a53" />
+      </head>
       <body>
+        <PWARegister />
         <header className="site-header">
           <a className="brand" href="/">
             <span className="brand-mark" aria-hidden="true" />
