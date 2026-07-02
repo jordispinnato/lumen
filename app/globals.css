@@ -3158,6 +3158,7 @@ body:has(.admin-cms-shell) {
 }
 
 .purchase-form input,
+.purchase-form select,
 .purchase-form textarea {
   width: 100%;
   min-height: 44px;
@@ -3172,6 +3173,62 @@ body:has(.admin-cms-shell) {
   min-height: 96px;
   padding-block: 12px;
   resize: vertical;
+}
+
+.admin-catalog-summary {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 12px;
+}
+
+.admin-catalog-summary article {
+  display: grid;
+  gap: 6px;
+  border: 1px solid #e0e6f0;
+  border-radius: 8px;
+  padding: 16px;
+  background: rgba(255, 255, 255, 0.94);
+  box-shadow: 0 12px 30px rgba(15, 23, 42, 0.05);
+}
+
+.admin-catalog-summary span {
+  color: #64748b;
+  font-size: 0.78rem;
+  font-weight: 900;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+
+.admin-catalog-summary strong {
+  color: #0f172a;
+  font-size: 1.55rem;
+}
+
+.admin-inline-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-top: 10px;
+}
+
+.admin-inline-actions form {
+  margin: 0;
+}
+
+.admin-inline-actions button {
+  min-height: 34px;
+  border: 1px solid #d8deea;
+  border-radius: 8px;
+  padding: 0 10px;
+  background: white;
+  color: #0757e3;
+  font-weight: 900;
+  cursor: pointer;
+}
+
+.admin-inline-actions button:hover {
+  border-color: rgba(37, 99, 235, 0.3);
+  box-shadow: var(--ds-shadow-md);
 }
 
 .account-tabs {
@@ -4302,6 +4359,7 @@ body:has(.account-app-shell) .site-footer {
 
   .grid,
   .admin-layout,
+  .admin-catalog-summary,
   .admin-metrics-grid,
   .admin-dashboard-grid,
   .booking-layout,

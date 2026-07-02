@@ -51,6 +51,26 @@ function getOrderTypeLabel(type) {
   return type === "digital" ? "Digital" : "Físico";
 }
 
+function getProductTypeLabel(type) {
+  return type === "digital" ? "Digital" : "Fisico";
+}
+
+function getProductAvailability(product) {
+  if (product.product_type === "physical") {
+    return Number(product.stock || 0) > 0 ? `Stock: ${product.stock}` : "Sin stock";
+  }
+
+  if (product.digital_file_name) {
+    return `Archivo: ${product.digital_file_name}`;
+  }
+
+  if (product.digital_url) {
+    return "URL digital cargada";
+  }
+
+  return "Sin archivo digital";
+}
+
 function getShippingSummary(order) {
   if (order.product_type !== "physical") {
     return "Entrega digital";
@@ -198,7 +218,7 @@ export default async function AdminPage({ searchParams }) {
       .order("created_at", { ascending: false }),
     dataSupabase
       .from("catalog_products")
-      .select("id,title,product_type,category,summary,price,stock,status,digital_url,digital_file_name,created_at")
+      .select("id,title,product_type,category,summary,price,stock,status,digital_url,digital_file_name,digital_file_path,created_at")
       .order("created_at", { ascending: false }),
     dataSupabase
       .from("catalog_orders")
@@ -238,6 +258,10 @@ export default async function AdminPage({ searchParams }) {
   const publishedCourses = (courses || []).filter((course) => course.status === "published");
   const draftCourses = (courses || []).filter((course) => course.status === "draft");
   const activeProducts = (catalogProducts || []).filter((product) => product.status === "published");
+  const physicalProducts = (catalogProducts || []).filter((product) => product.product_type === "physical");
+  const digitalProducts = (catalogProducts || []).filter((product) => product.product_type === "digital");
+  const downloadableDigitalProducts = digitalProducts.filter((product) => product.digital_file_name || product.digital_file_path || product.digital_url);
+  const pendingCatalogOrders = (catalogOrders || []).filter((order) => order.status === "pending_payment");
   const productsWithoutStock = (catalogProducts || []).filter((product) => {
     return product.product_type === "physical" && product.status === "published" && Number(product.stock || 0) <= 0;
   });
@@ -273,6 +297,7 @@ export default async function AdminPage({ searchParams }) {
     amount: formatPrice(order.amount || 0),
     shipping: getShippingSummary(order),
     status: getOrderStatusLabel(order.status),
+    date: formatDateTime(order.created_at),
     actions: [
       ...(order.status !== "pending_payment"
         ? [
@@ -857,6 +882,25 @@ export default async function AdminPage({ searchParams }) {
             <h2>Productos físicos y digitales</h2>
           </div>
 
+          <div className="admin-catalog-summary">
+            <article>
+              <span>Productos publicados</span>
+              <strong>{activeProducts.length}</strong>
+            </article>
+            <article>
+              <span>Fisicos</span>
+              <strong>{physicalProducts.length}</strong>
+            </article>
+            <article>
+              <span>Digitales listos</span>
+              <strong>{downloadableDigitalProducts.length}/{digitalProducts.length}</strong>
+            </article>
+            <article>
+              <span>Pedidos pendientes</span>
+              <strong>{pendingCatalogOrders.length}</strong>
+            </article>
+          </div>
+
           <span className="admin-anchor-target" id="productos" />
           <span className="admin-anchor-target" id="categorias" />
         <div className="admin-layout spaced-panel">
@@ -926,6 +970,31 @@ export default async function AdminPage({ searchParams }) {
                     {product.product_type === "digital" && product.digital_file_name ? ` - Archivo: ${product.digital_file_name}` : ""}
                     {product.product_type === "digital" && !product.digital_file_name && product.digital_url ? " - URL cargada" : ""}
                   </small>
+                  <small>{getProductTypeLabel(product.product_type)} - {getProductAvailability(product)}</small>
+                  <div className="admin-inline-actions">
+                    {product.status !== "published" ? (
+                      <form action="/admin/catalog-products/action" method="post">
+                        <input name="productId" type="hidden" value={product.id} />
+                        <button name="action" value="publish" type="submit">Publicar</button>
+                      </form>
+                    ) : null}
+                    {product.status !== "draft" ? (
+                      <form action="/admin/catalog-products/action" method="post">
+                        <input name="productId" type="hidden" value={product.id} />
+                        <button name="action" value="draft" type="submit">Borrador</button>
+                      </form>
+                    ) : null}
+                    {product.status !== "archived" ? (
+                      <form action="/admin/catalog-products/action" method="post">
+                        <input name="productId" type="hidden" value={product.id} />
+                        <button name="action" value="archive" type="submit">Archivar</button>
+                      </form>
+                    ) : null}
+                    <form action="/admin/catalog-products/action" method="post">
+                      <input name="productId" type="hidden" value={product.id} />
+                      <button name="action" value="delete" type="submit">Eliminar</button>
+                    </form>
+                  </div>
                   <details className="admin-inline-editor">
                     <summary>Editar producto</summary>
                     <form className="admin-form" action="/admin/catalog-products/create" method="post" encType="multipart/form-data">
@@ -999,6 +1068,7 @@ export default async function AdminPage({ searchParams }) {
               { key: "type", header: "Tipo" },
               { key: "amount", header: "Total" },
               { key: "shipping", header: "Envio" },
+              { key: "date", header: "Fecha" },
               { key: "status", header: "Estado", type: "status" },
             ]}
             rows={catalogOrderRows}

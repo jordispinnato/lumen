@@ -1,5 +1,10 @@
 import { NextResponse } from "next/server";
+import { createSupabaseAdminClient } from "../../../../lib/supabase/admin";
 import { createSupabaseServerClient } from "../../../../lib/supabase/server";
+
+function redirectToAdmin(origin, type, message) {
+  return NextResponse.redirect(`${origin}/admin?${type}=${encodeURIComponent(message)}#catalogo`, { status: 303 });
+}
 
 export async function POST(request) {
   const origin = new URL(request.url).origin;
@@ -18,8 +23,10 @@ export async function POST(request) {
     .maybeSingle();
 
   if (profile?.role !== "admin") {
-    return NextResponse.redirect(`${origin}/admin?error=No autorizado`, { status: 303 });
+    return redirectToAdmin(origin, "error", "No autorizado");
   }
+
+  const writeSupabase = createSupabaseAdminClient() || supabase;
 
   const productId = String(formData.get("productId") || "").trim();
   const title = String(formData.get("title") || "").trim();
@@ -32,15 +39,19 @@ export async function POST(request) {
   const digitalFile = formData.get("digitalFile");
   const status = String(formData.get("status") || "published");
   const stock = productType === "physical" && stockValue !== "" ? Number(stockValue) : null;
+  const validProductTypes = new Set(["physical", "digital"]);
+  const validStatuses = new Set(["published", "draft", "archived"]);
   let digitalFilePath = null;
   let digitalFileName = null;
   let digitalFileType = null;
   let digitalFileSize = null;
 
   if (!title || !category) {
-    return NextResponse.redirect(`${origin}/admin?error=${encodeURIComponent("Completa nombre y categoria del producto")}`, {
-      status: 303,
-    });
+    return redirectToAdmin(origin, "error", "Completa nombre y categoria del producto");
+  }
+
+  if (!validProductTypes.has(productType) || !validStatuses.has(status)) {
+    return redirectToAdmin(origin, "error", "Tipo o estado de producto invalido");
   }
 
   if (productType === "digital" && digitalFile?.size) {
@@ -50,7 +61,7 @@ export async function POST(request) {
     digitalFileType = digitalFile.type || "application/octet-stream";
     digitalFileSize = digitalFile.size;
 
-    const { error: uploadError } = await supabase.storage
+    const { error: uploadError } = await writeSupabase.storage
       .from("catalog-digital-files")
       .upload(digitalFilePath, digitalFile, {
         contentType: digitalFileType,
@@ -58,7 +69,7 @@ export async function POST(request) {
       });
 
     if (uploadError) {
-      return NextResponse.redirect(`${origin}/admin?error=${encodeURIComponent(uploadError.message)}`, { status: 303 });
+      return redirectToAdmin(origin, "error", uploadError.message);
     }
   }
 
@@ -81,12 +92,12 @@ export async function POST(request) {
   }
 
   const { error } = productId
-    ? await supabase.from("catalog_products").update(payload).eq("id", productId)
-    : await supabase.from("catalog_products").insert(payload);
+    ? await writeSupabase.from("catalog_products").update(payload).eq("id", productId)
+    : await writeSupabase.from("catalog_products").insert(payload);
 
   if (error) {
-    return NextResponse.redirect(`${origin}/admin?error=${encodeURIComponent(error.message)}`, { status: 303 });
+    return redirectToAdmin(origin, "error", error.message);
   }
 
-  return NextResponse.redirect(`${origin}/admin?message=Producto guardado`, { status: 303 });
+  return redirectToAdmin(origin, "message", "Producto guardado");
 }

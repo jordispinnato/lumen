@@ -1,4 +1,5 @@
 import { NextResponse } from "next/server";
+import { createSupabaseAdminClient } from "../../../../../lib/supabase/admin";
 import { createSupabaseServerClient } from "../../../../../lib/supabase/server";
 
 export async function GET(request, { params }) {
@@ -43,7 +44,8 @@ export async function GET(request, { params }) {
     return NextResponse.redirect(`${origin}/mi-cuenta#recursos`, { status: 303 });
   }
 
-  const { data: signed, error: signedError } = await supabase.storage
+  const storageSupabase = createSupabaseAdminClient() || supabase;
+  const { data: signed, error: signedError } = await storageSupabase.storage
     .from("catalog-digital-files")
     .createSignedUrl(order.catalog_products.digital_file_path, 60 * 10);
 

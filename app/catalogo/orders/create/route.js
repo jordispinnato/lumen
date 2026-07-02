@@ -1,6 +1,33 @@
 import { NextResponse } from "next/server";
 import { createSupabaseServerClient } from "../../../../lib/supabase/server";
 
+const argentinaProvinces = new Set([
+  "Buenos Aires",
+  "Ciudad Autonoma de Buenos Aires",
+  "Catamarca",
+  "Chaco",
+  "Chubut",
+  "Cordoba",
+  "Corrientes",
+  "Entre Rios",
+  "Formosa",
+  "Jujuy",
+  "La Pampa",
+  "La Rioja",
+  "Mendoza",
+  "Misiones",
+  "Neuquen",
+  "Rio Negro",
+  "Salta",
+  "San Juan",
+  "San Luis",
+  "Santa Cruz",
+  "Santa Fe",
+  "Santiago del Estero",
+  "Tierra del Fuego",
+  "Tucuman",
+]);
+
 export async function POST(request) {
   const origin = new URL(request.url).origin;
   const formData = await request.formData();
@@ -47,6 +74,13 @@ export async function POST(request) {
     if (missingShipping) {
       return NextResponse.redirect(
         `${origin}/catalogo/${productId}?error=${encodeURIComponent("Completá los datos de envío")}`,
+        { status: 303 }
+      );
+    }
+
+    if (!argentinaProvinces.has(shippingProvince)) {
+      return NextResponse.redirect(
+        `${origin}/catalogo/${productId}?error=${encodeURIComponent("Selecciona una provincia de Argentina")}`,
         { status: 303 }
       );
     }

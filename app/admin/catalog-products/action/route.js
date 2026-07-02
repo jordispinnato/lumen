@@ -29,10 +29,8 @@ async function requireAdmin(supabase, origin) {
 export async function POST(request) {
   const origin = new URL(request.url).origin;
   const formData = await request.formData();
-  const orderId = String(formData.get("orderId") || "").trim();
-  const action = String(formData.get("action") || "update").trim();
-  const status = String(formData.get("status") || "").trim();
-  const validStatuses = new Set(["pending_payment", "paid", "cancelled", "delivered"]);
+  const productId = String(formData.get("productId") || "").trim();
+  const action = String(formData.get("action") || "").trim();
   const supabase = await createSupabaseServerClient();
   const auth = await requireAdmin(supabase, origin);
 
@@ -40,31 +38,41 @@ export async function POST(request) {
     return auth.response;
   }
 
-  if (!orderId) {
-    return redirectToAdmin(origin, "error", "Accion de pedido incompleta");
+  if (!productId) {
+    return redirectToAdmin(origin, "error", "Producto incompleto");
   }
 
   const writeSupabase = createSupabaseAdminClient() || supabase;
+  const statusByAction = {
+    publish: "published",
+    draft: "draft",
+    archive: "archived",
+  };
 
   if (action === "delete") {
-    const { error } = await writeSupabase.from("catalog_orders").delete().eq("id", orderId);
+    const { error } = await writeSupabase.from("catalog_products").delete().eq("id", productId);
 
     if (error) {
       return redirectToAdmin(origin, "error", error.message);
     }
 
-    return redirectToAdmin(origin, "message", "Pedido eliminado");
+    return redirectToAdmin(origin, "message", "Producto eliminado");
   }
 
-  if (!validStatuses.has(status)) {
-    return redirectToAdmin(origin, "error", "Estado de pedido invalido");
+  const nextStatus = statusByAction[action];
+
+  if (!nextStatus) {
+    return redirectToAdmin(origin, "error", "Accion de producto invalida");
   }
 
-  const { error } = await writeSupabase.from("catalog_orders").update({ status }).eq("id", orderId);
+  const { error } = await writeSupabase
+    .from("catalog_products")
+    .update({ status: nextStatus })
+    .eq("id", productId);
 
   if (error) {
     return redirectToAdmin(origin, "error", error.message);
   }
 
-  return redirectToAdmin(origin, "message", "Pedido actualizado");
+  return redirectToAdmin(origin, "message", "Producto actualizado");
 }

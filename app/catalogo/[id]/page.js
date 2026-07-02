@@ -3,6 +3,33 @@ import { createSupabaseServerClient } from "../../../lib/supabase/server";
 import { formatPrice } from "../../../lib/courses";
 import { demoProducts, getProductTypeLabel } from "../../../lib/catalog";
 
+const argentinaProvinces = [
+  "Buenos Aires",
+  "Ciudad Autonoma de Buenos Aires",
+  "Catamarca",
+  "Chaco",
+  "Chubut",
+  "Cordoba",
+  "Corrientes",
+  "Entre Rios",
+  "Formosa",
+  "Jujuy",
+  "La Pampa",
+  "La Rioja",
+  "Mendoza",
+  "Misiones",
+  "Neuquen",
+  "Rio Negro",
+  "Salta",
+  "San Juan",
+  "San Luis",
+  "Santa Cruz",
+  "Santa Fe",
+  "Santiago del Estero",
+  "Tierra del Fuego",
+  "Tucuman",
+];
+
 export default async function ProductDetailPage({ params, searchParams }) {
   const { id } = await params;
   const query = await searchParams;
@@ -74,7 +101,12 @@ export default async function ProductDetailPage({ params, searchParams }) {
                     </label>
                     <label>
                       Provincia
-                      <input name="shippingProvince" required placeholder="Ej: Buenos Aires" />
+                      <select name="shippingProvince" required defaultValue="">
+                        <option value="">Seleccionar provincia</option>
+                        {argentinaProvinces.map((province) => (
+                          <option value={province} key={province}>{province}</option>
+                        ))}
+                      </select>
                     </label>
                     <label>
                       Localidad
