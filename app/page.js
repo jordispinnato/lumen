@@ -13,7 +13,8 @@ function getInitials(name) {
 
 export default async function HomePage() {
   const supabase = await createSupabaseServerClient();
-  const [{ data: courseData }, { data: specialists }, { data: products }] = await Promise.all([
+  const [{ data: userData }, { data: courseData }, { data: specialists }, { data: products }] = await Promise.all([
+    supabase.auth.getUser(),
     supabase
       .from("courses")
       .select("id,slug,title,summary,price,status,cover_image_url,instructor,level,total_duration,category,featured,display_order")
@@ -38,6 +39,7 @@ export default async function HomePage() {
 
   const courses = courseData?.length ? courseData.map(normalizeCourse) : demoCourses;
   const productCards = products?.length ? products : demoProducts.slice(0, 3);
+  const isLoggedIn = Boolean(userData.user);
 
   return (
     <main className="landing-page">
@@ -186,7 +188,11 @@ export default async function HomePage() {
           <p>Creamos un espacio simple para aprender, reservar turnos y acceder a recursos de bienestar.</p>
         </div>
         <div className="landing-actions">
-          <a className="button" href="/registro">Crear cuenta</a>
+          {isLoggedIn ? (
+            <a className="button" href="/mi-cuenta">Ir a Mi Espacio</a>
+          ) : (
+            <a className="button" href="/registro">Crear cuenta</a>
+          )}
           <a className="secondary-button" href="/turnos">Reservar turno</a>
         </div>
       </section>
