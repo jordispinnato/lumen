@@ -57,7 +57,7 @@ export async function POST(request) {
 
   const { data: product } = await supabase
     .from("catalog_products")
-    .select("id,title,product_type,price,status")
+    .select("id,title,product_type,price,status,stock")
     .eq("id", productId)
     .eq("status", "published")
     .maybeSingle();
@@ -69,6 +69,13 @@ export async function POST(request) {
   }
 
   if (product.product_type === "physical") {
+    if (typeof product.stock === "number" && product.stock <= 0) {
+      return NextResponse.redirect(
+        `${origin}/catalogo/${productId}?error=${encodeURIComponent("Este producto no tiene stock disponible")}`,
+        { status: 303 }
+      );
+    }
+
     const missingShipping = !shippingPhone || !shippingProvince || !shippingCity || !shippingPostalCode || !shippingStreet || !shippingNumber;
 
     if (missingShipping) {

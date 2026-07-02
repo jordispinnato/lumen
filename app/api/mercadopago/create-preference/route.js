@@ -1,31 +1,80 @@
 import { NextResponse } from "next/server";
-import { demoCourses } from "../../../../lib/courses";
 import { createMercadoPagoPreferenceClient } from "../../../../lib/mercadopago";
+import { createSupabaseAdminClient } from "../../../../lib/supabase/admin";
 import { createSupabaseServerClient } from "../../../../lib/supabase/server";
 
-export async function POST(request) {
-  const formData = await request.formData();
-  const courseSlug = String(formData.get("courseSlug") || "");
-  const supabase = await createSupabaseServerClient();
-  const { data } = await supabase
-    .from("courses")
-    .select("slug,title,price,status")
-    .eq("slug", courseSlug)
-    .maybeSingle();
-  const course = data || demoCourses.find((item) => item.slug === courseSlug);
+function redirectToCheckout(origin, courseSlug, type, message) {
+  const params = new URLSearchParams({ curso: courseSlug });
 
-  if (!course) {
-    return NextResponse.json({ error: "Curso no encontrado" }, { status: 404 });
+  if (message) {
+    params.set(type, message);
   }
 
-  if (!process.env.MERCADOPAGO_ACCESS_TOKEN) {
-    return NextResponse.json({
-      message: "Mercado Pago todavía no está configurado.",
-      nextStep: "Agregar MERCADOPAGO_ACCESS_TOKEN en .env.local y en Vercel.",
+  return NextResponse.redirect(`${origin}/checkout?${params.toString()}`, { status: 303 });
+}
+
+export async function POST(request) {
+  const origin = new URL(request.url).origin;
+  const formData = await request.formData();
+  const courseSlug = String(formData.get("courseSlug") || "").trim();
+  const supabase = await createSupabaseServerClient();
+  const adminSupabase = createSupabaseAdminClient();
+
+  const { data: userData } = await supabase.auth.getUser();
+
+  if (!userData.user) {
+    return NextResponse.redirect(`${origin}/login?next=${encodeURIComponent(`/checkout?curso=${courseSlug}`)}`, {
+      status: 303,
     });
   }
 
-  const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || "http://localhost:3000";
+  if (!process.env.MERCADOPAGO_ACCESS_TOKEN) {
+    return redirectToCheckout(origin, courseSlug, "error", "Mercado Pago todavia no esta configurado.");
+  }
+
+  if (!adminSupabase) {
+    return redirectToCheckout(origin, courseSlug, "error", "Falta configurar la clave segura de Supabase para registrar pagos.");
+  }
+
+  const { data: course } = await adminSupabase
+    .from("courses")
+    .select("id,slug,title,summary,price,status,cover_image_url")
+    .eq("slug", courseSlug)
+    .eq("status", "published")
+    .maybeSingle();
+
+  if (!course) {
+    return redirectToCheckout(origin, courseSlug, "error", "Curso no disponible.");
+  }
+
+  const { data: existingEnrollment } = await adminSupabase
+    .from("enrollments")
+    .select("id")
+    .eq("user_id", userData.user.id)
+    .eq("course_id", course.id)
+    .maybeSingle();
+
+  if (existingEnrollment) {
+    return NextResponse.redirect(`${origin}/aula?curso=${course.slug}`, { status: 303 });
+  }
+
+  const { data: order, error: orderError } = await adminSupabase
+    .from("orders")
+    .insert({
+      user_id: userData.user.id,
+      course_id: course.id,
+      amount: course.price,
+      status: "pending",
+      payment_provider: "mercadopago",
+    })
+    .select("id")
+    .maybeSingle();
+
+  if (orderError || !order) {
+    return redirectToCheckout(origin, courseSlug, "error", orderError?.message || "No se pudo crear la orden.");
+  }
+
+  const siteUrl = (process.env.NEXT_PUBLIC_SITE_URL || origin).replace(/\/$/, "");
   const preference = createMercadoPagoPreferenceClient();
 
   const result = await preference.create({
@@ -34,21 +83,43 @@ export async function POST(request) {
         {
           id: course.slug,
           title: course.title,
+          description: course.summary || "Curso online LUMEN",
           quantity: 1,
-          unit_price: course.price,
+          unit_price: Number(course.price || 0),
           currency_id: "ARS",
+          picture_url: course.cover_image_url || undefined,
         },
       ],
+      payer: {
+        email: userData.user.email || undefined,
+      },
       back_urls: {
-        success: `${siteUrl}/checkout/exito`,
-        failure: `${siteUrl}/checkout/error`,
-        pending: `${siteUrl}/checkout/pendiente`,
+        success: `${siteUrl}/checkout/exito?order=${order.id}`,
+        failure: `${siteUrl}/checkout/error?order=${order.id}`,
+        pending: `${siteUrl}/checkout/pendiente?order=${order.id}`,
       },
       auto_return: "approved",
-      external_reference: course.slug,
+      external_reference: order.id,
+      metadata: {
+        order_id: order.id,
+        user_id: userData.user.id,
+        course_id: course.id,
+        type: "course",
+      },
       notification_url: `${siteUrl}/api/mercadopago/webhook`,
     },
   });
 
-  return NextResponse.redirect(result.init_point);
+  await adminSupabase
+    .from("orders")
+    .update({ provider_reference: result.id ? String(result.id) : null })
+    .eq("id", order.id);
+
+  const checkoutUrl = result.init_point || result.sandbox_init_point;
+
+  if (!checkoutUrl) {
+    return redirectToCheckout(origin, courseSlug, "error", "Mercado Pago no devolvio un link de pago.");
+  }
+
+  return NextResponse.redirect(checkoutUrl, { status: 303 });
 }

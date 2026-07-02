@@ -1,4 +1,5 @@
 import { redirect } from "next/navigation";
+import ConfirmSubmitButton from "../components/ConfirmSubmitButton";
 import { createSupabaseAdminClient } from "../../lib/supabase/admin";
 import { createSupabaseServerClient } from "../../lib/supabase/server";
 import { hasGoogleCalendarConfig } from "../../lib/googleCalendar";
@@ -174,7 +175,7 @@ export default async function SpecialistPage({ searchParams }) {
   const notesResult = specialist
     ? await dataSupabase
         .from("specialist_patient_notes")
-        .select("id,patient_user_id,patient_email,patient_name,note,note_type,created_at")
+        .select("id,patient_user_id,patient_email,patient_name,note,note_type,created_at,updated_at")
         .eq("specialist_id", specialist.id)
         .order("created_at", { ascending: false })
     : { data: [], error: null };
@@ -543,6 +544,42 @@ export default async function SpecialistPage({ searchParams }) {
                             <article key={note.id}>
                               <span>{noteTypeLabel(note.note_type)} - {formatDateTime(note.created_at)}</span>
                               <p>{note.note}</p>
+                              <details className="specialist-note-editor">
+                                <summary>Editar nota</summary>
+                                <form className="specialist-note-form compact" action="/especialista/patients/notes/create" method="post">
+                                  <input name="action" type="hidden" value="update" />
+                                  <input name="specialistId" type="hidden" value={specialist.id} />
+                                  <input name="noteId" type="hidden" value={note.id} />
+                                  <label>
+                                    Tipo de nota
+                                    <select name="noteType" defaultValue={note.note_type || "general"}>
+                                      <option value="general">General</option>
+                                      <option value="session">Sesion</option>
+                                      <option value="follow_up">Seguimiento</option>
+                                      <option value="clinical">Clinica</option>
+                                    </select>
+                                  </label>
+                                  <label>
+                                    Nota privada
+                                    <textarea name="note" required rows="4" defaultValue={note.note} />
+                                  </label>
+                                  <div className="specialist-note-actions">
+                                    <button className="account-primary-action" type="submit">Guardar cambios</button>
+                                  </div>
+                                </form>
+                                <form className="specialist-note-delete-form" action="/especialista/patients/notes/create" method="post">
+                                  <input name="action" type="hidden" value="delete" />
+                                  <input name="specialistId" type="hidden" value={specialist.id} />
+                                  <input name="noteId" type="hidden" value={note.id} />
+                                  <ConfirmSubmitButton
+                                    className="account-danger-action"
+                                    message="Seguro queres eliminar esta nota? Esta accion no se puede deshacer."
+                                    type="submit"
+                                  >
+                                    Eliminar nota
+                                  </ConfirmSubmitButton>
+                                </form>
+                              </details>
                             </article>
                           )) : (
                             <p className="muted">Todavia no hay notas privadas para este paciente.</p>

@@ -21,6 +21,24 @@ async function requireAdmin(supabase, origin) {
   return { user: userData.user };
 }
 
+async function updateBookingStatus(supabase, bookingId, status, userId) {
+  const payload = {
+    status,
+    status_updated_at: new Date().toISOString(),
+    status_updated_by: userId,
+    ...(status === "cancelled" ? { cancelled_at: new Date().toISOString(), cancelled_by: userId } : {}),
+    ...(status === "completed" ? { completed_at: new Date().toISOString() } : {}),
+  };
+
+  const enrichedUpdate = await supabase.from("appointment_bookings").update(payload).eq("id", bookingId);
+
+  if (!enrichedUpdate.error) {
+    return enrichedUpdate;
+  }
+
+  return supabase.from("appointment_bookings").update({ status }).eq("id", bookingId);
+}
+
 export async function POST(request) {
   const origin = new URL(request.url).origin;
   const formData = await request.formData();
@@ -67,7 +85,7 @@ export async function POST(request) {
     return NextResponse.redirect(`${origin}/admin?error=${encodeURIComponent("Estado de turno invalido")}`, { status: 303 });
   }
 
-  const { error } = await supabase.from("appointment_bookings").update({ status }).eq("id", bookingId);
+  const { error } = await updateBookingStatus(supabase, bookingId, status, auth.user.id);
 
   if (error) {
     return NextResponse.redirect(`${origin}/admin?error=${encodeURIComponent(error.message)}`, { status: 303 });

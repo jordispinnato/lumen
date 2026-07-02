@@ -382,6 +382,13 @@ export default function BookingPicker({ specialists, slots, userEmail, initialSp
                 <p>La reserva quedará registrada en tu cuenta.</p>
                 <p>El pago todavía no está integrado en esta versión.</p>
               </div>
+              <label className="booking-consent">
+                <input name="privacyConsent" type="checkbox" value="accepted" required />
+                <span>
+                  Acepto la <a href="/politica-privacidad" target="_blank">Politica de privacidad</a> y los{" "}
+                  <a href="/terminos-condiciones" target="_blank">Terminos y condiciones</a> de LUMEN.
+                </span>
+              </label>
               <div className="booking-form-actions">
                 <button className="button" disabled={!selectedSlot || isSubmitting} type="submit">
                   {isSubmitting ? "Reservando..." : "Confirmar reserva"}
@@ -402,7 +409,7 @@ export default function BookingPicker({ specialists, slots, userEmail, initialSp
         ) : (
           <div className="booking-login-box">
             <p className="muted">Para confirmar la reserva necesitás iniciar sesión.</p>
-            <a className="button" href="/login">Ingresar</a>
+            <a className="button" href="/login?next=/turnos">Ingresar</a>
           </div>
         )}
         <p className="muted">El pago se conectará en una etapa posterior.</p>

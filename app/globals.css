@@ -3119,6 +3119,32 @@ body:has(.admin-cms-shell) {
   color: var(--ink);
 }
 
+.booking-confirm-form .booking-consent {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  padding: 12px;
+  background: rgba(255, 255, 255, 0.72);
+  color: var(--muted);
+  font-size: 0.9rem;
+  line-height: 1.45;
+}
+
+.booking-confirm-form .booking-consent input {
+  width: 18px;
+  min-width: 18px;
+  height: 18px;
+  min-height: 18px;
+  margin-top: 2px;
+}
+
+.booking-consent a {
+  color: var(--petrol);
+  font-weight: 900;
+}
+
 .booking-login-box {
   display: grid;
   gap: 12px;
@@ -4384,6 +4410,41 @@ body:has(.account-app-shell) .site-footer {
   overflow-wrap: anywhere;
 }
 
+.account-appointment-actions {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-top: 10px;
+}
+
+.account-appointment-actions a,
+.account-danger-action {
+  min-height: 34px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border: 1px solid #d8deea;
+  border-radius: 8px;
+  padding: 0 10px;
+  background: white;
+  color: #0757e3;
+  font-size: 0.82rem;
+  font-weight: 900;
+  cursor: pointer;
+}
+
+.account-danger-action {
+  border-color: rgba(185, 28, 28, 0.22);
+  background: #fff7f7;
+  color: #b91c1c;
+}
+
+.account-danger-action:hover {
+  border-color: rgba(185, 28, 28, 0.42);
+  background: #fee2e2;
+}
+
 .specialist-status {
   width: fit-content;
   border-radius: 999px;
@@ -4637,6 +4698,33 @@ body:has(.account-app-shell) .site-footer {
   margin: 0;
   color: #25324b;
   line-height: 1.5;
+}
+
+.specialist-note-editor {
+  display: grid;
+  gap: 10px;
+  margin-top: 4px;
+}
+
+.specialist-note-editor summary {
+  width: fit-content;
+  cursor: pointer;
+  color: #0757e3;
+  font-weight: 900;
+}
+
+.specialist-note-form.compact {
+  border: 1px solid #e5e9f2;
+  border-radius: 8px;
+  padding: 12px;
+  background: white;
+}
+
+.specialist-note-actions,
+.specialist-note-delete-form {
+  display: flex;
+  justify-content: flex-start;
+  gap: 8px;
 }
 
 .specialist-note-form label {

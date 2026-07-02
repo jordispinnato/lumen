@@ -22,6 +22,24 @@ async function getCurrentSpecialist(supabase, userId) {
   return { profile, specialist };
 }
 
+async function updateBookingStatus(supabase, bookingId, status, userId) {
+  const payload = {
+    status,
+    status_updated_at: new Date().toISOString(),
+    status_updated_by: userId,
+    ...(status === "cancelled" ? { cancelled_at: new Date().toISOString(), cancelled_by: userId } : {}),
+    ...(status === "completed" ? { completed_at: new Date().toISOString() } : {}),
+  };
+
+  const enrichedUpdate = await supabase.from("appointment_bookings").update(payload).eq("id", bookingId);
+
+  if (!enrichedUpdate.error) {
+    return enrichedUpdate;
+  }
+
+  return supabase.from("appointment_bookings").update({ status }).eq("id", bookingId);
+}
+
 export async function POST(request) {
   const origin = new URL(request.url).origin;
   const formData = await request.formData();
@@ -60,10 +78,7 @@ export async function POST(request) {
     return redirectToSpecialist(origin, "error", "No autorizado");
   }
 
-  const { error } = await dataSupabase
-    .from("appointment_bookings")
-    .update({ status })
-    .eq("id", bookingId);
+  const { error } = await updateBookingStatus(dataSupabase, bookingId, status, userData.user.id);
 
   if (error) {
     return redirectToSpecialist(origin, "error", error.message);

@@ -3,9 +3,9 @@ export default function CheckoutPendingPage() {
     <main className="section">
       <div className="form-card">
         <p className="eyebrow">Pago pendiente</p>
-        <h1>Estamos esperando la confirmación</h1>
-        <p className="muted">El acceso se habilitará cuando Mercado Pago confirme la operación.</p>
-        <a className="button" href="/aula">Ir al aula</a>
+        <h1>Estamos esperando la confirmacion</h1>
+        <p className="muted">Cuando Mercado Pago apruebe la operacion, el acceso se va a habilitar automaticamente.</p>
+        <a className="button" href="/mi-cuenta#cursos">Ver mis cursos</a>
       </div>
     </main>
   );

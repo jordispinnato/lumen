@@ -45,6 +45,11 @@ export async function POST(request) {
   }
 
   const writeSupabase = createSupabaseAdminClient() || supabase;
+  const { data: currentOrder } = await writeSupabase
+    .from("catalog_orders")
+    .select("id,status,product_id,product_type")
+    .eq("id", orderId)
+    .maybeSingle();
 
   if (action === "delete") {
     const { error } = await writeSupabase.from("catalog_orders").delete().eq("id", orderId);
@@ -60,10 +65,38 @@ export async function POST(request) {
     return redirectToAdmin(origin, "error", "Estado de pedido invalido");
   }
 
-  const { error } = await writeSupabase.from("catalog_orders").update({ status }).eq("id", orderId);
+  const enrichedPayload = {
+    status,
+    ...(status === "paid" ? { paid_at: new Date().toISOString() } : {}),
+    ...(status === "delivered" ? { delivered_at: new Date().toISOString() } : {}),
+    ...(status === "cancelled" ? { cancelled_at: new Date().toISOString() } : {}),
+  };
+  const enrichedUpdate = await writeSupabase.from("catalog_orders").update(enrichedPayload).eq("id", orderId);
+  const fallbackUpdate = enrichedUpdate.error
+    ? await writeSupabase.from("catalog_orders").update({ status }).eq("id", orderId)
+    : enrichedUpdate;
+  const { error } = fallbackUpdate;
 
   if (error) {
     return redirectToAdmin(origin, "error", error.message);
+  }
+
+  if (currentOrder?.product_type === "physical" && currentOrder.product_id) {
+    const becamePaid = !["paid", "delivered"].includes(currentOrder.status) && ["paid", "delivered"].includes(status);
+    const becameCancelled = ["paid", "delivered"].includes(currentOrder.status) && status === "cancelled";
+
+    if (becamePaid || becameCancelled) {
+      const { data: product } = await writeSupabase
+        .from("catalog_products")
+        .select("stock")
+        .eq("id", currentOrder.product_id)
+        .maybeSingle();
+
+      if (typeof product?.stock === "number") {
+        const nextStock = becamePaid ? Math.max(product.stock - 1, 0) : product.stock + 1;
+        await writeSupabase.from("catalog_products").update({ stock: nextStock }).eq("id", currentOrder.product_id);
+      }
+    }
   }
 
   return redirectToAdmin(origin, "message", "Pedido actualizado");

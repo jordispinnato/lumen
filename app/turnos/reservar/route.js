@@ -9,6 +9,7 @@ export async function POST(request) {
   const formData = await request.formData();
   const slotId = String(formData.get("slotId") || "").trim();
   const patientName = String(formData.get("patientName") || "").trim();
+  const privacyConsent = String(formData.get("privacyConsent") || "").trim();
   const supabase = await createSupabaseServerClient();
   const adminSupabase = createSupabaseAdminClient();
   const writeSupabase = adminSupabase || supabase;
@@ -26,6 +27,12 @@ export async function POST(request) {
 
   if (!slotId) {
     return NextResponse.redirect(`${origin}/turnos?error=${encodeURIComponent("Selecciona un horario disponible")}`, {
+      status: 303,
+    });
+  }
+
+  if (privacyConsent !== "accepted") {
+    return NextResponse.redirect(`${origin}/turnos?error=${encodeURIComponent("Para reservar tenes que aceptar las politicas de LUMEN")}`, {
       status: 303,
     });
   }
@@ -120,12 +127,26 @@ export async function POST(request) {
   }
 
   try {
+    await writeSupabase.from("appointment_consents").insert({
+      booking_id: booking?.id || null,
+      user_id: userData.user.id,
+      consent_type: "appointment_privacy_terms",
+      terms_version: "2026-07-02",
+      accepted_at: new Date().toISOString(),
+      user_agent: request.headers.get("user-agent"),
+    });
+  } catch (error) {
+    console.error("Appointment consent storage failed", error);
+  }
+
+  try {
     await sendAppointmentConfirmationEmail({
       to: userData.user.email,
       patientName,
       specialistName: slot.appointment_specialists?.name || "Especialista LUMEN",
       slotDate: slot.slot_date,
       slotTime: slot.slot_time,
+      meetingUrl: process.env.ONLINE_CONSULTATION_URL,
     });
   } catch (error) {
     console.error("Appointment confirmation email failed", error);
@@ -147,6 +168,7 @@ export async function POST(request) {
       specialistName: slot.appointment_specialists?.name || "Especialista LUMEN",
       slotDate: slot.slot_date,
       slotTime: slot.slot_time,
+      meetingUrl: process.env.ONLINE_CONSULTATION_URL,
     });
   } catch (error) {
     console.error("Specialist appointment notification failed", error);

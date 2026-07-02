@@ -1,4 +1,5 @@
 import { redirect } from "next/navigation";
+import ConfirmSubmitButton from "../components/ConfirmSubmitButton";
 import { createSupabaseServerClient } from "../../lib/supabase/server";
 import { formatPrice } from "../../lib/courses";
 import AccountDashboardShell from "./AccountDashboardShell";
@@ -127,7 +128,8 @@ function getShippingSummary(order) {
   return address.length ? address.join(", ") : "Dirección pendiente";
 }
 
-export default async function MiCuentaPage() {
+export default async function MiCuentaPage({ searchParams }) {
+  const params = await searchParams;
   const supabase = await createSupabaseServerClient();
   const { data: userData } = await supabase.auth.getUser();
 
@@ -322,6 +324,9 @@ export default async function MiCuentaPage() {
   return (
     <AccountDashboardShell navItems={navItems} displayName={displayName} avatarInitials={avatarInitials} isAdmin={profile?.role === "admin"}>
         <div className="account-dashboard" id="inicio">
+          {params?.message ? <p className="notice success">{params.message}</p> : null}
+          {params?.error ? <p className="notice error">{params.error}</p> : null}
+
           <section className="account-hero">
             <div>
               <span className="account-page-kicker">Mi Espacio</span>
@@ -443,6 +448,20 @@ export default async function MiCuentaPage() {
                       <div>
                         <strong>{formatDate(booking.appointment_slots?.slot_date)}</strong>
                         <span>{formatTime(booking.appointment_slots?.slot_time)} hs</span>
+                        <div className="account-appointment-actions">
+                          <a href="/turnos">Reprogramar</a>
+                          <form action="/turnos/cancelar" method="post">
+                            <input name="bookingId" type="hidden" value={booking.id} />
+                            <input name="reason" type="hidden" value="Cancelado por el paciente desde Mi Espacio" />
+                            <ConfirmSubmitButton
+                              className="account-danger-action"
+                              message="Seguro queres cancelar este turno?"
+                              type="submit"
+                            >
+                              Cancelar
+                            </ConfirmSubmitButton>
+                          </form>
+                        </div>
                       </div>
                     </article>
                   ))}
