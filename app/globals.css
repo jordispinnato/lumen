@@ -2577,6 +2577,35 @@ body:has(.admin-cms-shell) {
   margin-top: 12px;
 }
 
+.admin-user-summary {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 10px;
+  margin-top: 12px;
+}
+
+.admin-user-summary div {
+  display: grid;
+  gap: 4px;
+  border: 1px solid rgba(11, 74, 83, 0.1);
+  border-radius: 8px;
+  padding: 12px;
+  background: white;
+}
+
+.admin-user-summary span,
+.admin-user-summary small {
+  color: var(--muted);
+  font-size: 0.78rem;
+  font-weight: 800;
+}
+
+.admin-user-summary strong {
+  color: var(--deep);
+  font-size: 1.35rem;
+  line-height: 1;
+}
+
 .admin-user-detail-grid {
   display: grid;
   gap: 14px;
@@ -2639,6 +2668,18 @@ body:has(.admin-cms-shell) {
 .admin-mini-row span {
   color: var(--deep);
   font-weight: 800;
+}
+
+.admin-danger-form {
+  margin-top: 10px;
+  padding-top: 10px;
+  border-top: 1px solid rgba(220, 38, 38, 0.14);
+}
+
+.admin-danger-form button,
+.admin-mini-row button[name="action"][value="delete"] {
+  border-color: rgba(220, 38, 38, 0.22);
+  color: #b91c1c;
 }
 
 .specialist-option,
@@ -4501,6 +4542,10 @@ body:has(.account-app-shell) .site-footer {
 
   .admin-mini-form,
   .admin-mini-row {
+    grid-template-columns: 1fr;
+  }
+
+  .admin-user-summary {
     grid-template-columns: 1fr;
   }
 

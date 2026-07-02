@@ -3,6 +3,7 @@ import { createSupabaseAdminClient } from "../../lib/supabase/admin";
 import { createSupabaseServerClient } from "../../lib/supabase/server";
 import { formatPrice } from "../../lib/courses";
 import AdminCmsShell from "./AdminCmsShell";
+import AdminConfirmButton from "./AdminConfirmButton";
 import EntityTable from "./cms/EntityTable";
 
 export const dynamic = "force-dynamic";
@@ -1483,6 +1484,9 @@ export default async function AdminPage({ searchParams }) {
                 const userEnrollments = (enrollments || []).filter((enrollment) => enrollment.user_id === item.id);
                 const userBookings = bookings.filter((booking) => booking.user_id === item.id || booking.patient_email === item.email);
                 const userOrders = (catalogOrders || []).filter((order) => order.user_id === item.id || order.customer_email === item.email);
+                const completedUserBookings = userBookings.filter((booking) => booking.status === "completed").length;
+                const cancelledUserBookings = userBookings.filter((booking) => booking.status === "cancelled").length;
+                const paidUserOrders = userOrders.filter((order) => order.status === "paid" || order.status === "delivered").length;
 
                 return (
                   <article key={item.id}>
@@ -1493,6 +1497,22 @@ export default async function AdminPage({ searchParams }) {
                     </small>
                     <details className="admin-inline-editor">
                       <summary>Administrar usuario</summary>
+                      <div className="admin-user-summary">
+                        <div>
+                          <span>Cursos</span>
+                          <strong>{userEnrollments.length}</strong>
+                        </div>
+                        <div>
+                          <span>Turnos</span>
+                          <strong>{userBookings.length}</strong>
+                          <small>{completedUserBookings} realizados / {cancelledUserBookings} cancelados</small>
+                        </div>
+                        <div>
+                          <span>Pedidos</span>
+                          <strong>{userOrders.length}</strong>
+                          <small>{paidUserOrders} pagos o entregados</small>
+                        </div>
+                      </div>
                       <form className="admin-form" action="/admin/users/update" method="post">
                         <input name="userId" type="hidden" defaultValue={item.id} />
                         <label>
@@ -1533,7 +1553,9 @@ export default async function AdminPage({ searchParams }) {
                               <input name="enrollmentId" type="hidden" value={enrollment.id} />
                               <input name="action" type="hidden" value="delete" />
                               <span>{enrollment.courses?.title || courseById.get(enrollment.course_id)?.title || "Curso"}</span>
-                              <button type="submit">Quitar</button>
+                              <AdminConfirmButton type="submit" message="Vas a quitar este curso del usuario.">
+                                Quitar
+                              </AdminConfirmButton>
                             </form>
                           )) : <p className="muted">Sin cursos habilitados.</p>}
                         </section>
@@ -1552,7 +1574,9 @@ export default async function AdminPage({ searchParams }) {
                                 <option value="completed">Realizado</option>
                               </select>
                               <button type="submit">Guardar</button>
-                              <button name="action" value="delete" type="submit">Eliminar</button>
+                              <AdminConfirmButton name="action" value="delete" type="submit" message="Vas a eliminar este turno y liberar el horario.">
+                                Eliminar
+                              </AdminConfirmButton>
                             </form>
                           )) : <p className="muted">Sin turnos registrados.</p>}
                         </section>
@@ -1572,7 +1596,9 @@ export default async function AdminPage({ searchParams }) {
                                 <option value="cancelled">Cancelado</option>
                               </select>
                               <button type="submit">Guardar</button>
-                              <button name="action" value="delete" type="submit">Eliminar</button>
+                              <AdminConfirmButton name="action" value="delete" type="submit" message="Vas a eliminar este pedido del usuario.">
+                                Eliminar
+                              </AdminConfirmButton>
                             </form>
                           )) : <p className="muted">Sin pedidos registrados.</p>}
                         </section>
@@ -1669,6 +1695,13 @@ export default async function AdminPage({ searchParams }) {
                       </label>
                       <button className="button" type="submit">Guardar cambios</button>
                     </form>
+                    <form className="admin-danger-form" action="/admin/modules/create" method="post">
+                      <input name="moduleId" type="hidden" value={moduleItem.id} />
+                      <input name="action" type="hidden" value="delete" />
+                      <AdminConfirmButton type="submit" message="Vas a eliminar este modulo. Las lecciones asociadas quedaran sin modulo.">
+                        Eliminar modulo
+                      </AdminConfirmButton>
+                    </form>
                   </details>
                 </article>
               )) : (
@@ -1748,6 +1781,13 @@ export default async function AdminPage({ searchParams }) {
                         />
                       </label>
                       <button className="button" type="submit">Guardar cambios</button>
+                    </form>
+                    <form className="admin-danger-form" action="/admin/materials/create" method="post">
+                      <input name="materialId" type="hidden" value={material.id} />
+                      <input name="action" type="hidden" value="delete" />
+                      <AdminConfirmButton type="submit" message="Vas a eliminar este material. Si tenia archivo, tambien se intentara quitar del storage.">
+                        Eliminar material
+                      </AdminConfirmButton>
                     </form>
                     <p className="muted">Si no subis un archivo nuevo, se conserva el archivo actual.</p>
                   </details>
@@ -1829,6 +1869,13 @@ export default async function AdminPage({ searchParams }) {
                         Clase con vista previa
                       </label>
                       <button className="button" type="submit">Guardar cambios</button>
+                    </form>
+                    <form className="admin-danger-form" action="/admin/lessons/create" method="post">
+                      <input name="lessonId" type="hidden" value={lesson.id} />
+                      <input name="action" type="hidden" value="delete" />
+                      <AdminConfirmButton type="submit" message="Vas a eliminar esta leccion y sus accesos de progreso asociados.">
+                        Eliminar leccion
+                      </AdminConfirmButton>
                     </form>
                   </details>
                 </article>

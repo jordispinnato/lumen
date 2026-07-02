@@ -24,6 +24,7 @@ export async function POST(request) {
   const origin = new URL(request.url).origin;
   const formData = await request.formData();
   const moduleId = String(formData.get("moduleId") || "").trim();
+  const action = String(formData.get("action") || "save").trim();
   const courseId = String(formData.get("courseId") || "").trim();
   const title = String(formData.get("title") || "").trim();
   const description = String(formData.get("description") || "").trim();
@@ -34,6 +35,21 @@ export async function POST(request) {
 
   if (auth.response) {
     return auth.response;
+  }
+
+  if (action === "delete") {
+    if (!moduleId) {
+      return NextResponse.redirect(`${origin}/admin?error=${encodeURIComponent("Modulo incompleto")}`, { status: 303 });
+    }
+
+    await supabase.from("lessons").update({ module_id: null }).eq("module_id", moduleId);
+    const { error } = await supabase.from("course_modules").delete().eq("id", moduleId);
+
+    if (error) {
+      return NextResponse.redirect(`${origin}/admin?error=${encodeURIComponent(error.message)}`, { status: 303 });
+    }
+
+    return NextResponse.redirect(`${origin}/admin?message=Modulo eliminado#modulos`, { status: 303 });
   }
 
   if (!courseId || !title) {
@@ -58,5 +74,5 @@ export async function POST(request) {
     return NextResponse.redirect(`${origin}/admin?error=${encodeURIComponent(error.message)}`, { status: 303 });
   }
 
-  return NextResponse.redirect(`${origin}/admin?message=Modulo guardado`, { status: 303 });
+  return NextResponse.redirect(`${origin}/admin?message=Modulo guardado#modulos`, { status: 303 });
 }

@@ -15,6 +15,7 @@ export async function POST(request) {
   const origin = new URL(request.url).origin;
   const formData = await request.formData();
   const materialId = String(formData.get("materialId") || "").trim();
+  const action = String(formData.get("action") || "save").trim();
   const courseId = String(formData.get("courseId") || "").trim();
   const lessonId = String(formData.get("lessonId") || "").trim();
   const title = String(formData.get("title") || "").trim();
@@ -38,6 +39,30 @@ export async function POST(request) {
 
   if (profile?.role !== "admin") {
     return NextResponse.redirect(`${origin}/admin?error=No autorizado`, { status: 303 });
+  }
+
+  if (action === "delete") {
+    if (!materialId) {
+      return NextResponse.redirect(`${origin}/admin?error=${encodeURIComponent("Material incompleto")}`, { status: 303 });
+    }
+
+    const { data: material } = await supabase
+      .from("course_materials")
+      .select("file_path")
+      .eq("id", materialId)
+      .maybeSingle();
+
+    const { error } = await supabase.from("course_materials").delete().eq("id", materialId);
+
+    if (error) {
+      return NextResponse.redirect(`${origin}/admin?error=${encodeURIComponent(error.message)}`, { status: 303 });
+    }
+
+    if (material?.file_path) {
+      await supabase.storage.from("course-materials").remove([material.file_path]);
+    }
+
+    return NextResponse.redirect(`${origin}/admin?message=Material eliminado#materiales`, { status: 303 });
   }
 
   const hasFile = file && typeof file !== "string" && file.size > 0;
@@ -128,5 +153,5 @@ export async function POST(request) {
     });
   }
 
-  return NextResponse.redirect(`${origin}/admin?message=Material cargado`, { status: 303 });
+  return NextResponse.redirect(`${origin}/admin?message=Material cargado#materiales`, { status: 303 });
 }

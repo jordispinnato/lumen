@@ -5,6 +5,7 @@ export async function POST(request) {
   const origin = new URL(request.url).origin;
   const formData = await request.formData();
   const lessonId = String(formData.get("lessonId") || "").trim();
+  const action = String(formData.get("action") || "save").trim();
   const courseId = String(formData.get("courseId") || "").trim();
   const moduleId = String(formData.get("moduleId") || "").trim();
   const title = String(formData.get("title") || "").trim();
@@ -30,6 +31,21 @@ export async function POST(request) {
 
   if (profile?.role !== "admin") {
     return NextResponse.redirect(`${origin}/admin?error=No autorizado`, { status: 303 });
+  }
+
+  if (action === "delete") {
+    if (!lessonId) {
+      return NextResponse.redirect(`${origin}/admin?error=${encodeURIComponent("Leccion incompleta")}`, { status: 303 });
+    }
+
+    await supabase.from("course_materials").update({ lesson_id: null }).eq("lesson_id", lessonId);
+    const { error } = await supabase.from("lessons").delete().eq("id", lessonId);
+
+    if (error) {
+      return NextResponse.redirect(`${origin}/admin?error=${encodeURIComponent(error.message)}`, { status: 303 });
+    }
+
+    return NextResponse.redirect(`${origin}/admin?message=Leccion eliminada#lecciones`, { status: 303 });
   }
 
   if (!courseId || !title) {
