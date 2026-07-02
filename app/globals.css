@@ -4184,6 +4184,12 @@ body:has(.account-app-shell) .site-footer {
   align-items: center;
 }
 
+.specialist-booking-actions {
+  display: grid;
+  justify-items: end;
+  gap: 8px;
+}
+
 .specialist-booking-card.is-today {
   border-color: rgba(249, 115, 22, 0.18);
   background:
@@ -4263,6 +4269,164 @@ body:has(.account-app-shell) .site-footer {
 
 .specialist-recent-list article {
   gap: 6px;
+}
+
+.specialist-status-form {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+}
+
+.specialist-status-form select {
+  min-height: 34px;
+  border: 1px solid #d8deea;
+  border-radius: 8px;
+  padding: 0 8px;
+  background: white;
+  color: #0f172a;
+  font-weight: 800;
+}
+
+.specialist-status-form button {
+  min-height: 34px;
+  border: 1px solid #d8deea;
+  border-radius: 8px;
+  padding: 0 10px;
+  background: white;
+  color: #0757e3;
+  font-weight: 900;
+  cursor: pointer;
+}
+
+.specialist-patients-panel {
+  scroll-margin-top: 24px;
+}
+
+.specialist-patient-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 14px;
+}
+
+.specialist-patient-card {
+  display: grid;
+  gap: 14px;
+  border: 1px solid #e5e9f2;
+  border-radius: var(--ds-radius);
+  padding: 16px;
+  background: white;
+}
+
+.specialist-patient-head {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.specialist-patient-head div {
+  min-width: 0;
+  display: grid;
+  gap: 4px;
+}
+
+.specialist-patient-head strong {
+  color: #0f172a;
+  font-size: 1.05rem;
+}
+
+.specialist-patient-head a,
+.specialist-patient-head span {
+  color: #64748b;
+  overflow-wrap: anywhere;
+}
+
+.specialist-patient-stats {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 8px;
+  margin: 0;
+}
+
+.specialist-patient-stats div {
+  display: grid;
+  gap: 4px;
+  border-radius: 8px;
+  padding: 10px;
+  background: #f8fafc;
+}
+
+.specialist-patient-stats dt {
+  color: #64748b;
+  font-size: 0.72rem;
+  font-weight: 900;
+}
+
+.specialist-patient-stats dd {
+  margin: 0;
+  color: #0f172a;
+  font-size: 1.25rem;
+  font-weight: 900;
+}
+
+.specialist-patient-timeline,
+.specialist-note-list,
+.specialist-note-form,
+.specialist-patient-notes {
+  display: grid;
+  gap: 10px;
+}
+
+.specialist-patient-timeline small {
+  color: #64748b;
+}
+
+.specialist-patient-notes summary {
+  cursor: pointer;
+  color: #0757e3;
+  font-weight: 900;
+}
+
+.specialist-note-list article {
+  display: grid;
+  gap: 6px;
+  border: 1px solid #e5e9f2;
+  border-radius: 8px;
+  padding: 12px;
+  background: #f8fafc;
+}
+
+.specialist-note-list span {
+  color: #64748b;
+  font-size: 0.78rem;
+  font-weight: 900;
+}
+
+.specialist-note-list p {
+  margin: 0;
+  color: #25324b;
+  line-height: 1.5;
+}
+
+.specialist-note-form label {
+  display: grid;
+  gap: 7px;
+  color: #0f172a;
+  font-weight: 900;
+}
+
+.specialist-note-form select,
+.specialist-note-form textarea {
+  width: 100%;
+  border: 1px solid #d8deea;
+  border-radius: 8px;
+  padding: 10px 12px;
+  background: white;
+  color: #0f172a;
+}
+
+.specialist-note-form textarea {
+  min-height: 110px;
+  resize: vertical;
 }
 
 @media (max-width: 980px) {
@@ -4709,6 +4873,15 @@ body:has(.account-app-shell) .site-footer {
   .specialist-booking-card {
     grid-template-columns: 1fr;
     justify-items: start;
+  }
+
+  .specialist-booking-actions {
+    justify-items: start;
+  }
+
+  .specialist-patient-grid,
+  .specialist-patient-stats {
+    grid-template-columns: 1fr;
   }
 
   .cms-entity-head,
