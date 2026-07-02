@@ -19,7 +19,6 @@ export default async function LoginPage({ searchParams }) {
         <button className="button" type="submit">Entrar al aula</button>
         {error ? <p className="notice error">{error}</p> : null}
         {message ? <p className="notice success">{message}</p> : null}
-        <p className="muted">Este formulario ya está conectado a Supabase Auth.</p>
       </form>
     </main>
   );
