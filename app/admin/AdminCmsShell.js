@@ -37,6 +37,57 @@ const menuGroups = [
   ],
 ];
 
+const viewActions = {
+  dashboard: [
+    { label: "Turnos", href: "#turnos" },
+    { label: "Cursos", href: "#cursos" },
+    { label: "Usuarios", href: "#usuarios" },
+  ],
+  turnos: [
+    { label: "Profesionales", href: "#profesionales" },
+    { label: "Horarios", href: "#turnos" },
+    { label: "Reservas", href: "#turnos" },
+  ],
+  cursos: [
+    { label: "Crear curso", href: "#cursos" },
+    { label: "Modulos", href: "#modulos" },
+    { label: "Lecciones", href: "#lecciones" },
+    { label: "Materiales", href: "#materiales" },
+  ],
+  modulos: [
+    { label: "Crear modulo", href: "#modulos" },
+    { label: "Lecciones", href: "#lecciones" },
+    { label: "Cursos", href: "#cursos" },
+  ],
+  lecciones: [
+    { label: "Crear leccion", href: "#lecciones" },
+    { label: "Materiales", href: "#materiales" },
+    { label: "Cursos", href: "#cursos" },
+  ],
+  materiales: [
+    { label: "Subir material", href: "#materiales" },
+    { label: "Lecciones", href: "#lecciones" },
+    { label: "Cursos", href: "#cursos" },
+  ],
+  catalogo: [
+    { label: "Productos", href: "#productos" },
+    { label: "Solicitudes", href: "#solicitudes" },
+  ],
+  usuarios: [
+    { label: "Usuarios", href: "#usuarios" },
+    { label: "Inscripciones", href: "#inscripciones" },
+  ],
+  inscripciones: [
+    { label: "Habilitar curso", href: "#inscripciones" },
+    { label: "Usuarios", href: "#usuarios" },
+  ],
+  contenido: [
+    { label: "Modulos", href: "#modulos" },
+    { label: "Lecciones", href: "#lecciones" },
+    { label: "Materiales", href: "#materiales" },
+  ],
+};
+
 function getInitials(name, email) {
   const source = name || email || "Admin";
   return source
@@ -76,9 +127,11 @@ export default function AdminCmsShell({ adminName, adminEmail, children }) {
   const [isCollapsed, setIsCollapsed] = useState(false);
   const [isMobileOpen, setIsMobileOpen] = useState(false);
   const [activeHash, setActiveHash] = useState("#dashboard");
+  const [searchQuery, setSearchQuery] = useState("");
   const initials = getInitials(adminName, adminEmail);
   const activeItem = flatMenu.find((item) => item.href === activeHash) || flatMenu[0];
   const activeView = getViewFromHash(activeHash);
+  const activeActions = viewActions[activeView] || [];
 
   useEffect(() => {
     const storedValue = window.localStorage.getItem("lumen-admin-sidebar-collapsed");
@@ -108,6 +161,25 @@ export default function AdminCmsShell({ adminName, adminEmail, children }) {
       panel.hidden = views.length ? !views.includes(activeView) : false;
     });
   }, [activeView]);
+
+  useEffect(() => {
+    const items = document.querySelectorAll(
+      ".admin-cms-content article, .admin-cms-content tbody tr, .admin-cms-content .cms-empty-state"
+    );
+    const normalizedQuery = searchQuery.trim().toLowerCase();
+
+    items.forEach((item) => {
+      const parentPanel = item.closest("[data-admin-view]");
+
+      if (parentPanel?.hidden) {
+        item.removeAttribute("data-admin-filter-hidden");
+        return;
+      }
+
+      const matches = !normalizedQuery || item.textContent.toLowerCase().includes(normalizedQuery);
+      item.toggleAttribute("data-admin-filter-hidden", !matches);
+    });
+  }, [activeView, searchQuery]);
 
   function toggleCollapsed() {
     setIsCollapsed((current) => {
@@ -175,7 +247,12 @@ export default function AdminCmsShell({ adminName, adminEmail, children }) {
 
           <label className="admin-cms-search">
             <span>Buscar</span>
-            <input placeholder="Buscar en el CMS..." type="search" />
+            <input
+              placeholder={`Buscar en ${activeItem.label.toLowerCase()}...`}
+              type="search"
+              value={searchQuery}
+              onChange={(event) => setSearchQuery(event.target.value)}
+            />
           </label>
 
           <details className="admin-user-menu">
@@ -196,6 +273,15 @@ export default function AdminCmsShell({ adminName, adminEmail, children }) {
         </header>
 
         <main className="admin-cms-content">
+          {activeActions.length ? (
+            <nav className="admin-cms-view-actions" aria-label="Accesos de la pantalla actual">
+              {activeActions.map((action) => (
+                <a href={action.href} key={`${activeView}-${action.href}`}>
+                  {action.label}
+                </a>
+              ))}
+            </nav>
+          ) : null}
           {children}
         </main>
 

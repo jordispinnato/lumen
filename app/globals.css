@@ -1461,6 +1461,37 @@ body:has(.admin-cms-shell) {
   padding: 26px clamp(16px, 3vw, 32px);
 }
 
+.admin-cms-view-actions {
+  position: sticky;
+  top: 76px;
+  z-index: 18;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-bottom: 18px;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  padding: 10px;
+  background: rgba(255, 253, 248, 0.9);
+  backdrop-filter: blur(12px);
+}
+
+.admin-cms-view-actions a {
+  min-height: 36px;
+  display: inline-flex;
+  align-items: center;
+  border: 1px solid rgba(11, 74, 83, 0.12);
+  border-radius: 8px;
+  padding: 0 12px;
+  background: white;
+  color: var(--deep);
+  font-weight: 900;
+}
+
+.admin-cms-content [data-admin-filter-hidden] {
+  display: none !important;
+}
+
 .admin-cms-inner {
   max-width: 1380px;
 }
@@ -1651,6 +1682,11 @@ body:has(.admin-cms-shell) {
 
 .admin-section-head h2 {
   font-size: clamp(1.5rem, 2.4vw, 2.4rem);
+}
+
+.admin-cms-shell[data-active-admin-view="usuarios"] #cursos > .admin-section-head,
+.admin-cms-shell[data-active-admin-view="inscripciones"] #cursos > .admin-section-head {
+  display: none;
 }
 
 .admin-form {
@@ -4343,6 +4379,57 @@ body:has(.account-app-shell) .site-footer {
   scroll-margin-top: 24px;
 }
 
+.specialist-patient-tools {
+  display: grid;
+  gap: 14px;
+}
+
+.specialist-patient-toolbar {
+  display: grid;
+  grid-template-columns: minmax(220px, 1fr) minmax(180px, 240px) auto;
+  gap: 10px;
+  align-items: end;
+  border: 1px solid #e5e9f2;
+  border-radius: var(--ds-radius);
+  padding: 12px;
+  background: #f8fafc;
+}
+
+.specialist-patient-toolbar label {
+  display: grid;
+  gap: 6px;
+  color: #64748b;
+  font-size: 0.76rem;
+  font-weight: 900;
+  text-transform: uppercase;
+}
+
+.specialist-patient-toolbar input,
+.specialist-patient-toolbar select {
+  min-height: 40px;
+  border: 1px solid #d8deea;
+  border-radius: 8px;
+  padding: 0 11px;
+  background: white;
+  color: #0f172a;
+  font-size: 0.95rem;
+  font-weight: 800;
+  text-transform: none;
+}
+
+.specialist-patient-toolbar strong {
+  min-height: 40px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border: 1px solid #d8deea;
+  border-radius: 8px;
+  padding: 0 12px;
+  background: white;
+  color: #0f172a;
+  white-space: nowrap;
+}
+
 .specialist-patient-grid {
   display: grid;
   grid-template-columns: repeat(2, minmax(0, 1fr));
@@ -4356,6 +4443,10 @@ body:has(.account-app-shell) .site-footer {
   border-radius: var(--ds-radius);
   padding: 16px;
   background: white;
+}
+
+.specialist-patient-card[data-patient-hidden] {
+  display: none;
 }
 
 .specialist-patient-head {
@@ -4383,7 +4474,7 @@ body:has(.account-app-shell) .site-footer {
 
 .specialist-patient-stats {
   display: grid;
-  grid-template-columns: repeat(4, minmax(0, 1fr));
+  grid-template-columns: repeat(5, minmax(0, 1fr));
   gap: 8px;
   margin: 0;
 }
@@ -4412,9 +4503,34 @@ body:has(.account-app-shell) .site-footer {
 .specialist-patient-timeline,
 .specialist-note-list,
 .specialist-note-form,
-.specialist-patient-notes {
+.specialist-patient-notes,
+.specialist-patient-history {
   display: grid;
   gap: 10px;
+}
+
+.specialist-patient-history {
+  margin-top: 8px;
+}
+
+.specialist-patient-history > article {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr) auto;
+  gap: 10px;
+  align-items: center;
+  border: 1px solid #e5e9f2;
+  border-radius: 8px;
+  padding: 10px;
+  background: #fff;
+}
+
+.specialist-patient-history div {
+  display: grid;
+  gap: 3px;
+}
+
+.specialist-patient-history small {
+  color: #64748b;
 }
 
 .specialist-patient-timeline small {
@@ -4922,6 +5038,15 @@ body:has(.account-app-shell) .site-footer {
 
   .specialist-booking-actions {
     justify-items: start;
+  }
+
+  .specialist-patient-toolbar,
+  .specialist-patient-history > article {
+    grid-template-columns: 1fr;
+  }
+
+  .specialist-patient-toolbar strong {
+    justify-content: flex-start;
   }
 
   .specialist-patient-grid,

@@ -3,6 +3,7 @@ import { createSupabaseAdminClient } from "../../lib/supabase/admin";
 import { createSupabaseServerClient } from "../../lib/supabase/server";
 import { hasGoogleCalendarConfig } from "../../lib/googleCalendar";
 import AccountDashboardShell from "../mi-cuenta/AccountDashboardShell";
+import SpecialistPatientTools from "./SpecialistPatientTools";
 
 function formatDate(value) {
   if (!value) {
@@ -246,6 +247,7 @@ export default async function SpecialistPage({ searchParams }) {
         bookings: sortedBookings,
         notes: patientNotes,
         total: sortedBookings.length,
+        confirmed: sortedBookings.filter((booking) => booking.status === "confirmed").length,
         completed: sortedBookings.filter((booking) => booking.status === "completed").length,
         cancelled: sortedBookings.filter((booking) => booking.status === "cancelled").length,
         nextBooking: upcoming.sort((a, b) => {
@@ -253,7 +255,9 @@ export default async function SpecialistPage({ searchParams }) {
           const bValue = `${b.appointment_slots?.slot_date || ""} ${b.appointment_slots?.slot_time || ""}`;
           return aValue.localeCompare(bValue);
         })[0],
+        firstBooking: sortedBookings[sortedBookings.length - 1],
         lastBooking: sortedBookings[0],
+        lastNote: patientNotes[0],
       };
     })
     .sort((a, b) => String(b.lastBooking?.created_at || "").localeCompare(String(a.lastBooking?.created_at || "")));
@@ -462,9 +466,15 @@ export default async function SpecialistPage({ searchParams }) {
                 </p>
               ) : null}
               {patients.length ? (
-                <div className="specialist-patient-grid">
+                <SpecialistPatientTools total={patients.length}>
                   {patients.map((patient) => (
-                    <article className="specialist-patient-card" key={patient.key}>
+                    <article
+                      className="specialist-patient-card"
+                      data-patient-card
+                      data-patient-search={`${patient.name} ${patient.email}`}
+                      data-patient-status={patient.nextBooking ? "with-next" : "without-next"}
+                      key={patient.key}
+                    >
                       <div className="specialist-patient-head">
                         <span className="account-avatar">{initialsFromName(patient.name || patient.email)}</span>
                         <div>
@@ -480,6 +490,10 @@ export default async function SpecialistPage({ searchParams }) {
                         <div>
                           <dt>Realizados</dt>
                           <dd>{patient.completed}</dd>
+                        </div>
+                        <div>
+                          <dt>Activos</dt>
+                          <dd>{patient.confirmed}</dd>
                         </div>
                         <div>
                           <dt>Cancelados</dt>
@@ -502,11 +516,30 @@ export default async function SpecialistPage({ searchParams }) {
                             ? `${formatDate(patient.lastBooking.appointment_slots?.slot_date)} - ${statusLabel(patient.lastBooking.status)}`
                             : "Sin historial"}
                         </small>
+                        <small>
+                          Primera reserva: {patient.firstBooking ? formatDateTime(patient.firstBooking.created_at) : "Sin dato"}
+                        </small>
+                        <small>
+                          Ultima nota: {patient.lastNote ? `${noteTypeLabel(patient.lastNote.note_type)} - ${formatDateTime(patient.lastNote.created_at)}` : "Sin notas"}
+                        </small>
                       </div>
                       <details className="specialist-patient-notes">
-                        <summary>Ver ficha y notas</summary>
+                        <summary>Ver ficha, historial y notas</summary>
+                        <div className="specialist-patient-history">
+                          <strong>Historial de turnos</strong>
+                          {patient.bookings.map((booking) => (
+                            <article key={booking.id}>
+                              <span className={`specialist-status ${statusTone(booking.status)}`}>{statusLabel(booking.status)}</span>
+                              <div>
+                                <strong>{formatDate(booking.appointment_slots?.slot_date)}</strong>
+                                <small>{formatTime(booking.appointment_slots?.slot_time)} hs - reservado {formatDateTime(booking.created_at)}</small>
+                              </div>
+                              <BookingStatusForm booking={booking} />
+                            </article>
+                          ))}
+                        </div>
                         <div className="specialist-note-list">
-                          {patient.notes.length ? patient.notes.slice(0, 4).map((note) => (
+                          {patient.notes.length ? patient.notes.map((note) => (
                             <article key={note.id}>
                               <span>{noteTypeLabel(note.note_type)} - {formatDateTime(note.created_at)}</span>
                               <p>{note.note}</p>
@@ -540,7 +573,7 @@ export default async function SpecialistPage({ searchParams }) {
                       </details>
                     </article>
                   ))}
-                </div>
+                </SpecialistPatientTools>
               ) : (
                 <div className="account-empty-state">
                   <span className="account-empty-icon">P</span>
