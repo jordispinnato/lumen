@@ -1496,6 +1496,30 @@ export default async function AdminPage({ searchParams }) {
           <section className="panel" data-admin-view="usuarios">
             <span className="admin-anchor-target" id="usuarios" />
             <h2>Usuarios registrados</h2>
+            <form className="admin-message-composer" action="/admin/messages/create" method="post">
+              <div>
+                <h3>Enviar mensaje a usuarios</h3>
+                <p className="muted">Para promociones, avisos importantes o novedades generales. Aparece en Mi Espacio, seccion Mensajes.</p>
+              </div>
+              <label>
+                Tipo
+                <select name="messageType" defaultValue="promocion">
+                  <option value="general">General</option>
+                  <option value="promocion">Promocion</option>
+                  <option value="curso">Curso</option>
+                  <option value="catalogo">Catalogo</option>
+                </select>
+              </label>
+              <label>
+                Titulo
+                <input name="subject" required placeholder="Ej: Nueva promocion disponible" />
+              </label>
+              <label className="wide-field">
+                Mensaje
+                <textarea name="body" rows="3" required placeholder="Escribi el mensaje que van a ver los usuarios." />
+              </label>
+              <button className="button" type="submit">Enviar a todos</button>
+            </form>
             <div className="compact-list">
               {profiles?.length ? profiles.map((item) => {
                 const userEnrollments = (enrollments || []).filter((enrollment) => enrollment.user_id === item.id);

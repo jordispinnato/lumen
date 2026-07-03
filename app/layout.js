@@ -13,14 +13,19 @@ export default async function RootLayout({ children }) {
   const { data: userData } = await supabase.auth.getUser();
   let isAdmin = false;
   let isSpecialist = false;
+  let displayName = "";
+  let unreadNotifications = 0;
+  let unreadMessages = 0;
+  let cartItems = 0;
 
   if (userData.user) {
     const { data: profile } = await supabase
       .from("profiles")
-      .select("role")
+      .select("full_name,email,role")
       .eq("id", userData.user.id)
       .maybeSingle();
 
+    displayName = profile?.full_name || userData.user.email || "Usuario LUMEN";
     isAdmin = profile?.role === "admin";
     isSpecialist = profile?.role === "specialist";
 
@@ -33,6 +38,27 @@ export default async function RootLayout({ children }) {
 
       isSpecialist = Boolean(linkedSpecialist);
     }
+
+    const [{ count: notificationCount }, { count: messageCount }, { count: cartCount }] = await Promise.all([
+      supabase
+        .from("user_notifications")
+        .select("id", { count: "exact", head: true })
+        .or(`user_id.eq.${userData.user.id},user_id.is.null`)
+        .is("read_at", null),
+      supabase
+        .from("user_messages")
+        .select("id", { count: "exact", head: true })
+        .or(`user_id.eq.${userData.user.id},user_id.is.null`)
+        .is("read_at", null),
+      supabase
+        .from("catalog_cart_items")
+        .select("id", { count: "exact", head: true })
+        .eq("user_id", userData.user.id),
+    ]);
+
+    unreadNotifications = notificationCount || 0;
+    unreadMessages = messageCount || 0;
+    cartItems = cartCount || 0;
   }
 
   return (
@@ -53,7 +79,16 @@ export default async function RootLayout({ children }) {
             <span className="brand-mark" aria-hidden="true" />
             <span>LUMEN</span>
           </a>
-          <SiteNav isAdmin={isAdmin} isSpecialist={isSpecialist} isLoggedIn={Boolean(userData.user)} />
+          <SiteNav
+            cartItems={cartItems}
+            displayName={displayName}
+            email={userData.user?.email}
+            isAdmin={isAdmin}
+            isSpecialist={isSpecialist}
+            isLoggedIn={Boolean(userData.user)}
+            unreadMessages={unreadMessages}
+            unreadNotifications={unreadNotifications}
+          />
         </header>
         {children}
         <footer className="site-footer">

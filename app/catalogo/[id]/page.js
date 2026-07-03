@@ -86,8 +86,15 @@ export default async function ProductDetailPage({ params, searchParams }) {
             {isDemo ? (
               <p className="notice success">Este es un producto de ejemplo. Carga productos reales desde admin para registrar solicitudes.</p>
             ) : userData.user ? (
-              <form className="purchase-form" action="/catalogo/orders/create" method="post">
-                <input name="productId" type="hidden" value={product.id} />
+              <div className="purchase-stack">
+                <form className="cart-inline-form" action="/catalogo/cart/add" method="post">
+                  <input name="productId" type="hidden" value={product.id} />
+                  <input name="quantity" type="hidden" value="1" />
+                  <button className="secondary-button" type="submit">Agregar al carrito</button>
+                </form>
+
+                <form className="purchase-form" action="/catalogo/orders/create" method="post">
+                  <input name="productId" type="hidden" value={product.id} />
                 <label>
                   Nombre y apellido
                   <input name="customerName" placeholder="Nombre de quien compra" />
@@ -137,8 +144,9 @@ export default async function ProductDetailPage({ params, searchParams }) {
                   <p className="muted">La descarga se habilitará automáticamente cuando conectemos pagos y el pago quede aprobado.</p>
                 )}
 
-                <button className="button" type="submit">Registrar solicitud</button>
-              </form>
+                  <button className="button" type="submit">Registrar solicitud</button>
+                </form>
+              </div>
             ) : (
               <div className="booking-login-box">
                 <p className="muted">Para comprar o solicitar este producto necesitás iniciar sesión.</p>

@@ -144,10 +144,13 @@ export default async function MiCuentaPage({ searchParams }) {
     { data: bookings },
     { data: enrollments },
     { data: catalogOrders },
+    { data: notifications },
+    { data: messages },
+    { data: cartItems },
   ] = await Promise.all([
     supabase
       .from("profiles")
-      .select("full_name,email,role,created_at")
+      .select("full_name,email,phone,role,created_at")
       .eq("id", userData.user.id)
       .maybeSingle(),
     supabase
@@ -201,6 +204,32 @@ export default async function MiCuentaPage({ searchParams }) {
       `)
       .eq("user_id", userData.user.id)
       .order("created_at", { ascending: false }),
+    supabase
+      .from("user_notifications")
+      .select("id,title,body,href,notification_type,read_at,created_at")
+      .or(`user_id.eq.${userData.user.id},user_id.is.null`)
+      .order("created_at", { ascending: false }),
+    supabase
+      .from("user_messages")
+      .select("id,subject,body,message_type,read_at,created_at")
+      .or(`user_id.eq.${userData.user.id},user_id.is.null`)
+      .order("created_at", { ascending: false }),
+    supabase
+      .from("catalog_cart_items")
+      .select(`
+        id,
+        quantity,
+        created_at,
+        catalog_products:product_id (
+          id,
+          title,
+          summary,
+          product_type,
+          price
+        )
+      `)
+      .eq("user_id", userData.user.id)
+      .order("created_at", { ascending: false }),
   ]);
 
   const upcomingBookings = (bookings || [])
@@ -219,6 +248,9 @@ export default async function MiCuentaPage({ searchParams }) {
     });
   const nextBooking = upcomingBookings[0];
   const catalogOrderList = catalogOrders || [];
+  const notificationList = notifications || [];
+  const messageList = messages || [];
+  const cartItemList = cartItems || [];
   const digitalOrders = catalogOrderList.filter((order) => order.product_type === "digital");
   const approvedDigitalOrders = digitalOrders.filter((order) => order.status === "paid" || order.status === "delivered");
   const displayName = profile?.full_name || userData.user.email;
@@ -317,6 +349,9 @@ export default async function MiCuentaPage({ searchParams }) {
     { href: "#cursos", icon: "C", label: "Mis cursos" },
     { href: "#recursos", icon: "R", label: "Mis recursos" },
     { href: "#pedidos", icon: "P", label: "Mis pedidos" },
+    { href: "#carrito", icon: "K", label: "Carrito" },
+    { href: "#notificaciones", icon: "N", label: "Notificaciones" },
+    { href: "#mensajes", icon: "M", label: "Mensajes" },
     { href: "#certificados", icon: "D", label: "Certificados" },
     { href: "#configuracion", icon: "S", label: "Configuración" },
   ];
@@ -576,6 +611,30 @@ export default async function MiCuentaPage({ searchParams }) {
               )}
             </section>
 
+            <section className="account-panel" id="carrito">
+              <div className="account-panel-head">
+                <div>
+                  <AccountIcon tone="orange">K</AccountIcon>
+                  <h2>Carrito</h2>
+                </div>
+                <a href="/catalogo">Ir al catalogo</a>
+              </div>
+              {cartItemList.length ? (
+                <div className="account-history-list">
+                  {cartItemList.map((item) => (
+                    <article key={item.id}>
+                      <span>{item.catalog_products?.product_type === "digital" ? "Digital" : "Fisico"}</span>
+                      <strong>{item.catalog_products?.title || "Producto"}</strong>
+                      <small>Cantidad: {item.quantity} Â· {formatPrice((item.catalog_products?.price || 0) * item.quantity)}</small>
+                      <a className="account-secondary-action" href={`/catalogo/${item.catalog_products?.id}`}>Ver producto</a>
+                    </article>
+                  ))}
+                </div>
+              ) : (
+                <EmptyState title="Tu carrito esta vacio" text="Agrega productos o recursos desde el catalogo para prepararlos antes de comprar." href="/catalogo" action="Explorar catalogo" />
+              )}
+            </section>
+
             <section className="account-panel" id="certificados">
               <div className="account-panel-head">
                 <div>
@@ -587,6 +646,55 @@ export default async function MiCuentaPage({ searchParams }) {
                 title="Certificados en preparacion"
                 text="Cuando un curso tenga certificado habilitado y lo completes, vas a poder verlo desde aca."
               />
+            </section>
+          </div>
+
+          <div className="account-lower-grid">
+            <section className="account-panel" id="notificaciones">
+              <div className="account-panel-head">
+                <div>
+                  <AccountIcon tone="blue">N</AccountIcon>
+                  <h2>Notificaciones</h2>
+                </div>
+              </div>
+              {notificationList.length ? (
+                <div className="account-message-list">
+                  {notificationList.slice(0, 8).map((item) => (
+                    <article className={item.read_at ? "" : "is-unread"} key={item.id}>
+                      <span>{item.notification_type}</span>
+                      <strong>{item.title}</strong>
+                      {item.body ? <p>{item.body}</p> : null}
+                      <small>{formatDateTime(item.created_at)}</small>
+                      {item.href ? <a href={item.href}>Abrir</a> : null}
+                    </article>
+                  ))}
+                </div>
+              ) : (
+                <EmptyState title="No tenes notificaciones" text="Cuando haya novedades de turnos, cursos o compras, van a aparecer aca." />
+              )}
+            </section>
+
+            <section className="account-panel" id="mensajes">
+              <div className="account-panel-head">
+                <div>
+                  <AccountIcon tone="purple">M</AccountIcon>
+                  <h2>Mensajes</h2>
+                </div>
+              </div>
+              {messageList.length ? (
+                <div className="account-message-list">
+                  {messageList.slice(0, 8).map((item) => (
+                    <article className={item.read_at ? "" : "is-unread"} key={item.id}>
+                      <span>{item.message_type}</span>
+                      <strong>{item.subject}</strong>
+                      {item.body ? <p>{item.body}</p> : null}
+                      <small>{formatDateTime(item.created_at)}</small>
+                    </article>
+                  ))}
+                </div>
+              ) : (
+                <EmptyState title="No tenes mensajes" text="Las promociones, avisos importantes y comunicaciones de LUMEN se van a ver aca." />
+              )}
             </section>
           </div>
 
@@ -607,6 +715,10 @@ export default async function MiCuentaPage({ searchParams }) {
                 <strong>{profile?.full_name || "Sin nombre cargado"}</strong>
               </div>
               <div>
+                <span>Telefono</span>
+                <strong>{profile?.phone || "Sin telefono cargado"}</strong>
+              </div>
+              <div>
                 <span>Rol</span>
                 <strong>{profile?.role || "student"}</strong>
               </div>
@@ -615,7 +727,36 @@ export default async function MiCuentaPage({ searchParams }) {
                 <strong>{formatDateTime(profile?.created_at || userData.user.created_at)}</strong>
               </div>
             </div>
-            <p className="account-muted">Por ahora esta información es de solo lectura.</p>
+            <div className="account-settings-grid">
+              <form className="account-settings-card" action="/mi-cuenta/profile/update" method="post">
+                <h3>Datos personales</h3>
+                <label>
+                  Nombre y apellido
+                  <input name="fullName" defaultValue={profile?.full_name || ""} placeholder="Tu nombre" />
+                </label>
+                <label>
+                  Telefono
+                  <input name="phone" defaultValue={profile?.phone || ""} placeholder="Ej: 11 1234 5678" />
+                </label>
+                <button className="account-primary-action" type="submit">Guardar cambios</button>
+              </form>
+
+              <form className="account-settings-card" action="/mi-cuenta/security/email" method="post">
+                <h3>Cambiar email</h3>
+                <p>Te vamos a enviar un email de confirmacion a la nueva direccion antes de aplicar el cambio.</p>
+                <label>
+                  Nuevo email
+                  <input name="newEmail" type="email" placeholder="nuevo@email.com" required />
+                </label>
+                <button className="account-secondary-action" type="submit">Enviar confirmacion</button>
+              </form>
+
+              <form className="account-settings-card" action="/mi-cuenta/security/password" method="post">
+                <h3>Cambiar contrasena</h3>
+                <p>Por seguridad, te enviamos un enlace al email actual para iniciar el cambio.</p>
+                <button className="account-secondary-action" type="submit">Enviar enlace seguro</button>
+              </form>
+            </div>
           </section>
         </div>
     </AccountDashboardShell>

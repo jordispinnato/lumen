@@ -57,20 +57,26 @@ export default function AccountDashboardShell({ navItems, displayName, avatarIni
             <span />
           </button>
           <div className="account-header-actions">
-            <button className="account-icon-button" type="button" aria-label="Notificaciones">
+            <a className="account-icon-button" href="#notificaciones" aria-label="Notificaciones">
               N
               <span>3</span>
-            </button>
-            <button className="account-icon-button" type="button" aria-label="Mensajes">M</button>
+            </a>
+            <a className="account-icon-button" href="#mensajes" aria-label="Mensajes">M</a>
+            <a className="account-icon-button" href="#carrito" aria-label="Carrito">K</a>
             <details className="account-user-menu">
               <summary>
                 <span className="account-avatar">{avatarInitials}</span>
                 <strong>{displayName}</strong>
               </summary>
               <div>
+                <a href="#cursos">Mi aprendizaje</a>
+                <a href="#carrito">Mi carrito</a>
+                <a href="#notificaciones">Notificaciones</a>
+                <a href="#mensajes">Mensajes</a>
+                <a href="#configuracion">Configuracion de la cuenta</a>
+                <a href="#pedidos">Historial de compra</a>
                 <a href="/">Ir al sitio principal</a>
                 {isAdmin ? <a href="/admin">Ir al Admin</a> : null}
-                <a href="#configuracion">Ver perfil</a>
                 <form action="/auth/logout" method="post">
                   <button type="submit">Cerrar sesión</button>
                 </form>
