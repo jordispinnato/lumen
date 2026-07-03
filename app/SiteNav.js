@@ -16,7 +16,6 @@ function NavCounter({ value }) {
 }
 
 export default function SiteNav({
-  cartItems = 0,
   displayName = "",
   email = "",
   isAdmin,
@@ -27,6 +26,7 @@ export default function SiteNav({
 }) {
   const [isOpen, setIsOpen] = useState(false);
   const initials = getInitials(displayName || email);
+  const pendingAlerts = unreadNotifications + unreadMessages;
 
   function closeMenu() {
     setIsOpen(false);
@@ -53,18 +53,14 @@ export default function SiteNav({
         <div className="site-nav-actions">
           {isLoggedIn ? (
             <>
-              <a className="nav-icon-link" href="/mi-cuenta#favoritos" onClick={closeMenu} aria-label="Lista de deseos">H</a>
-              <a className="nav-icon-link" href="/mi-cuenta#carrito" onClick={closeMenu} aria-label="Carrito">
-                C
-                <NavCounter value={cartItems} />
-              </a>
-              <a className="nav-icon-link" href="/mi-cuenta#notificaciones" onClick={closeMenu} aria-label="Notificaciones">
-                N
-                <NavCounter value={unreadNotifications} />
-              </a>
               <details className="site-user-menu">
                 <summary>
                   <span className="site-user-avatar">{initials}</span>
+                  {pendingAlerts > 0 ? (
+                    <span className="site-user-badge" aria-label={`${pendingAlerts} pendientes`}>
+                      {pendingAlerts > 9 ? "9+" : pendingAlerts}
+                    </span>
+                  ) : null}
                 </summary>
                 <div className="site-user-dropdown">
                   <div className="site-user-card">
