@@ -227,19 +227,6 @@ h3 {
   font-weight: 700;
 }
 
-.nav-icon-link {
-  position: relative;
-  width: 42px;
-  height: 42px;
-  display: inline-grid;
-  place-items: center;
-  border: 1px solid rgba(11, 74, 83, 0.12);
-  border-radius: 8px;
-  background: rgba(255, 255, 255, 0.64);
-  color: var(--deep);
-  box-shadow: 0 10px 22px rgba(14, 45, 49, 0.06);
-}
-
 .nav-counter {
   position: absolute;
   top: -6px;
@@ -1071,30 +1058,6 @@ h3 {
   margin: 0;
   color: #53627d;
   line-height: 1.55;
-}
-
-.landing-icon {
-  width: 58px;
-  height: 58px;
-  display: inline-grid;
-  place-items: center;
-  border-radius: var(--ds-radius);
-  font-weight: 900;
-}
-
-.landing-icon.is-purple {
-  background: #ede9fe;
-  color: #6d28d9;
-}
-
-.landing-icon.is-green {
-  background: #dcfce7;
-  color: #16a34a;
-}
-
-.landing-icon.is-orange {
-  background: #ffedd5;
-  color: #f97316;
 }
 
 .landing-section {
@@ -5267,11 +5230,6 @@ body:has(.account-app-shell) .site-footer {
     width: 100%;
     margin-top: 10px;
     box-shadow: none;
-  }
-
-  .nav-icon-link {
-    width: 100%;
-    min-height: 46px;
   }
 
   .site-nav a:not(.button),

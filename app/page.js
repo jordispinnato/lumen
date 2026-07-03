@@ -59,19 +59,16 @@ export default async function HomePage() {
 
       <section className="landing-feature-grid" aria-label="Accesos principales">
         <article className="landing-feature-card">
-          <span className="landing-icon is-purple" aria-hidden="true">C</span>
           <h2>Cursos</h2>
           <p>Aprendé a tu ritmo con contenidos diseñados por profesionales.</p>
           <a className="secondary-button" href="/cursos">Ver cursos</a>
         </article>
         <article className="landing-feature-card">
-          <span className="landing-icon is-green" aria-hidden="true">T</span>
           <h2>Turnos</h2>
           <p>Reservá atención psicológica online de manera simple y clara.</p>
           <a className="secondary-button" href="/turnos">Reservar turno</a>
         </article>
         <article className="landing-feature-card">
-          <span className="landing-icon is-orange" aria-hidden="true">R</span>
           <h2>Catálogo</h2>
           <p>Recursos físicos y digitales para bienestar, educación y práctica clínica.</p>
           <a className="secondary-button" href="/catalogo">Ver catálogo</a>
