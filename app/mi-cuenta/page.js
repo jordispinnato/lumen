@@ -251,6 +251,8 @@ export default async function MiCuentaPage({ searchParams }) {
   const notificationList = notifications || [];
   const messageList = messages || [];
   const cartItemList = cartItems || [];
+  const pendingAccountAlerts =
+    notificationList.filter((item) => !item.read_at).length + messageList.filter((item) => !item.read_at).length;
   const digitalOrders = catalogOrderList.filter((order) => order.product_type === "digital");
   const approvedDigitalOrders = digitalOrders.filter((order) => order.status === "paid" || order.status === "delivered");
   const displayName = profile?.full_name || userData.user.email;
@@ -357,7 +359,13 @@ export default async function MiCuentaPage({ searchParams }) {
   ];
 
   return (
-    <AccountDashboardShell navItems={navItems} displayName={displayName} avatarInitials={avatarInitials} isAdmin={profile?.role === "admin"}>
+    <AccountDashboardShell
+      navItems={navItems}
+      displayName={displayName}
+      avatarInitials={avatarInitials}
+      isAdmin={profile?.role === "admin"}
+      notificationCount={pendingAccountAlerts}
+    >
         <div className="account-dashboard" id="inicio">
           {params?.message ? <p className="notice success">{params.message}</p> : null}
           {params?.error ? <p className="notice error">{params.error}</p> : null}

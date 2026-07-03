@@ -3939,6 +3939,7 @@ body:has(.account-app-shell) .site-footer {
 }
 
 .account-user-menu summary {
+  position: relative;
   display: inline-flex;
   align-items: center;
   gap: 10px;
@@ -3948,6 +3949,23 @@ body:has(.account-app-shell) .site-footer {
 
 .account-user-menu summary::-webkit-details-marker {
   display: none;
+}
+
+.account-user-badge {
+  position: absolute;
+  top: -9px;
+  left: 34px;
+  min-width: 22px;
+  height: 22px;
+  display: inline-grid;
+  place-items: center;
+  border: 2px solid white;
+  border-radius: 999px;
+  background: #2563eb;
+  color: white;
+  font-size: 0.72rem;
+  font-weight: 900;
+  line-height: 1;
 }
 
 .account-user-menu > div {

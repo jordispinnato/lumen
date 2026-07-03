@@ -2,7 +2,14 @@
 
 import { useState } from "react";
 
-export default function AccountDashboardShell({ navItems, displayName, avatarInitials, isAdmin = false, children }) {
+export default function AccountDashboardShell({
+  navItems,
+  displayName,
+  avatarInitials,
+  isAdmin = false,
+  notificationCount = 0,
+  children,
+}) {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
 
   function closeMenu() {
@@ -57,16 +64,15 @@ export default function AccountDashboardShell({ navItems, displayName, avatarIni
             <span />
           </button>
           <div className="account-header-actions">
-            <a className="account-icon-button" href="#notificaciones" aria-label="Notificaciones">
-              N
-              <span>3</span>
-            </a>
-            <a className="account-icon-button" href="#mensajes" aria-label="Mensajes">M</a>
-            <a className="account-icon-button" href="#carrito" aria-label="Carrito">K</a>
             <details className="account-user-menu">
               <summary>
                 <span className="account-avatar">{avatarInitials}</span>
                 <strong>{displayName}</strong>
+                {notificationCount > 0 ? (
+                  <span className="account-user-badge" aria-label={`${notificationCount} pendientes`}>
+                    {notificationCount > 9 ? "9+" : notificationCount}
+                  </span>
+                ) : null}
               </summary>
               <div>
                 <a href="#cursos">Mi aprendizaje</a>
