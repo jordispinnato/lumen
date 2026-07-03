@@ -25,7 +25,7 @@ export default async function RootLayout({ children }) {
       .eq("id", userData.user.id)
       .maybeSingle();
 
-    displayName = profile?.full_name || userData.user.email || "Usuario LUMEN";
+    displayName = profile?.full_name || userData.user.user_metadata?.full_name || userData.user.email || "Usuario LUMEN";
     isAdmin = profile?.role === "admin";
     isSpecialist = profile?.role === "specialist";
 

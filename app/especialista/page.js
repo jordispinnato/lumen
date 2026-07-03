@@ -199,7 +199,7 @@ export default async function SpecialistPage({ searchParams }) {
   });
   const recentBookings = bookings.slice(0, 5);
   const nextBooking = upcomingBookings[0];
-  const displayName = specialist?.name || profile?.full_name || userData.user.email;
+  const displayName = specialist?.name || profile?.full_name || userData.user.user_metadata?.full_name || userData.user.email;
   const isCalendarConfigured = hasGoogleCalendarConfig();
   const notesByPatientKey = new Map();
 

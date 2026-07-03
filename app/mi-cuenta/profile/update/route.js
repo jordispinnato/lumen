@@ -19,7 +19,18 @@ export async function POST(request) {
     return NextResponse.redirect(`${origin}/login?next=/mi-cuenta`, { status: 303 });
   }
 
-  const { error } = await supabase
+  const { error: authError } = await supabase.auth.updateUser({
+    data: {
+      full_name: fullName || null,
+      phone: phone || null,
+    },
+  });
+
+  if (authError) {
+    return redirectWith(origin, { error: authError.message });
+  }
+
+  const profileUpdate = await supabase
     .from("profiles")
     .update({
       full_name: fullName || null,
@@ -28,16 +39,18 @@ export async function POST(request) {
     })
     .eq("id", userData.user.id);
 
-  if (error) {
-    return redirectWith(origin, { error: error.message });
-  }
+  if (profileUpdate.error) {
+    const fallbackUpdate = await supabase
+      .from("profiles")
+      .update({
+        full_name: fullName || null,
+      })
+      .eq("id", userData.user.id);
 
-  await supabase.auth.updateUser({
-    data: {
-      full_name: fullName || null,
-      phone: phone || null,
-    },
-  });
+    if (fallbackUpdate.error) {
+      return redirectWith(origin, { error: fallbackUpdate.error.message });
+    }
+  }
 
   return redirectWith(origin, { message: "Tus datos se actualizaron correctamente." });
 }

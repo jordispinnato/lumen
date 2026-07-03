@@ -255,8 +255,10 @@ export default async function MiCuentaPage({ searchParams }) {
     notificationList.filter((item) => !item.read_at).length + messageList.filter((item) => !item.read_at).length;
   const digitalOrders = catalogOrderList.filter((order) => order.product_type === "digital");
   const approvedDigitalOrders = digitalOrders.filter((order) => order.status === "paid" || order.status === "delivered");
-  const displayName = profile?.full_name || userData.user.email;
-  const firstName = profile?.full_name?.split(" ")?.[0] || userData.user.email?.split("@")?.[0] || "LUMEN";
+  const profileName = profile?.full_name || userData.user.user_metadata?.full_name || "";
+  const profilePhone = profile?.phone || userData.user.user_metadata?.phone || "";
+  const displayName = profileName || userData.user.email;
+  const firstName = profileName?.split(" ")?.[0] || userData.user.email?.split("@")?.[0] || "LUMEN";
   const avatarInitials = initialsFromName(displayName);
   const courseIds = (enrollments || []).map((enrollment) => enrollment.courses?.id).filter(Boolean);
   const [{ data: enrolledLessons }, { data: lessonProgress }] = courseIds.length
@@ -720,11 +722,11 @@ export default async function MiCuentaPage({ searchParams }) {
               </div>
               <div>
                 <span>Nombre</span>
-                <strong>{profile?.full_name || "Sin nombre cargado"}</strong>
+                <strong>{profileName || "Sin nombre cargado"}</strong>
               </div>
               <div>
                 <span>Telefono</span>
-                <strong>{profile?.phone || "Sin telefono cargado"}</strong>
+                <strong>{profilePhone || "Sin telefono cargado"}</strong>
               </div>
               <div>
                 <span>Rol</span>
@@ -740,11 +742,11 @@ export default async function MiCuentaPage({ searchParams }) {
                 <h3>Datos personales</h3>
                 <label>
                   Nombre y apellido
-                  <input name="fullName" defaultValue={profile?.full_name || ""} placeholder="Tu nombre" />
+                  <input name="fullName" defaultValue={profileName} placeholder="Tu nombre" />
                 </label>
                 <label>
                   Telefono
-                  <input name="phone" defaultValue={profile?.phone || ""} placeholder="Ej: 11 1234 5678" />
+                  <input name="phone" defaultValue={profilePhone} placeholder="Ej: 11 1234 5678" />
                 </label>
                 <button className="account-primary-action" type="submit">Guardar cambios</button>
               </form>
