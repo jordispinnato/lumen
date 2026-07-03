@@ -993,7 +993,9 @@ export default async function AdminPage({ searchParams }) {
                     ) : null}
                     <form action="/admin/catalog-products/action" method="post">
                       <input name="productId" type="hidden" value={product.id} />
-                      <button name="action" value="delete" type="submit">Eliminar</button>
+                      <AdminConfirmButton name="action" value="delete" type="submit" message="Vas a eliminar este producto del catalogo.">
+                        Eliminar
+                      </AdminConfirmButton>
                     </form>
                   </div>
                   <details className="admin-inline-editor">
@@ -1095,6 +1097,21 @@ export default async function AdminPage({ searchParams }) {
           <div className="admin-section-head">
             <p className="eyebrow">Cursos</p>
             <h2>Constructor academico</h2>
+          </div>
+
+          <div className="admin-workflow-guide" data-admin-view="cursos modulos lecciones materiales">
+            {[
+              ["1", "Curso", "Crea la ficha principal, precio, portada y estado."],
+              ["2", "Modulos", "Ordena el programa por bloques o etapas."],
+              ["3", "Lecciones", "Agrega videos, duración, objetivos y vista previa."],
+              ["4", "Materiales", "Sube PDFs, archivos o links asociados a curso/lección."],
+            ].map(([step, title, text]) => (
+              <article key={step}>
+                <span>{step}</span>
+                <strong>{title}</strong>
+                <small>{text}</small>
+              </article>
+            ))}
           </div>
 
         <div className="admin-layout spaced-panel">

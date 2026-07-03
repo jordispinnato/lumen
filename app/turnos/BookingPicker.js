@@ -84,15 +84,28 @@ function isSunday(dateValue) {
   return new Date(`${dateValue}T00:00:00`).getDay() === 0;
 }
 
-function getInitialSpecialistId(specialists, initialSpecialistSlug) {
+function getInitialSpecialistId(specialists, initialSpecialistSlug, initialSpecialistId) {
+  if (initialSpecialistId && specialists.some((specialist) => specialist.id === initialSpecialistId)) {
+    return initialSpecialistId;
+  }
+
   const matchedSpecialist = specialists.find((specialist) => specialist.slug === initialSpecialistSlug);
   return matchedSpecialist?.id || specialists[0]?.id;
 }
 
-export default function BookingPicker({ specialists, slots, userEmail, initialSpecialistSlug }) {
+export default function BookingPicker({
+  specialists,
+  slots,
+  userEmail,
+  initialSpecialistSlug,
+  initialSpecialistId = "",
+  mode = "book",
+  rescheduleBookingId = "",
+}) {
   const currentDate = new Date();
+  const isRescheduling = mode === "reschedule" && rescheduleBookingId;
   const [selectedSpecialistId, setSelectedSpecialistId] = useState(
-    getInitialSpecialistId(specialists, initialSpecialistSlug)
+    getInitialSpecialistId(specialists, initialSpecialistSlug, initialSpecialistId)
   );
   const [selectedMonthIndex, setSelectedMonthIndex] = useState(currentDate.getMonth());
   const [selectedYear, setSelectedYear] = useState(currentDate.getFullYear());
@@ -329,7 +342,7 @@ export default function BookingPicker({ specialists, slots, userEmail, initialSp
 
       <aside className="panel booking-summary">
         <p className="eyebrow">Resumen</p>
-        <h2>Reserva de atención psicológica</h2>
+        <h2>{isRescheduling ? "Reprogramación de turno" : "Reserva de atención psicológica"}</h2>
         <div className="selected-professional">
           {selectedSpecialist.photo_url ? (
             <img alt="" src={selectedSpecialist.photo_url} />
@@ -367,8 +380,14 @@ export default function BookingPicker({ specialists, slots, userEmail, initialSp
         <p className="price">{formatPrice(selectedSpecialist.price)}</p>
         {userEmail ? (
           isReviewing ? (
-            <form className="booking-confirm-form" action="/turnos/reservar" method="post" onSubmit={() => setIsSubmitting(true)}>
+            <form
+              className="booking-confirm-form"
+              action={isRescheduling ? "/turnos/reprogramar" : "/turnos/reservar"}
+              method="post"
+              onSubmit={() => setIsSubmitting(true)}
+            >
               <input name="slotId" type="hidden" value={selectedSlot?.id || ""} />
+              {isRescheduling ? <input name="bookingId" type="hidden" value={rescheduleBookingId} /> : null}
               <label>
                 Nombre del paciente
                 <input name="patientName" placeholder="Nombre y apellido" />
@@ -378,20 +397,24 @@ export default function BookingPicker({ specialists, slots, userEmail, initialSp
                 <input readOnly value={userEmail} />
               </label>
               <div className="booking-review-box">
-                <strong>Confirmación previa</strong>
-                <p>La reserva quedará registrada en tu cuenta.</p>
+                <strong>{isRescheduling ? "Confirmación de reprogramación" : "Confirmación previa"}</strong>
+                <p>{isRescheduling ? "El turno anterior se libera y este nuevo horario queda confirmado." : "La reserva quedará registrada en tu cuenta."}</p>
                 <p>El pago todavía no está integrado en esta versión.</p>
               </div>
-              <label className="booking-consent">
-                <input name="privacyConsent" type="checkbox" value="accepted" required />
-                <span>
-                  Acepto la <a href="/politica-privacidad" target="_blank">Politica de privacidad</a> y los{" "}
-                  <a href="/terminos-condiciones" target="_blank">Terminos y condiciones</a> de LUMEN.
-                </span>
-              </label>
+              {!isRescheduling ? (
+                <label className="booking-consent">
+                  <input name="privacyConsent" type="checkbox" value="accepted" required />
+                  <span>
+                    Acepto la <a href="/politica-privacidad" target="_blank">Politica de privacidad</a> y los{" "}
+                    <a href="/terminos-condiciones" target="_blank">Terminos y condiciones</a> de LUMEN.
+                  </span>
+                </label>
+              ) : null}
               <div className="booking-form-actions">
                 <button className="button" disabled={!selectedSlot || isSubmitting} type="submit">
-                  {isSubmitting ? "Reservando..." : "Confirmar reserva"}
+                  {isSubmitting
+                    ? isRescheduling ? "Reprogramando..." : "Reservando..."
+                    : isRescheduling ? "Confirmar reprogramación" : "Confirmar reserva"}
                 </button>
                 <button className="button secondary" type="button" onClick={() => setIsReviewing(false)}>Volver</button>
               </div>
@@ -399,7 +422,7 @@ export default function BookingPicker({ specialists, slots, userEmail, initialSp
           ) : (
             <div className="booking-confirm-form">
               <button className="button" disabled={!selectedSlot} type="button" onClick={() => setIsReviewing(true)}>
-                Revisar reserva
+                {isRescheduling ? "Revisar reprogramación" : "Revisar reserva"}
               </button>
               <p className="muted">
                 {selectedSlot ? "Revisá los datos antes de confirmar." : "Elegí un día y horario para continuar."}

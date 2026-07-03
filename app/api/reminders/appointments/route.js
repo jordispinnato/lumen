@@ -46,6 +46,7 @@ export async function GET(request) {
       )
     `)
     .eq("status", "confirmed")
+    .is("reminder_sent_at", null)
     .eq("appointment_slots.slot_date", tomorrow);
 
   if (error) {

@@ -449,7 +449,7 @@ export default async function MiCuentaPage({ searchParams }) {
                         <strong>{formatDate(booking.appointment_slots?.slot_date)}</strong>
                         <span>{formatTime(booking.appointment_slots?.slot_time)} hs</span>
                         <div className="account-appointment-actions">
-                          <a href="/turnos">Reprogramar</a>
+                          <a href={`/turnos?reprogramar=${booking.id}`}>Reprogramar</a>
                           <form action="/turnos/cancelar" method="post">
                             <input name="bookingId" type="hidden" value={booking.id} />
                             <input name="reason" type="hidden" value="Cancelado por el paciente desde Mi Espacio" />

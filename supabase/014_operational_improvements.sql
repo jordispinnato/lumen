@@ -3,6 +3,9 @@ alter table public.appointment_bookings
   add column if not exists cancelled_by uuid references auth.users(id) on delete set null,
   add column if not exists cancellation_reason text,
   add column if not exists completed_at timestamptz,
+  add column if not exists rescheduled_from_slot_id uuid references public.appointment_slots(id) on delete set null,
+  add column if not exists rescheduled_at timestamptz,
+  add column if not exists rescheduled_by uuid references auth.users(id) on delete set null,
   add column if not exists status_updated_at timestamptz,
   add column if not exists status_updated_by uuid references auth.users(id) on delete set null,
   add column if not exists reminder_sent_at timestamptz;

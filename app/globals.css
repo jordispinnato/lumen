@@ -3409,6 +3409,42 @@ body:has(.admin-cms-shell) {
   box-shadow: var(--ds-shadow-md);
 }
 
+.admin-workflow-guide {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 12px;
+  margin: 0 0 18px;
+}
+
+.admin-workflow-guide article {
+  display: grid;
+  gap: 7px;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  padding: 14px;
+  background: rgba(255, 255, 255, 0.68);
+}
+
+.admin-workflow-guide span {
+  width: 30px;
+  height: 30px;
+  display: inline-grid;
+  place-items: center;
+  border-radius: 50%;
+  background: rgba(11, 74, 83, 0.12);
+  color: var(--petrol);
+  font-weight: 900;
+}
+
+.admin-workflow-guide strong {
+  color: var(--deep);
+}
+
+.admin-workflow-guide small {
+  color: var(--muted);
+  line-height: 1.45;
+}
+
 .account-tabs {
   position: sticky;
   top: 74px;
@@ -4848,6 +4884,7 @@ body:has(.account-app-shell) .site-footer {
   .grid,
   .admin-layout,
   .admin-catalog-summary,
+  .admin-workflow-guide,
   .admin-metrics-grid,
   .admin-dashboard-grid,
   .booking-layout,

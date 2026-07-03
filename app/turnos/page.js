@@ -10,6 +10,7 @@ export default async function TurnosPage({ searchParams }) {
   const params = await searchParams;
   const supabase = await createSupabaseServerClient();
   const { data: userData } = await supabase.auth.getUser();
+  const today = new Date().toISOString().slice(0, 10);
   const [{ data: specialists }, { data: slots }] = await Promise.all([
     supabase
       .from("appointment_specialists")
@@ -24,6 +25,31 @@ export default async function TurnosPage({ searchParams }) {
       .order("slot_date", { ascending: true })
       .order("slot_time", { ascending: true }),
   ]);
+  const rescheduleId = typeof params?.reprogramar === "string" ? params.reprogramar : "";
+  const { data: rescheduleBooking } = userData.user && rescheduleId
+    ? await supabase
+        .from("appointment_bookings")
+        .select(`
+          id,
+          status,
+          specialist_id,
+          appointment_specialists:specialist_id (
+            name
+          ),
+          appointment_slots:slot_id (
+            slot_date,
+            slot_time
+          )
+        `)
+        .eq("id", rescheduleId)
+        .eq("user_id", userData.user.id)
+        .maybeSingle()
+    : { data: null };
+  const canReschedule = Boolean(
+    rescheduleBooking &&
+    rescheduleBooking.status !== "cancelled" &&
+    rescheduleBooking.appointment_slots?.slot_date >= today
+  );
 
   return (
     <main className="section">
@@ -35,7 +61,29 @@ export default async function TurnosPage({ searchParams }) {
             Elegí una especialista, revisá los días y horarios disponibles y dejá preparada la reserva de tu consulta.
           </p>
           {params?.error ? <p className="notice error">{params.error}</p> : null}
+          {params?.message ? <p className="notice success">{params.message}</p> : null}
         </div>
+
+        {rescheduleId && !canReschedule ? (
+          <section className="panel booking-success">
+            <p className="eyebrow">Reprogramar turno</p>
+            <h2>No se puede reprogramar este turno</h2>
+            <p className="muted">El turno no existe, no pertenece a tu cuenta, ya fue cancelado o corresponde a una fecha pasada.</p>
+            <a className="button secondary" href="/mi-cuenta#turnos">Volver a Mi Espacio</a>
+          </section>
+        ) : null}
+
+        {canReschedule ? (
+          <section className="panel booking-reschedule-banner">
+            <p className="eyebrow">Reprogramar turno</p>
+            <h2>Elegí el nuevo día y horario</h2>
+            <p className="muted">
+              Vas a cambiar tu turno con {rescheduleBooking.appointment_specialists?.name || "la especialista"} del{" "}
+              {new Date(`${rescheduleBooking.appointment_slots?.slot_date}T00:00:00`).toLocaleDateString("es-AR")} a las{" "}
+              {String(rescheduleBooking.appointment_slots?.slot_time || "").slice(0, 5)} hs.
+            </p>
+          </section>
+        ) : null}
 
         {params?.success ? (
           <section className="panel booking-success">
@@ -79,6 +127,9 @@ export default async function TurnosPage({ searchParams }) {
 
         <BookingPicker
           initialSpecialistSlug={params?.especialista || ""}
+          initialSpecialistId={canReschedule ? rescheduleBooking.specialist_id : ""}
+          mode={canReschedule ? "reschedule" : "book"}
+          rescheduleBookingId={canReschedule ? rescheduleBooking.id : ""}
           specialists={specialists || []}
           slots={slots || []}
           userEmail={userData.user?.email || ""}
