@@ -55,7 +55,8 @@ a {
 :where(.site-header, .site-nav, .landing-page, .admin-cms-shell, .account-app-shell) :where(h1, h2, h3, p, a, span, strong, small, em, button, input, textarea, select, label) {
   min-width: 0;
   max-width: 100%;
-  overflow-wrap: anywhere;
+  overflow-wrap: break-word;
+  word-break: normal;
 }
 
 :where(.admin-cms-shell, .account-app-shell) :where(section, article, div, form, fieldset, label) {
@@ -4374,7 +4375,7 @@ body:has(.account-app-shell) .site-footer {
 
 .account-stats-grid {
   display: grid;
-  grid-template-columns: repeat(4, minmax(0, 1fr));
+  grid-template-columns: repeat(auto-fit, minmax(min(230px, 100%), 1fr));
   gap: 18px;
 }
 
@@ -4416,6 +4417,11 @@ body:has(.account-app-shell) .site-footer {
   gap: 16px;
   align-content: center;
   padding: 22px;
+}
+
+.account-stat-card :where(span, strong, small, em, a) {
+  overflow-wrap: break-word;
+  word-break: normal;
 }
 
 .account-stat-card div {
@@ -5777,13 +5783,16 @@ body:has(.account-app-shell) .site-footer {
     gap: 12px;
   }
 
-  .account-stats-grid,
   .account-course-grid,
   .account-lower-grid,
   .account-resource-grid,
   .account-profile-grid,
   .account-settings-grid {
     grid-template-columns: 1fr;
+  }
+
+  .account-stats-grid {
+    grid-template-columns: repeat(auto-fit, minmax(min(220px, 100%), 1fr));
   }
 
   .account-stat-card {
