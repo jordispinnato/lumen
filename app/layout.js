@@ -16,6 +16,8 @@ export default async function RootLayout({ children }) {
   let displayName = "";
   let unreadNotifications = 0;
   let unreadMessages = 0;
+  let notificationPreview = [];
+  let messagePreview = [];
   let cartItems = 0;
 
   if (userData.user) {
@@ -39,7 +41,13 @@ export default async function RootLayout({ children }) {
       isSpecialist = Boolean(linkedSpecialist);
     }
 
-    const [{ count: notificationCount }, { count: messageCount }, { count: cartCount }] = await Promise.all([
+    const [
+      { count: notificationCount },
+      { count: messageCount },
+      { count: cartCount },
+      { data: notificationRows },
+      { data: messageRows },
+    ] = await Promise.all([
       supabase
         .from("user_notifications")
         .select("id", { count: "exact", head: true })
@@ -54,10 +62,24 @@ export default async function RootLayout({ children }) {
         .from("catalog_cart_items")
         .select("id", { count: "exact", head: true })
         .eq("user_id", userData.user.id),
+      supabase
+        .from("user_notifications")
+        .select("id,title,body,href,notification_type,read_at,created_at")
+        .or(`user_id.eq.${userData.user.id},user_id.is.null`)
+        .order("created_at", { ascending: false })
+        .limit(4),
+      supabase
+        .from("user_messages")
+        .select("id,subject,body,message_type,read_at,created_at")
+        .or(`user_id.eq.${userData.user.id},user_id.is.null`)
+        .order("created_at", { ascending: false })
+        .limit(4),
     ]);
 
     unreadNotifications = notificationCount || 0;
     unreadMessages = messageCount || 0;
+    notificationPreview = notificationRows || [];
+    messagePreview = messageRows || [];
     cartItems = cartCount || 0;
   }
 
@@ -88,6 +110,8 @@ export default async function RootLayout({ children }) {
             isLoggedIn={Boolean(userData.user)}
             unreadMessages={unreadMessages}
             unreadNotifications={unreadNotifications}
+            notificationPreview={notificationPreview}
+            messagePreview={messagePreview}
           />
         </header>
         {children}

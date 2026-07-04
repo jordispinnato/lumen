@@ -32,9 +32,47 @@ function NavCounter({ value }) {
   return value > 0 ? <span className="nav-counter">{value > 9 ? "9+" : value}</span> : null;
 }
 
-function SiteNotificationMenu({ unreadMessages = 0, unreadNotifications = 0, isOpen, onToggle, onClose }) {
+function formatShortDate(value) {
+  if (!value) {
+    return "";
+  }
+
+  return new Date(value).toLocaleDateString("es-AR");
+}
+
+function SiteNotificationMenu({
+  unreadMessages = 0,
+  unreadNotifications = 0,
+  notificationPreview = [],
+  messagePreview = [],
+  isOpen,
+  onToggle,
+  onClose,
+}) {
   const pendingAlerts = unreadNotifications + unreadMessages;
   const menuRef = useRef(null);
+  const items = [
+    ...notificationPreview.map((item) => ({
+      id: `notification-${item.id}`,
+      label: item.notification_type || "Notificacion",
+      title: item.title,
+      body: item.body,
+      href: item.href || "/mi-cuenta#notificaciones",
+      date: item.created_at,
+      unread: !item.read_at,
+    })),
+    ...messagePreview.map((item) => ({
+      id: `message-${item.id}`,
+      label: item.message_type || "Mensaje",
+      title: item.subject,
+      body: item.body,
+      href: "/mi-cuenta#mensajes",
+      date: item.created_at,
+      unread: !item.read_at,
+    })),
+  ]
+    .sort((a, b) => String(b.date || "").localeCompare(String(a.date || "")))
+    .slice(0, 5);
 
   useCloseOnOutsideClick(menuRef, isOpen, onClose);
 
@@ -52,14 +90,21 @@ function SiteNotificationMenu({ unreadMessages = 0, unreadNotifications = 0, isO
       </summary>
       <div className="site-notification-dropdown">
         <strong>Notificaciones</strong>
-        <a href="/mi-cuenta#notificaciones" onClick={onClose}>
-          Notificaciones
-          <NavCounter value={unreadNotifications} />
-        </a>
-        <a href="/mi-cuenta#mensajes" onClick={onClose}>
-          Mensajes
-          <NavCounter value={unreadMessages} />
-        </a>
+        {items.length ? (
+          <div className="site-notification-list">
+            {items.map((item) => (
+              <a className={item.unread ? "is-unread" : ""} href={item.href} key={item.id} onClick={onClose}>
+                <span>{item.label}</span>
+                <b>{item.title}</b>
+                {item.body ? <small>{item.body}</small> : null}
+                <em>{formatShortDate(item.date)}</em>
+              </a>
+            ))}
+          </div>
+        ) : (
+          <p className="site-notification-empty">No tenes novedades por ahora.</p>
+        )}
+        <a className="site-notification-all" href="/mi-cuenta#notificaciones" onClick={onClose}>Ver todas</a>
       </div>
     </details>
   );
@@ -73,6 +118,8 @@ export default function SiteNav({
   isLoggedIn,
   unreadMessages = 0,
   unreadNotifications = 0,
+  notificationPreview = [],
+  messagePreview = [],
 }) {
   const [isOpen, setIsOpen] = useState(false);
   const [isNotificationOpen, setIsNotificationOpen] = useState(false);
@@ -112,6 +159,8 @@ export default function SiteNav({
               <SiteNotificationMenu
                 unreadMessages={unreadMessages}
                 unreadNotifications={unreadNotifications}
+                notificationPreview={notificationPreview}
+                messagePreview={messagePreview}
                 isOpen={isNotificationOpen}
                 onClose={() => setIsNotificationOpen(false)}
                 onToggle={() => {
