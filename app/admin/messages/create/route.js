@@ -53,6 +53,13 @@ export async function POST(request) {
   });
 
   if (error) {
+    if (error.code === "PGRST205" || error.message?.includes("user_messages")) {
+      return NextResponse.redirect(
+        `${origin}/admin?error=${encodeURIComponent("Falta ejecutar el SQL 015 para activar mensajes, notificaciones y carrito.")}#usuarios`,
+        { status: 303 }
+      );
+    }
+
     return NextResponse.redirect(`${origin}/admin?error=${encodeURIComponent(error.message)}#usuarios`, {
       status: 303,
     });
