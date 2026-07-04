@@ -23,6 +23,7 @@ const menuGroups = [
     { label: "Productos", href: "#productos", icon: "R" },
     { label: "Categorias", href: "#categorias", icon: "K" },
     { label: "Solicitudes", href: "#solicitudes", icon: "S" },
+    { label: "Facturas", href: "#facturas", icon: "F" },
   ],
   [
     { label: "Usuarios", href: "#usuarios", icon: "U" },
@@ -72,6 +73,7 @@ const viewActions = {
   catalogo: [
     { label: "Productos", href: "#productos" },
     { label: "Solicitudes", href: "#solicitudes" },
+    { label: "Facturas", href: "#facturas" },
   ],
   usuarios: [
     { label: "Usuarios", href: "#usuarios" },
@@ -112,6 +114,7 @@ function getViewFromHash(hash) {
     productos: "catalogo",
     categorias: "catalogo",
     solicitudes: "catalogo",
+    facturas: "catalogo",
     usuarios: "usuarios",
     inscripciones: "inscripciones",
     contenido: "contenido",

@@ -186,6 +186,8 @@ export default function AccountDashboardShell({
               <div>
                 <a href="#cursos" onClick={closeMenu}>Mi aprendizaje</a>
                 <a href="#carrito" onClick={closeMenu}>Mi carrito</a>
+                <a href="#compras" onClick={closeMenu}>Mis compras</a>
+                <a href="#facturacion" onClick={closeMenu}>Facturacion</a>
                 <a href="#configuracion" onClick={closeMenu}>Configuracion de la cuenta</a>
                 <a href="#pedidos" onClick={closeMenu}>Historial de compra</a>
                 <a href="/" onClick={closeMenu}>Ir al sitio principal</a>

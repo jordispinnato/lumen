@@ -1,5 +1,6 @@
 import { redirect } from "next/navigation";
 import ConfirmSubmitButton from "../components/ConfirmSubmitButton";
+import BillingDetailsForm from "../components/BillingDetailsForm";
 import { createSupabaseServerClient } from "../../lib/supabase/server";
 import { formatPrice } from "../../lib/courses";
 import AccountDashboardShell from "./AccountDashboardShell";
@@ -112,6 +113,39 @@ function getOrderTypeLabel(type) {
   return type === "digital" ? "Digital" : "Físico";
 }
 
+function getCoursePaymentStatusLabel(status) {
+  const labels = {
+    pending: "Pendiente",
+    approved: "Pagado",
+    rejected: "Rechazado",
+    cancelled: "Cancelado",
+  };
+
+  return labels[status] || status || "Sin estado";
+}
+
+function getInvoiceStatusLabel(status) {
+  const labels = {
+    requested: "Solicitada",
+    issued: "Emitida",
+    cancelled: "Cancelada",
+    not_requested: "No solicitada",
+  };
+
+  return labels[status] || "No solicitada";
+}
+
+function getTaxConditionLabel(value) {
+  const labels = {
+    consumidor_final: "Consumidor final",
+    monotributo: "Monotributo",
+    responsable_inscripto: "Responsable inscripto",
+    exento: "Exento",
+  };
+
+  return labels[value] || "Sin datos";
+}
+
 function getShippingSummary(order) {
   if (order.product_type !== "physical") {
     return "Entrega digital";
@@ -147,6 +181,9 @@ export default async function MiCuentaPage({ searchParams }) {
     { data: notifications },
     { data: messages },
     { data: cartItems },
+    { data: courseOrders },
+    { data: billingProfile },
+    { data: invoiceRequests },
   ] = await Promise.all([
     supabase
       .from("profiles")
@@ -230,6 +267,22 @@ export default async function MiCuentaPage({ searchParams }) {
       `)
       .eq("user_id", userData.user.id)
       .order("created_at", { ascending: false }),
+    supabase
+      .from("orders")
+      .select("id,status,amount,created_at,courses:course_id (id,slug,title)")
+      .eq("user_id", userData.user.id)
+      .order("created_at", { ascending: false }),
+    supabase
+      .from("billing_profiles")
+      .select("buyer_type,legal_name,tax_id,tax_condition,billing_email,fiscal_address,province,city,postal_code")
+      .eq("user_id", userData.user.id)
+      .eq("is_default", true)
+      .maybeSingle(),
+    supabase
+      .from("invoice_requests")
+      .select("id,order_id,catalog_order_id,purchase_type,status,invoice_number,invoice_file_url,requested_at,issued_at")
+      .eq("user_id", userData.user.id)
+      .order("requested_at", { ascending: false }),
   ]);
 
   const upcomingBookings = (bookings || [])
@@ -248,6 +301,47 @@ export default async function MiCuentaPage({ searchParams }) {
     });
   const nextBooking = upcomingBookings[0];
   const catalogOrderList = catalogOrders || [];
+  const courseOrderList = courseOrders || [];
+  const invoiceRequestList = invoiceRequests || [];
+  const invoiceByCourseOrderId = new Map(invoiceRequestList.filter((item) => item.order_id).map((item) => [item.order_id, item]));
+  const invoiceByCatalogOrderId = new Map(invoiceRequestList.filter((item) => item.catalog_order_id).map((item) => [item.catalog_order_id, item]));
+  const purchaseRows = [
+    ...courseOrderList.map((order) => {
+      const invoice = invoiceByCourseOrderId.get(order.id);
+
+      return {
+        id: `course-${order.id}`,
+        purchaseKey: `course:${order.id}`,
+        type: "Curso",
+        title: order.courses?.title || "Curso LUMEN",
+        date: order.created_at,
+        amount: order.amount || 0,
+        paymentStatus: getCoursePaymentStatusLabel(order.status),
+        invoiceStatus: getInvoiceStatusLabel(invoice?.status),
+        invoiceNumber: invoice?.invoice_number,
+        canRequestInvoice: order.status === "approved" && !invoice,
+        href: order.courses?.slug ? `/aula?curso=${order.courses.slug}` : "/aula",
+      };
+    }),
+    ...catalogOrderList.map((order) => {
+      const invoice = invoiceByCatalogOrderId.get(order.id);
+
+      return {
+        id: `catalog-${order.id}`,
+        purchaseKey: `catalog:${order.id}`,
+        type: getOrderTypeLabel(order.product_type),
+        title: order.catalog_products?.title || "Producto LUMEN",
+        date: order.created_at,
+        amount: order.amount || 0,
+        paymentStatus: getOrderStatusLabel(order.status),
+        invoiceStatus: getInvoiceStatusLabel(invoice?.status),
+        invoiceNumber: invoice?.invoice_number,
+        canRequestInvoice: ["paid", "delivered"].includes(order.status) && !invoice,
+        href: order.catalog_products?.id ? `/catalogo/${order.catalog_products.id}` : "/catalogo",
+      };
+    }),
+  ].sort((a, b) => String(b.date || "").localeCompare(String(a.date || "")));
+  const invoiceEligiblePurchases = purchaseRows.filter((purchase) => purchase.canRequestInvoice);
   const notificationList = notifications || [];
   const messageList = messages || [];
   const cartItemList = cartItems || [];
@@ -380,6 +474,8 @@ export default async function MiCuentaPage({ searchParams }) {
     { href: "#cursos", icon: "C", label: "Mis cursos" },
     { href: "#recursos", icon: "R", label: "Mis recursos" },
     { href: "#pedidos", icon: "P", label: "Mis pedidos" },
+    { href: "#compras", icon: "$", label: "Mis compras" },
+    { href: "#facturacion", icon: "F", label: "Facturacion" },
     { href: "#carrito", icon: "K", label: "Carrito" },
     { href: "#notificaciones", icon: "N", label: "Notificaciones" },
     { href: "#mensajes", icon: "M", label: "Mensajes" },
@@ -636,6 +732,36 @@ export default async function MiCuentaPage({ searchParams }) {
           </section>
 
           <div className="account-lower-grid">
+            <section className="account-panel" id="compras">
+              <div className="account-panel-head">
+                <div>
+                  <AccountIcon tone="green">$</AccountIcon>
+                  <h2>Mis compras</h2>
+                </div>
+              </div>
+              {purchaseRows.length ? (
+                <div className="account-history-list">
+                  {purchaseRows.map((purchase) => (
+                    <article key={purchase.id}>
+                      <span>{purchase.type}</span>
+                      <strong>{purchase.title}</strong>
+                      <small>
+                        {formatPrice(purchase.amount)} - {formatDateTime(purchase.date)}
+                      </small>
+                      <small>Pago: {purchase.paymentStatus}</small>
+                      <small>
+                        Factura: {purchase.invoiceStatus}
+                        {purchase.invoiceNumber ? ` - ${purchase.invoiceNumber}` : ""}
+                      </small>
+                      <a className="account-secondary-action" href={purchase.href}>Ver compra</a>
+                    </article>
+                  ))}
+                </div>
+              ) : (
+                <EmptyState title="Todavia no tenes compras" text="Cuando compres cursos, servicios o recursos, el historial va a aparecer aca." href="/cursos" action="Explorar cursos" />
+              )}
+            </section>
+
             <section className="account-panel" id="pedidos">
               <div className="account-panel-head">
                 <div>
@@ -747,6 +873,95 @@ export default async function MiCuentaPage({ searchParams }) {
               )}
             </section>
           </div>
+
+          <section className="account-panel" id="facturacion">
+            <div className="account-panel-head">
+              <div>
+                <AccountIcon tone="orange">F</AccountIcon>
+                <h2>Facturacion</h2>
+              </div>
+            </div>
+            <div className="account-profile-grid">
+              <div>
+                <span>Nombre / razon social</span>
+                <strong>{billingProfile?.legal_name || "Sin datos cargados"}</strong>
+              </div>
+              <div>
+                <span>DNI / CUIL / CUIT</span>
+                <strong>{billingProfile?.tax_id || "Sin datos cargados"}</strong>
+              </div>
+              <div>
+                <span>Condicion fiscal</span>
+                <strong>{getTaxConditionLabel(billingProfile?.tax_condition)}</strong>
+              </div>
+              <div>
+                <span>Email de facturacion</span>
+                <strong>{billingProfile?.billing_email || userData.user.email}</strong>
+              </div>
+            </div>
+            <div className="account-settings-grid is-wide">
+              <BillingDetailsForm
+                billingProfile={billingProfile}
+                userEmail={userData.user.email}
+                returnTo="/mi-cuenta#facturacion"
+                submitLabel="Guardar datos de facturacion"
+                intro="Estos datos quedan guardados para futuras compras. La factura siempre se solicita despues del pago."
+              />
+              <div className="account-settings-card">
+                <h3>Solicitar factura de una compra</h3>
+                <p>Si ya guardaste tus datos fiscales, podes pedir factura para una compra pagada.</p>
+                {billingProfile && invoiceEligiblePurchases.length ? (
+                  <form className="billing-quick-request" action="/mi-cuenta/billing/request" method="post">
+                    <input name="buyerType" type="hidden" value={billingProfile.buyer_type || "person"} />
+                    <input name="legalName" type="hidden" value={billingProfile.legal_name || ""} />
+                    <input name="taxId" type="hidden" value={billingProfile.tax_id || ""} />
+                    <input name="taxCondition" type="hidden" value={billingProfile.tax_condition || "consumidor_final"} />
+                    <input name="billingEmail" type="hidden" value={billingProfile.billing_email || userData.user.email || ""} />
+                    <input name="fiscalAddress" type="hidden" value={billingProfile.fiscal_address || ""} />
+                    <input name="province" type="hidden" value={billingProfile.province || ""} />
+                    <input name="city" type="hidden" value={billingProfile.city || ""} />
+                    <input name="postalCode" type="hidden" value={billingProfile.postal_code || ""} />
+                    <input name="returnTo" type="hidden" value="/mi-cuenta#facturacion" />
+                    <label>
+                      Compra
+                      <select name="purchaseKey" required>
+                        <option value="">Seleccionar compra</option>
+                        {invoiceEligiblePurchases.map((purchase) => (
+                          <option value={purchase.purchaseKey} key={purchase.id}>
+                            {purchase.title} - {formatPrice(purchase.amount)}
+                          </option>
+                        ))}
+                      </select>
+                    </label>
+                    <button className="account-secondary-action" type="submit">Solicitar factura</button>
+                  </form>
+                ) : (
+                  <p className="muted">
+                    {billingProfile ? "No hay compras pagadas pendientes de factura." : "Primero guarda tus datos fiscales."}
+                  </p>
+                )}
+              </div>
+              <div className="account-settings-card">
+                <h3>Estado de facturas</h3>
+                <p>Por ahora LUMEN registra la solicitud y permite al admin marcarla como emitida. Mas adelante aca se puede integrar AFIP/ARCA o un generador automatico de comprobantes.</p>
+                {invoiceRequestList.length ? (
+                  <div className="account-message-list">
+                    {invoiceRequestList.slice(0, 4).map((invoice) => (
+                      <article key={invoice.id}>
+                        <span>{getInvoiceStatusLabel(invoice.status)}</span>
+                        <strong>{invoice.purchase_type === "course" ? "Curso" : "Catalogo"}</strong>
+                        <small>{formatDateTime(invoice.requested_at)}</small>
+                        {invoice.invoice_number ? <small>Numero: {invoice.invoice_number}</small> : null}
+                        {invoice.invoice_file_url ? <a href={invoice.invoice_file_url}>Ver comprobante</a> : null}
+                      </article>
+                    ))}
+                  </div>
+                ) : (
+                  <p className="muted">Todavia no solicitaste facturas.</p>
+                )}
+              </div>
+            </div>
+          </section>
 
           <section className="account-panel" id="configuracion">
             <div className="account-panel-head">

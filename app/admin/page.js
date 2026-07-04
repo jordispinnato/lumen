@@ -52,6 +52,27 @@ function getOrderTypeLabel(type) {
   return type === "digital" ? "Digital" : "Físico";
 }
 
+function getInvoiceStatusLabel(status) {
+  const labels = {
+    requested: "Pendiente",
+    issued: "Emitida",
+    cancelled: "Cancelada",
+  };
+
+  return labels[status] || "No solicitada";
+}
+
+function getTaxConditionLabel(value) {
+  const labels = {
+    consumidor_final: "Consumidor final",
+    monotributo: "Monotributo",
+    responsable_inscripto: "Responsable inscripto",
+    exento: "Exento",
+  };
+
+  return labels[value] || value || "Sin datos";
+}
+
 function getProductTypeLabel(type) {
   return type === "digital" ? "Digital" : "Fisico";
 }
@@ -180,6 +201,7 @@ export default async function AdminPage({ searchParams }) {
     { data: catalogProducts },
     { data: catalogOrders },
     { data: specialistCalendarConnections },
+    { data: invoiceRequests },
   ] = await Promise.all([
     dataSupabase
       .from("courses")
@@ -228,6 +250,10 @@ export default async function AdminPage({ searchParams }) {
     dataSupabase
       .from("specialist_calendar_connections")
       .select("specialist_id,google_calendar_email,google_calendar_connected_at,calendar_sync_enabled"),
+    dataSupabase
+      .from("invoice_requests")
+      .select("id,user_id,purchase_type,purchase_title,amount,status,invoice_number,invoice_file_url,billing_snapshot,requested_at,issued_at,order_id,catalog_order_id")
+      .order("requested_at", { ascending: false }),
   ]);
 
   const today = new Date().toISOString().slice(0, 10);
@@ -263,6 +289,7 @@ export default async function AdminPage({ searchParams }) {
   const digitalProducts = (catalogProducts || []).filter((product) => product.product_type === "digital");
   const downloadableDigitalProducts = digitalProducts.filter((product) => product.digital_file_name || product.digital_file_path || product.digital_url);
   const pendingCatalogOrders = (catalogOrders || []).filter((order) => order.status === "pending_payment");
+  const pendingInvoiceRequests = (invoiceRequests || []).filter((invoice) => invoice.status === "requested");
   const productsWithoutStock = (catalogProducts || []).filter((product) => {
     return product.product_type === "physical" && product.status === "published" && Number(product.stock || 0) <= 0;
   });
@@ -396,6 +423,50 @@ export default async function AdminPage({ searchParams }) {
   }));
   const profileById = new Map((profiles || []).map((item) => [item.id, item]));
   const courseById = new Map((courses || []).map((course) => [course.id, course]));
+  const invoiceRows = (invoiceRequests || []).map((invoice) => {
+    const user = profileById.get(invoice.user_id);
+    const billing = invoice.billing_snapshot || {};
+    const fiscalDetails = [
+      billing.legal_name,
+      billing.tax_id,
+      getTaxConditionLabel(billing.tax_condition),
+      billing.fiscal_address,
+      [billing.city, billing.province, billing.postal_code ? `CP ${billing.postal_code}` : ""].filter(Boolean).join(", "),
+    ].filter(Boolean).join(" - ");
+
+    return {
+      id: invoice.id,
+      user: user?.full_name || user?.email || invoice.user_id || "Usuario",
+      email: billing.billing_email || user?.email || "Sin email",
+      purchase: invoice.purchase_title || (invoice.purchase_type === "course" ? "Curso" : "Catalogo"),
+      amount: formatPrice(invoice.amount || 0),
+      date: formatDateTime(invoice.requested_at),
+      fiscal: fiscalDetails || "Sin datos fiscales",
+      status: getInvoiceStatusLabel(invoice.status),
+      number: invoice.invoice_number || "Pendiente",
+      actions: [
+        ...(invoice.status !== "issued"
+          ? [
+              {
+                label: "Marcar emitida",
+                endpoint: "/admin/invoices/action",
+                fields: { invoiceId: invoice.id, action: "issued" },
+                confirmTitle: "Marcar factura como emitida",
+                confirmText: "La solicitud quedara como emitida. Podras completar numero o link desde el formulario de esta seccion.",
+              },
+            ]
+          : [
+              {
+                label: "Marcar pendiente",
+                endpoint: "/admin/invoices/action",
+                fields: { invoiceId: invoice.id, action: "requested" },
+                confirmTitle: "Marcar factura como pendiente",
+                confirmText: "La factura volvera a estado pendiente.",
+              },
+            ]),
+      ],
+    };
+  });
   const enrollmentRows = (enrollments || []).map((enrollment) => ({
     id: enrollment.id,
     student: profileById.get(enrollment.user_id)?.email || profileById.get(enrollment.user_id)?.full_name || enrollment.user_id || "Alumno",
@@ -430,6 +501,7 @@ export default async function AdminPage({ searchParams }) {
             <MetricCard label="Inscripciones" value={enrollments?.length || 0} helper="Accesos habilitados a cursos" href="#inscripciones" />
             <MetricCard label="Productos activos" value={activeProducts.length} helper="Productos publicados del catalogo" href="#catalogo" />
             <MetricCard label="Solicitudes de compra" value={catalogOrders?.length || 0} helper="Pedidos registrados" href="#catalogo" />
+            <MetricCard label="Facturas solicitadas" value={pendingInvoiceRequests.length} helper="Pendientes de emision" href="#facturas" />
             <MetricCard label="Usuarios registrados" value={profiles?.length || 0} helper="Perfiles creados" href="#inscripciones" />
           </div>
 
@@ -439,6 +511,7 @@ export default async function AdminPage({ searchParams }) {
             <a href="#cursos">Gestionar cursos</a>
             <a href="#catalogo">Gestionar catalogo</a>
             <a href="#inscripciones">Ver inscripciones</a>
+            <a href="#facturas">Facturas solicitadas</a>
             <a href="#contenido">Ver contenido/materiales</a>
           </nav>
 
@@ -1090,6 +1163,72 @@ export default async function AdminPage({ searchParams }) {
             emptyText="Cuando una persona solicite un producto, el pedido aparecera aca."
             searchPlaceholder="Buscar por cliente, producto o estado"
           />
+        </section>
+
+        <section className="panel spaced-panel" id="facturas">
+          <EntityTable
+            title="Facturas solicitadas"
+            description="Solicitudes de factura posteriores al pago. La integracion AFIP/ARCA queda preparada para una etapa futura."
+            columns={[
+              { key: "user", header: "Usuario" },
+              { key: "email", header: "Email" },
+              { key: "purchase", header: "Compra" },
+              { key: "amount", header: "Monto" },
+              { key: "date", header: "Fecha" },
+              { key: "fiscal", header: "Datos fiscales" },
+              { key: "status", header: "Estado", type: "status" },
+              { key: "number", header: "Numero" },
+            ]}
+            rows={invoiceRows}
+            filters={[
+              {
+                key: "status",
+                label: "Estado",
+                options: [
+                  { value: "Pendiente", label: "Pendiente" },
+                  { value: "Emitida", label: "Emitida" },
+                  { value: "Cancelada", label: "Cancelada" },
+                ],
+              },
+            ]}
+            emptyTitle="Todavia no hay facturas solicitadas."
+            emptyText="Cuando un usuario pida factura despues del pago, aparecera aca."
+            searchPlaceholder="Buscar por usuario, compra, CUIT o estado"
+          />
+
+          <details className="cms-entity-details spaced-panel">
+            <summary>Actualizar numero o link de comprobante</summary>
+            <form className="admin-form" action="/admin/invoices/action" method="post">
+              <label>
+                Solicitud
+                <select name="invoiceId" required>
+                  <option value="">Seleccionar factura</option>
+                  {(invoiceRequests || []).map((invoice) => (
+                    <option value={invoice.id} key={invoice.id}>
+                      {(profileById.get(invoice.user_id)?.email || invoice.user_id)} - {invoice.purchase_title || invoice.purchase_type}
+                    </option>
+                  ))}
+                </select>
+              </label>
+              <label>
+                Estado
+                <select name="action" defaultValue="issued">
+                  <option value="issued">Emitida</option>
+                  <option value="requested">Pendiente</option>
+                </select>
+              </label>
+              <label>
+                Numero de factura
+                <input name="invoiceNumber" placeholder="Ej: B-0001-00000001" />
+              </label>
+              <label>
+                Link/PDF del comprobante
+                <input name="invoiceFileUrl" type="url" placeholder="https://..." />
+              </label>
+              <button className="button wide-field" type="submit">Guardar estado de factura</button>
+            </form>
+            <p className="muted">Comentario tecnico: aca mas adelante se puede conectar AFIP/ARCA o un generador automatico de comprobantes.</p>
+          </details>
         </section>
         </section>
 

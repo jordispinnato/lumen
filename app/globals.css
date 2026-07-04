@@ -4907,6 +4907,10 @@ body:has(.account-app-shell) .site-footer {
   margin-top: 18px;
 }
 
+.account-settings-grid.is-wide {
+  grid-template-columns: minmax(0, 1.2fr) minmax(280px, 0.8fr);
+}
+
 .account-settings-card {
   display: grid;
   align-content: start;
@@ -4934,7 +4938,9 @@ body:has(.account-app-shell) .site-footer {
   font-weight: 800;
 }
 
-.account-settings-card input {
+.account-settings-card input,
+.account-settings-card select,
+.account-settings-card textarea {
   width: 100%;
   min-height: 44px;
   border: 1px solid #d8deea;
@@ -4942,6 +4948,43 @@ body:has(.account-app-shell) .site-footer {
   padding: 0 12px;
   background: #f8fafc;
   color: #0f172a;
+}
+
+.account-settings-card textarea {
+  min-height: 96px;
+  padding-block: 10px;
+  resize: vertical;
+}
+
+.billing-form {
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+
+.billing-quick-request {
+  display: grid;
+  gap: 12px;
+}
+
+.billing-post-checkout {
+  width: min(760px, calc(100% - 32px));
+  display: grid;
+  gap: 16px;
+  margin: 22px auto 0;
+  border: 1px solid var(--ds-border);
+  border-radius: var(--ds-radius);
+  padding: 24px;
+  background: rgba(255, 255, 255, 0.94);
+  box-shadow: var(--ds-shadow-md);
+}
+
+.billing-post-checkout h2 {
+  margin: 0 0 8px;
+}
+
+.billing-choice-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
 }
 
 .specialist-dashboard .account-hero {
@@ -5853,7 +5896,9 @@ body:has(.account-app-shell) .site-footer {
   .account-lower-grid,
   .account-resource-grid,
   .account-profile-grid,
-  .account-settings-grid {
+  .account-settings-grid,
+  .account-settings-grid.is-wide,
+  .billing-form {
     grid-template-columns: 1fr;
   }
 

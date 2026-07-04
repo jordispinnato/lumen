@@ -191,6 +191,8 @@ export default function SiteNav({
                     <a href="/mi-cuenta#cursos" onClick={closeMenu}>Mi aprendizaje</a>
                     <a href="/mi-cuenta#carrito" onClick={closeMenu}>Mi carrito</a>
                     <a href="/mi-cuenta#favoritos" onClick={closeMenu}>Lista de deseos</a>
+                    <a href="/mi-cuenta#compras" onClick={closeMenu}>Mis compras</a>
+                    <a href="/mi-cuenta#facturacion" onClick={closeMenu}>Facturacion</a>
                     {isSpecialist ? <a href="/especialista" onClick={closeMenu}>Panel especialista</a> : null}
                     {isAdmin ? <a href="/admin" onClick={closeMenu}>Admin</a> : null}
                   </div>
