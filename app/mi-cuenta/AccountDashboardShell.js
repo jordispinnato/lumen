@@ -1,6 +1,23 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
+
+function useCloseOnOutsideClick(ref, isOpen, onClose) {
+  useEffect(() => {
+    if (!isOpen) {
+      return undefined;
+    }
+
+    function handlePointerDown(event) {
+      if (ref.current && !ref.current.contains(event.target)) {
+        onClose();
+      }
+    }
+
+    document.addEventListener("pointerdown", handlePointerDown);
+    return () => document.removeEventListener("pointerdown", handlePointerDown);
+  }, [isOpen, onClose, ref]);
+}
 
 function formatShortDate(value) {
   if (!value) {
@@ -10,7 +27,8 @@ function formatShortDate(value) {
   return new Date(value).toLocaleDateString("es-AR");
 }
 
-function NotificationDropdown({ messages = [], notifications = [], count = 0 }) {
+function NotificationDropdown({ messages = [], notifications = [], count = 0, isOpen, onToggle, onClose }) {
+  const menuRef = useRef(null);
   const items = [
     ...notifications.slice(0, 4).map((item) => ({
       id: `notification-${item.id}`,
@@ -34,21 +52,29 @@ function NotificationDropdown({ messages = [], notifications = [], count = 0 }) 
     .sort((a, b) => String(b.date || "").localeCompare(String(a.date || "")))
     .slice(0, 6);
 
+  useCloseOnOutsideClick(menuRef, isOpen, onClose);
+
   return (
-    <details className="account-notification-menu">
-      <summary aria-label="Abrir notificaciones">
+    <details className="account-notification-menu" open={isOpen} ref={menuRef}>
+      <summary
+        aria-label="Abrir notificaciones"
+        onClick={(event) => {
+          event.preventDefault();
+          onToggle();
+        }}
+      >
         <span className="notification-bell-shape" aria-hidden="true" />
         {count > 0 ? <span className="account-notification-badge">{count > 9 ? "9+" : count}</span> : null}
       </summary>
       <div className="account-notification-dropdown">
         <div className="account-notification-head">
           <strong>Notificaciones</strong>
-          <a href="#notificaciones">Ver todas</a>
+          <a href="#notificaciones" onClick={onClose}>Ver todas</a>
         </div>
         {items.length ? (
           <div className="account-notification-list">
             {items.map((item) => (
-              <a className={item.unread ? "is-unread" : ""} href={item.href} key={item.id}>
+              <a className={item.unread ? "is-unread" : ""} href={item.href} key={item.id} onClick={onClose}>
                 <span>{item.type}</span>
                 <strong>{item.title}</strong>
                 {item.body ? <small>{item.body}</small> : null}
@@ -75,9 +101,16 @@ export default function AccountDashboardShell({
   children,
 }) {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const [isNotificationOpen, setIsNotificationOpen] = useState(false);
+  const [isUserMenuOpen, setIsUserMenuOpen] = useState(false);
+  const userMenuRef = useRef(null);
+
+  useCloseOnOutsideClick(userMenuRef, isUserMenuOpen, () => setIsUserMenuOpen(false));
 
   function closeMenu() {
     setIsMenuOpen(false);
+    setIsNotificationOpen(false);
+    setIsUserMenuOpen(false);
   }
 
   return (
@@ -128,19 +161,35 @@ export default function AccountDashboardShell({
             <span />
           </button>
           <div className="account-header-actions">
-            <NotificationDropdown count={notificationCount} messages={messages} notifications={notifications} />
-            <details className="account-user-menu">
-              <summary>
+            <NotificationDropdown
+              count={notificationCount}
+              messages={messages}
+              notifications={notifications}
+              isOpen={isNotificationOpen}
+              onClose={() => setIsNotificationOpen(false)}
+              onToggle={() => {
+                setIsNotificationOpen((value) => !value);
+                setIsUserMenuOpen(false);
+              }}
+            />
+            <details className="account-user-menu" open={isUserMenuOpen} ref={userMenuRef}>
+              <summary
+                onClick={(event) => {
+                  event.preventDefault();
+                  setIsUserMenuOpen((value) => !value);
+                  setIsNotificationOpen(false);
+                }}
+              >
                 <span className="account-avatar">{avatarInitials}</span>
                 <strong>{displayName}</strong>
               </summary>
               <div>
-                <a href="#cursos">Mi aprendizaje</a>
-                <a href="#carrito">Mi carrito</a>
-                <a href="#configuracion">Configuracion de la cuenta</a>
-                <a href="#pedidos">Historial de compra</a>
-                <a href="/">Ir al sitio principal</a>
-                {isAdmin ? <a href="/admin">Ir al Admin</a> : null}
+                <a href="#cursos" onClick={closeMenu}>Mi aprendizaje</a>
+                <a href="#carrito" onClick={closeMenu}>Mi carrito</a>
+                <a href="#configuracion" onClick={closeMenu}>Configuracion de la cuenta</a>
+                <a href="#pedidos" onClick={closeMenu}>Historial de compra</a>
+                <a href="/" onClick={closeMenu}>Ir al sitio principal</a>
+                {isAdmin ? <a href="/admin" onClick={closeMenu}>Ir al Admin</a> : null}
                 <form action="/auth/logout" method="post">
                   <button type="submit">Cerrar sesión</button>
                 </form>

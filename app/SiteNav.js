@@ -1,6 +1,23 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
+
+function useCloseOnOutsideClick(ref, isOpen, onClose) {
+  useEffect(() => {
+    if (!isOpen) {
+      return undefined;
+    }
+
+    function handlePointerDown(event) {
+      if (ref.current && !ref.current.contains(event.target)) {
+        onClose();
+      }
+    }
+
+    document.addEventListener("pointerdown", handlePointerDown);
+    return () => document.removeEventListener("pointerdown", handlePointerDown);
+  }, [isOpen, onClose, ref]);
+}
 
 function getInitials(value) {
   return String(value || "L")
@@ -15,22 +32,31 @@ function NavCounter({ value }) {
   return value > 0 ? <span className="nav-counter">{value > 9 ? "9+" : value}</span> : null;
 }
 
-function SiteNotificationMenu({ unreadMessages = 0, unreadNotifications = 0 }) {
+function SiteNotificationMenu({ unreadMessages = 0, unreadNotifications = 0, isOpen, onToggle, onClose }) {
   const pendingAlerts = unreadNotifications + unreadMessages;
+  const menuRef = useRef(null);
+
+  useCloseOnOutsideClick(menuRef, isOpen, onClose);
 
   return (
-    <details className="site-notification-menu">
-      <summary aria-label="Abrir notificaciones">
+    <details className="site-notification-menu" open={isOpen} ref={menuRef}>
+      <summary
+        aria-label="Abrir notificaciones"
+        onClick={(event) => {
+          event.preventDefault();
+          onToggle();
+        }}
+      >
         <span className="notification-bell-shape" aria-hidden="true" />
         <NavCounter value={pendingAlerts} />
       </summary>
       <div className="site-notification-dropdown">
         <strong>Notificaciones</strong>
-        <a href="/mi-cuenta#notificaciones">
+        <a href="/mi-cuenta#notificaciones" onClick={onClose}>
           Notificaciones
           <NavCounter value={unreadNotifications} />
         </a>
-        <a href="/mi-cuenta#mensajes">
+        <a href="/mi-cuenta#mensajes" onClick={onClose}>
           Mensajes
           <NavCounter value={unreadMessages} />
         </a>
@@ -49,10 +75,17 @@ export default function SiteNav({
   unreadNotifications = 0,
 }) {
   const [isOpen, setIsOpen] = useState(false);
+  const [isNotificationOpen, setIsNotificationOpen] = useState(false);
+  const [isUserMenuOpen, setIsUserMenuOpen] = useState(false);
+  const userMenuRef = useRef(null);
   const initials = getInitials(displayName || email);
+
+  useCloseOnOutsideClick(userMenuRef, isUserMenuOpen, () => setIsUserMenuOpen(false));
 
   function closeMenu() {
     setIsOpen(false);
+    setIsNotificationOpen(false);
+    setIsUserMenuOpen(false);
   }
 
   return (
@@ -76,9 +109,24 @@ export default function SiteNav({
         <div className="site-nav-actions">
           {isLoggedIn ? (
             <>
-              <SiteNotificationMenu unreadMessages={unreadMessages} unreadNotifications={unreadNotifications} />
-              <details className="site-user-menu">
-                <summary>
+              <SiteNotificationMenu
+                unreadMessages={unreadMessages}
+                unreadNotifications={unreadNotifications}
+                isOpen={isNotificationOpen}
+                onClose={() => setIsNotificationOpen(false)}
+                onToggle={() => {
+                  setIsNotificationOpen((value) => !value);
+                  setIsUserMenuOpen(false);
+                }}
+              />
+              <details className="site-user-menu" open={isUserMenuOpen} ref={userMenuRef}>
+                <summary
+                  onClick={(event) => {
+                    event.preventDefault();
+                    setIsUserMenuOpen((value) => !value);
+                    setIsNotificationOpen(false);
+                  }}
+                >
                   <span className="site-user-avatar">{initials}</span>
                 </summary>
                 <div className="site-user-dropdown">
