@@ -52,15 +52,36 @@ a {
   text-decoration: none;
 }
 
+:where(.site-header, .site-nav, .landing-page, .admin-cms-shell, .account-app-shell) :where(h1, h2, h3, p, a, span, strong, small, em, button, input, textarea, select, label) {
+  min-width: 0;
+  max-width: 100%;
+  overflow-wrap: anywhere;
+}
+
+:where(.admin-cms-shell, .account-app-shell) :where(section, article, div, form, fieldset, label) {
+  min-width: 0;
+}
+
+:where(.admin-cms-shell, .account-app-shell) :where(.button, button, a[role="button"], input, select, textarea) {
+  max-width: 100%;
+}
+
+:where(.admin-cms-shell, .account-app-shell) :where(.button, button, a[role="button"]) {
+  line-height: 1.18;
+  text-align: center;
+}
+
 button,
 input,
 textarea,
 select {
   font: inherit;
+  min-width: 0;
 }
 
 button {
   cursor: pointer;
+  white-space: normal;
 }
 
 button:disabled {
@@ -244,6 +265,104 @@ h3 {
 
 .site-user-menu {
   position: relative;
+}
+
+.site-notification-menu {
+  position: relative;
+}
+
+.site-notification-menu summary {
+  position: relative;
+  width: 44px;
+  height: 44px;
+  display: inline-grid;
+  place-items: center;
+  border: 1px solid rgba(20, 53, 56, 0.14);
+  border-radius: 8px;
+  background: rgba(255, 255, 255, 0.78);
+  color: #173b3f;
+  cursor: pointer;
+  list-style: none;
+  box-shadow: 0 10px 24px rgba(14, 45, 49, 0.08);
+}
+
+.site-notification-menu summary::-webkit-details-marker {
+  display: none;
+}
+
+.notification-bell-shape {
+  position: relative;
+  width: 17px;
+  height: 15px;
+  display: inline-block;
+  border: 2px solid currentColor;
+  border-bottom: 0;
+  border-radius: 12px 12px 2px 2px;
+}
+
+.notification-bell-shape::before {
+  content: "";
+  position: absolute;
+  left: 50%;
+  bottom: -5px;
+  width: 23px;
+  height: 2px;
+  border-radius: 999px;
+  background: currentColor;
+  transform: translateX(-50%);
+}
+
+.notification-bell-shape::after {
+  content: "";
+  position: absolute;
+  left: 50%;
+  bottom: -10px;
+  width: 5px;
+  height: 5px;
+  border-radius: 999px;
+  background: currentColor;
+  transform: translateX(-50%);
+}
+
+.site-notification-dropdown {
+  position: absolute;
+  top: calc(100% + 12px);
+  right: 0;
+  z-index: 45;
+  width: min(310px, calc(100vw - 28px));
+  display: grid;
+  gap: 6px;
+  border: 1px solid rgba(20, 53, 56, 0.14);
+  border-radius: 8px;
+  padding: 10px;
+  background: rgba(255, 255, 255, 0.98);
+  box-shadow: 0 24px 60px rgba(15, 23, 42, 0.16);
+}
+
+.site-notification-dropdown strong {
+  padding: 8px 10px;
+  color: #0f172a;
+}
+
+.site-notification-dropdown a {
+  min-height: 42px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  border-radius: 8px;
+  padding: 0 10px;
+  color: #25324b;
+  font-weight: 800;
+}
+
+.site-notification-dropdown a:hover {
+  background: #f2f5fb;
+}
+
+.site-notification-dropdown .nav-counter {
+  position: static;
+  flex: 0 0 auto;
 }
 
 .site-user-menu summary {
@@ -3895,9 +4014,120 @@ body:has(.account-app-shell) .site-footer {
 }
 
 .account-header-actions {
+  min-width: 0;
   display: flex;
   align-items: center;
   gap: 14px;
+}
+
+.account-notification-menu {
+  position: relative;
+}
+
+.account-notification-menu summary {
+  position: relative;
+  width: 44px;
+  height: 44px;
+  display: inline-grid;
+  place-items: center;
+  border: 1px solid #e5e9f2;
+  border-radius: 8px;
+  background: white;
+  color: #0f172a;
+  cursor: pointer;
+  list-style: none;
+}
+
+.account-notification-menu summary::-webkit-details-marker {
+  display: none;
+}
+
+.account-notification-badge {
+  position: absolute;
+  top: -7px;
+  right: -7px;
+  min-width: 21px;
+  height: 21px;
+  display: inline-grid;
+  place-items: center;
+  border: 2px solid white;
+  border-radius: 999px;
+  background: #2563eb;
+  color: white;
+  font-size: 0.72rem;
+  font-weight: 900;
+  line-height: 1;
+}
+
+.account-notification-dropdown {
+  position: absolute;
+  top: calc(100% + 12px);
+  right: 0;
+  z-index: 8;
+  width: min(360px, calc(100vw - 28px));
+  display: grid;
+  gap: 10px;
+  border: 1px solid #e5e9f2;
+  border-radius: 8px;
+  padding: 12px;
+  background: white;
+  box-shadow: 0 18px 40px rgba(15, 23, 42, 0.12);
+}
+
+.account-notification-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.account-notification-head strong {
+  color: #0f172a;
+  font-size: 0.95rem;
+}
+
+.account-notification-head a {
+  color: #2563eb;
+  font-size: 0.82rem;
+  font-weight: 900;
+}
+
+.account-notification-list {
+  display: grid;
+  gap: 8px;
+}
+
+.account-notification-list a,
+.account-notification-empty {
+  display: grid;
+  gap: 4px;
+  border: 1px solid #eef2f7;
+  border-radius: 8px;
+  padding: 11px;
+  background: #f8fafc;
+}
+
+.account-notification-list a.is-unread {
+  border-color: rgba(37, 99, 235, 0.22);
+  background: #eff6ff;
+}
+
+.account-notification-list strong {
+  color: #0f172a;
+  font-size: 0.9rem;
+}
+
+.account-notification-list p,
+.account-notification-empty {
+  margin: 0;
+  color: #64748b;
+  font-size: 0.82rem;
+}
+
+.account-notification-list small {
+  color: #94a3b8;
+  font-size: 0.74rem;
+  font-weight: 800;
 }
 
 .account-icon-button {
@@ -4054,6 +4284,58 @@ body:has(.account-app-shell) .site-footer {
   line-height: 1.6;
 }
 
+.account-featured-notice {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr) auto;
+  gap: 14px;
+  align-items: center;
+  border: 1px solid #e0e6f0;
+  border-radius: var(--ds-radius);
+  padding: 16px;
+  background: rgba(255, 255, 255, 0.96);
+  box-shadow: 0 16px 42px rgba(15, 23, 42, 0.06);
+}
+
+.account-featured-notice.is-unread {
+  border-color: rgba(37, 99, 235, 0.24);
+  background: linear-gradient(135deg, rgba(239, 246, 255, 0.95), rgba(255, 255, 255, 0.98));
+}
+
+.account-featured-notice > span {
+  border-radius: 999px;
+  padding: 6px 10px;
+  background: #eef4ff;
+  color: #0757e3;
+  font-size: 0.74rem;
+  font-weight: 900;
+  text-transform: uppercase;
+}
+
+.account-featured-notice h2 {
+  margin: 0 0 4px;
+  color: #0f172a;
+  font-size: clamp(1rem, 2vw, 1.25rem);
+}
+
+.account-featured-notice p {
+  margin: 0;
+  color: #64748b;
+  line-height: 1.45;
+}
+
+.account-featured-notice a {
+  min-height: 40px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border: 1px solid #d8deea;
+  border-radius: var(--ds-radius);
+  padding: 0 14px;
+  background: white;
+  color: #0757e3;
+  font-weight: 900;
+}
+
 .account-primary-action,
 .account-secondary-action,
 .account-wide-action,
@@ -4100,6 +4382,7 @@ body:has(.account-app-shell) .site-footer {
 .account-panel,
 .account-course-card,
 .account-resource-card {
+  min-width: 0;
   border: 1px solid #e0e6f0;
   border-radius: var(--ds-radius);
   background: rgba(255, 255, 255, 0.96);
@@ -4410,6 +4693,7 @@ body:has(.account-app-shell) .site-footer {
 .account-activity-list article,
 .account-history-list article,
 .account-message-list article {
+  min-width: 0;
   display: grid;
   gap: 12px;
   border: 1px solid #e5e9f2;
@@ -5259,11 +5543,15 @@ body:has(.account-app-shell) .site-footer {
   }
 
   .site-user-menu,
+  .site-notification-menu,
   .site-user-menu summary,
+  .site-notification-menu summary,
+  .site-notification-dropdown,
   .site-user-dropdown {
     width: 100%;
   }
 
+  .site-notification-dropdown,
   .site-user-dropdown {
     position: static;
     width: 100%;
@@ -5272,7 +5560,8 @@ body:has(.account-app-shell) .site-footer {
   }
 
   .site-nav a:not(.button),
-  .nav-button {
+  .nav-button,
+  .site-notification-menu summary {
     min-height: 48px;
     width: 100%;
     justify-content: flex-start;
@@ -5429,6 +5718,10 @@ body:has(.account-app-shell) .site-footer {
     padding: 0 18px;
   }
 
+  .account-header-actions {
+    gap: 8px;
+  }
+
   .account-mobile-menu {
     width: 42px;
     height: 42px;
@@ -5456,9 +5749,20 @@ body:has(.account-app-shell) .site-footer {
 
   .account-hero,
   .account-panel-head,
+  .account-featured-notice,
   .account-course-meta {
     align-items: flex-start;
     flex-direction: column;
+  }
+
+  .account-featured-notice {
+    grid-template-columns: 1fr;
+  }
+
+  .account-notification-dropdown,
+  .account-user-menu > div {
+    right: -6px;
+    width: min(330px, calc(100vw - 22px));
   }
 
   .account-primary-action {

@@ -253,6 +253,33 @@ export default async function MiCuentaPage({ searchParams }) {
   const cartItemList = cartItems || [];
   const pendingAccountAlerts =
     notificationList.filter((item) => !item.read_at).length + messageList.filter((item) => !item.read_at).length;
+  const featuredAccountNotice = [
+    ...messageList.map((item) => ({
+      id: `message-${item.id}`,
+      label: item.message_type || "Mensaje",
+      title: item.subject,
+      body: item.body,
+      date: item.created_at,
+      href: "#mensajes",
+      unread: !item.read_at,
+    })),
+    ...notificationList.map((item) => ({
+      id: `notification-${item.id}`,
+      label: item.notification_type || "Notificacion",
+      title: item.title,
+      body: item.body,
+      date: item.created_at,
+      href: item.href || "#notificaciones",
+      unread: !item.read_at,
+    })),
+  ]
+    .sort((a, b) => {
+      if (a.unread !== b.unread) {
+        return a.unread ? -1 : 1;
+      }
+
+      return String(b.date || "").localeCompare(String(a.date || ""));
+    })[0];
   const digitalOrders = catalogOrderList.filter((order) => order.product_type === "digital");
   const approvedDigitalOrders = digitalOrders.filter((order) => order.status === "paid" || order.status === "delivered");
   const profileName = profile?.full_name || userData.user.user_metadata?.full_name || "";
@@ -367,6 +394,8 @@ export default async function MiCuentaPage({ searchParams }) {
       avatarInitials={avatarInitials}
       isAdmin={profile?.role === "admin"}
       notificationCount={pendingAccountAlerts}
+      notifications={notificationList}
+      messages={messageList}
     >
         <div className="account-dashboard" id="inicio">
           {params?.message ? <p className="notice success">{params.message}</p> : null}
@@ -380,6 +409,17 @@ export default async function MiCuentaPage({ searchParams }) {
             </div>
             <a className="account-primary-action" href="/turnos">Reservar turno</a>
           </section>
+
+          {featuredAccountNotice ? (
+            <section className={`account-featured-notice${featuredAccountNotice.unread ? " is-unread" : ""}`}>
+              <span>{featuredAccountNotice.label}</span>
+              <div>
+                <h2>{featuredAccountNotice.title}</h2>
+                {featuredAccountNotice.body ? <p>{featuredAccountNotice.body}</p> : null}
+              </div>
+              <a href={featuredAccountNotice.href}>Revisar</a>
+            </section>
+          ) : null}
 
           <section className="account-stats-grid" aria-label="Resumen de Mi Espacio">
             <StatCard

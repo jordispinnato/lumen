@@ -65,6 +65,27 @@ export async function POST(request) {
     });
   }
 
+  const { error: notificationError } = await adminSupabase.from("user_notifications").insert({
+    user_id: null,
+    title: subject,
+    body,
+    href: "/mi-cuenta#mensajes",
+    notification_type: messageType || "mensaje",
+  });
+
+  if (notificationError) {
+    if (notificationError.code === "PGRST205" || notificationError.message?.includes("user_notifications")) {
+      return NextResponse.redirect(
+        `${origin}/admin?error=${encodeURIComponent("Mensaje enviado, pero falta ejecutar el SQL 015 para activar notificaciones.")}#usuarios`,
+        { status: 303 }
+      );
+    }
+
+    return NextResponse.redirect(`${origin}/admin?error=${encodeURIComponent(notificationError.message)}#usuarios`, {
+      status: 303,
+    });
+  }
+
   return NextResponse.redirect(`${origin}/admin?message=Mensaje enviado a todos los usuarios#usuarios`, {
     status: 303,
   });

@@ -15,6 +15,30 @@ function NavCounter({ value }) {
   return value > 0 ? <span className="nav-counter">{value > 9 ? "9+" : value}</span> : null;
 }
 
+function SiteNotificationMenu({ unreadMessages = 0, unreadNotifications = 0 }) {
+  const pendingAlerts = unreadNotifications + unreadMessages;
+
+  return (
+    <details className="site-notification-menu">
+      <summary aria-label="Abrir notificaciones">
+        <span className="notification-bell-shape" aria-hidden="true" />
+        <NavCounter value={pendingAlerts} />
+      </summary>
+      <div className="site-notification-dropdown">
+        <strong>Notificaciones</strong>
+        <a href="/mi-cuenta#notificaciones">
+          Notificaciones
+          <NavCounter value={unreadNotifications} />
+        </a>
+        <a href="/mi-cuenta#mensajes">
+          Mensajes
+          <NavCounter value={unreadMessages} />
+        </a>
+      </div>
+    </details>
+  );
+}
+
 export default function SiteNav({
   displayName = "",
   email = "",
@@ -26,7 +50,6 @@ export default function SiteNav({
 }) {
   const [isOpen, setIsOpen] = useState(false);
   const initials = getInitials(displayName || email);
-  const pendingAlerts = unreadNotifications + unreadMessages;
 
   function closeMenu() {
     setIsOpen(false);
@@ -53,14 +76,10 @@ export default function SiteNav({
         <div className="site-nav-actions">
           {isLoggedIn ? (
             <>
+              <SiteNotificationMenu unreadMessages={unreadMessages} unreadNotifications={unreadNotifications} />
               <details className="site-user-menu">
                 <summary>
                   <span className="site-user-avatar">{initials}</span>
-                  {pendingAlerts > 0 ? (
-                    <span className="site-user-badge" aria-label={`${pendingAlerts} pendientes`}>
-                      {pendingAlerts > 9 ? "9+" : pendingAlerts}
-                    </span>
-                  ) : null}
                 </summary>
                 <div className="site-user-dropdown">
                   <div className="site-user-card">
@@ -77,13 +96,6 @@ export default function SiteNav({
                     <a href="/mi-cuenta#favoritos" onClick={closeMenu}>Lista de deseos</a>
                     {isSpecialist ? <a href="/especialista" onClick={closeMenu}>Panel especialista</a> : null}
                     {isAdmin ? <a href="/admin" onClick={closeMenu}>Admin</a> : null}
-                  </div>
-                  <div className="site-user-section">
-                    <a href="/mi-cuenta#notificaciones" onClick={closeMenu}>Notificaciones</a>
-                    <a className="site-user-row" href="/mi-cuenta#mensajes" onClick={closeMenu}>
-                      Mensajes
-                      <NavCounter value={unreadMessages} />
-                    </a>
                   </div>
                   <div className="site-user-section">
                     <a href="/mi-cuenta#configuracion" onClick={closeMenu}>Configuracion de la cuenta</a>
