@@ -132,12 +132,29 @@ export default function SiteNav({
   const [isOpen, setIsOpen] = useState(false);
   const [isNotificationOpen, setIsNotificationOpen] = useState(false);
   const [isUserMenuOpen, setIsUserMenuOpen] = useState(false);
+  const closeTimerRef = useRef(null);
   const userMenuRef = useRef(null);
   const initials = getInitials(displayName || email);
 
   useCloseOnOutsideClick(userMenuRef, isUserMenuOpen, () => setIsUserMenuOpen(false));
 
+  function clearCloseTimer() {
+    if (closeTimerRef.current) {
+      window.clearTimeout(closeTimerRef.current);
+      closeTimerRef.current = null;
+    }
+  }
+
+  function closeDropdownsWithDelay() {
+    clearCloseTimer();
+    closeTimerRef.current = window.setTimeout(() => {
+      setIsNotificationOpen(false);
+      setIsUserMenuOpen(false);
+    }, 260);
+  }
+
   function closeMenu() {
+    clearCloseTimer();
     setIsOpen(false);
     setIsNotificationOpen(false);
     setIsUserMenuOpen(false);
@@ -172,11 +189,13 @@ export default function SiteNav({
                 isOpen={isNotificationOpen}
                 onClose={() => setIsNotificationOpen(false)}
                 onHoverStart={() => {
+                  clearCloseTimer();
                   setIsNotificationOpen(true);
                   setIsUserMenuOpen(false);
                 }}
-                onHoverEnd={() => setIsNotificationOpen(false)}
+                onHoverEnd={closeDropdownsWithDelay}
                 onToggle={() => {
+                  clearCloseTimer();
                   setIsNotificationOpen((value) => !value);
                   setIsUserMenuOpen(false);
                 }}
@@ -186,14 +205,16 @@ export default function SiteNav({
                 open={isUserMenuOpen}
                 ref={userMenuRef}
                 onMouseEnter={() => {
+                  clearCloseTimer();
                   setIsUserMenuOpen(true);
                   setIsNotificationOpen(false);
                 }}
-                onMouseLeave={() => setIsUserMenuOpen(false)}
+                onMouseLeave={closeDropdownsWithDelay}
               >
                 <summary
                   onClick={(event) => {
                     event.preventDefault();
+                    clearCloseTimer();
                     setIsUserMenuOpen((value) => !value);
                     setIsNotificationOpen(false);
                   }}
