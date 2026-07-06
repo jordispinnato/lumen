@@ -214,6 +214,40 @@ h3 {
   justify-content: center;
 }
 
+.site-nav-links a {
+  position: relative;
+  color: #2f4643;
+  font-weight: 800;
+  transition: color 160ms ease, transform 160ms ease;
+}
+
+.site-nav-links a::after {
+  content: "";
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 4px;
+  height: 2px;
+  border-radius: 999px;
+  background: var(--aqua);
+  opacity: 0;
+  transform: scaleX(0.35);
+  transform-origin: center;
+  transition: opacity 160ms ease, transform 160ms ease;
+}
+
+.site-nav-links a:hover,
+.site-nav-links a:focus-visible {
+  color: var(--petrol);
+  transform: translateY(-1px);
+}
+
+.site-nav-links a:hover::after,
+.site-nav-links a:focus-visible::after {
+  opacity: 1;
+  transform: scaleX(1);
+}
+
 .site-nav-actions {
   justify-content: flex-end;
 }
@@ -285,6 +319,16 @@ h3 {
   cursor: pointer;
   list-style: none;
   box-shadow: 0 10px 24px rgba(14, 45, 49, 0.08);
+  transition: color 160ms ease, border-color 160ms ease, background 160ms ease, box-shadow 160ms ease, transform 160ms ease;
+}
+
+.site-notification-menu:hover summary,
+.site-notification-menu summary:focus-visible {
+  border-color: rgba(104, 199, 189, 0.62);
+  background: rgba(232, 251, 247, 0.88);
+  color: var(--petrol);
+  transform: translateY(-1px);
+  box-shadow: 0 14px 30px rgba(14, 45, 49, 0.12);
 }
 
 .site-notification-menu summary::-webkit-details-marker {
@@ -437,6 +481,14 @@ h3 {
   background: #101623;
   color: white;
   font-weight: 900;
+  transition: background 160ms ease, box-shadow 160ms ease, transform 160ms ease;
+}
+
+.site-user-menu:hover .site-user-avatar,
+.site-user-menu summary:focus-visible .site-user-avatar {
+  background: var(--petrol);
+  transform: translateY(-1px);
+  box-shadow: 0 12px 24px rgba(11, 74, 83, 0.18);
 }
 
 .site-user-avatar.large {

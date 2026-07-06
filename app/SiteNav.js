@@ -48,6 +48,8 @@ function SiteNotificationMenu({
   isOpen,
   onToggle,
   onClose,
+  onHoverStart,
+  onHoverEnd,
 }) {
   const pendingAlerts = unreadNotifications + unreadMessages;
   const menuRef = useRef(null);
@@ -77,7 +79,13 @@ function SiteNotificationMenu({
   useCloseOnOutsideClick(menuRef, isOpen, onClose);
 
   return (
-    <details className="site-notification-menu" open={isOpen} ref={menuRef}>
+    <details
+      className="site-notification-menu"
+      open={isOpen}
+      ref={menuRef}
+      onMouseEnter={onHoverStart}
+      onMouseLeave={onHoverEnd}
+    >
       <summary
         aria-label="Abrir notificaciones"
         onClick={(event) => {
@@ -163,12 +171,26 @@ export default function SiteNav({
                 messagePreview={messagePreview}
                 isOpen={isNotificationOpen}
                 onClose={() => setIsNotificationOpen(false)}
+                onHoverStart={() => {
+                  setIsNotificationOpen(true);
+                  setIsUserMenuOpen(false);
+                }}
+                onHoverEnd={() => setIsNotificationOpen(false)}
                 onToggle={() => {
                   setIsNotificationOpen((value) => !value);
                   setIsUserMenuOpen(false);
                 }}
               />
-              <details className="site-user-menu" open={isUserMenuOpen} ref={userMenuRef}>
+              <details
+                className="site-user-menu"
+                open={isUserMenuOpen}
+                ref={userMenuRef}
+                onMouseEnter={() => {
+                  setIsUserMenuOpen(true);
+                  setIsNotificationOpen(false);
+                }}
+                onMouseLeave={() => setIsUserMenuOpen(false)}
+              >
                 <summary
                   onClick={(event) => {
                     event.preventDefault();
