@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
 import { createSupabaseServerClient } from "../../../lib/supabase/server";
+import { sendContactMessageNotificationEmail } from "../../../lib/email";
 
 function redirectWith(origin, params) {
   return NextResponse.redirect(`${origin}/contacto?${params.toString()}`, { status: 303 });
@@ -34,6 +35,19 @@ export async function POST(request) {
   if (error) {
     params.set("error", "No pudimos enviar la consulta. Si falta la tabla, ejecuta el SQL 017 en Supabase.");
     return redirectWith(origin, params);
+  }
+
+  try {
+    await sendContactMessageNotificationEmail({
+      firstName,
+      lastName,
+      email,
+      phone,
+      subject,
+      message,
+    });
+  } catch (emailError) {
+    console.error("Contact message email notification failed", emailError);
   }
 
   params.set("message", "Gracias. Recibimos tu consulta y te vamos a responder por email.");
