@@ -96,10 +96,12 @@ export default async function CourseDetailPage({ params }) {
             <div className="actions">
               {isEnrolled ? (
                 <a className="button" href={`/aula?curso=${course.slug}`}>Acceder al aula</a>
+              ) : userData.user ? (
+                <a className="button" href={`/checkout?curso=${course.slug}`}>Comprar curso</a>
               ) : (
-                <a className="button" href="/login">Ingresar para acceder</a>
+                <a className="button" href={`/login?next=/checkout?curso=${course.slug}`}>Ingresar para comprar</a>
               )}
-              <a className="secondary-button" href="/cursos">Comprar más adelante</a>
+              <a className="secondary-button" href="/cursos">Ver otros cursos</a>
             </div>
           </div>
 

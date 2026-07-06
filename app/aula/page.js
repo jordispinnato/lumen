@@ -9,6 +9,29 @@ function formatTime(minutes) {
   return `${minutes} min`;
 }
 
+function formatMaterialType(value) {
+  const labels = {
+    audio: "Audio",
+    file: "Archivo",
+    link: "Link",
+    pdf: "PDF",
+  };
+
+  return labels[value] || "Material";
+}
+
+function formatProgressState(progressItem, isCompleted) {
+  if (isCompleted) {
+    return "Completada";
+  }
+
+  if (progressItem?.last_viewed_at) {
+    return "En progreso";
+  }
+
+  return "Pendiente";
+}
+
 function splitLines(value) {
   return String(value || "")
     .split("\n")
@@ -184,6 +207,9 @@ export default async function ClassroomPage({ searchParams }) {
   );
   const embedUrl = getEmbedUrl(activeLesson?.video_url);
   const objectives = splitLines(activeLesson?.objectives);
+  const lessonMaterials = materialsWithUrls.filter((material) => material.lesson_id === activeLesson?.id);
+  const courseMaterials = materialsWithUrls.filter((material) => !material.lesson_id);
+  const activeLessonCompleted = activeLesson ? completedLessons.has(activeLesson.id) : false;
 
   return (
     <main className="section classroom-section">
@@ -208,6 +234,12 @@ export default async function ClassroomPage({ searchParams }) {
             </div>
           </div>
 
+          <div className="classroom-summary-card">
+            <p className="eyebrow">Ruta del curso</p>
+            <strong>{totalLessons || "Sin"} clases publicadas</strong>
+            <span>{activeCourse.total_duration || activeCourse.summary || "Avanza a tu ritmo desde el aula privada."}</span>
+          </div>
+
           <nav className="module-sidebar" aria-label="Clases del curso">
             {(modules || []).map((moduleItem) => (
               <section key={moduleItem.id}>
@@ -215,6 +247,7 @@ export default async function ClassroomPage({ searchParams }) {
                 {(lessonsByModule.get(moduleItem.id) || []).map((lesson) => {
                   const isCompleted = completedLessons.has(lesson.id);
                   const isCurrent = activeLesson?.id === lesson.id;
+                  const progressItem = progressByLesson.get(lesson.id);
 
                   return (
                     <a
@@ -223,7 +256,7 @@ export default async function ClassroomPage({ searchParams }) {
                       key={lesson.id}
                     >
                       <span>{lesson.title}</span>
-                      <small>{isCompleted ? "Completada" : formatTime(lesson.duration_minutes)}</small>
+                      <small>{formatProgressState(progressItem, isCompleted)} · {formatTime(lesson.duration_minutes)}</small>
                     </a>
                   );
                 })}
@@ -239,7 +272,7 @@ export default async function ClassroomPage({ searchParams }) {
                     key={lesson.id}
                   >
                     <span>{lesson.title}</span>
-                    <small>{completedLessons.has(lesson.id) ? "Completada" : formatTime(lesson.duration_minutes)}</small>
+                    <small>{formatProgressState(progressByLesson.get(lesson.id), completedLessons.has(lesson.id))} · {formatTime(lesson.duration_minutes)}</small>
                   </a>
                 ))}
               </section>
@@ -277,6 +310,11 @@ export default async function ClassroomPage({ searchParams }) {
               <article className="panel lesson-panel">
                 <p className="eyebrow">{activeCourse.title}</p>
                 <h1>{activeLesson.title}</h1>
+                <div className="lesson-meta-row">
+                  <span>Clase {activeLessonIndex + 1} de {totalLessons}</span>
+                  <span>{formatTime(activeLesson.duration_minutes)}</span>
+                  <span>{activeLessonCompleted ? "Completada" : "En curso"}</span>
+                </div>
                 <p className="muted">{activeLesson.description || activeCourse.summary}</p>
 
                 {objectives.length ? (
@@ -288,12 +326,15 @@ export default async function ClassroomPage({ searchParams }) {
                   </>
                 ) : null}
 
-                <h3>Materiales</h3>
-                {materialsWithUrls.length ? (
+                <div className="lesson-material-grid">
+                  <section>
+                <h3>Materiales de esta clase</h3>
+                {lessonMaterials.length ? (
                   <ul className="lesson-list">
-                    {materialsWithUrls.map((material) => (
+                    {lessonMaterials.map((material) => (
                       <li key={material.id}>
                         <div>
+                          <small>{formatMaterialType(material.material_type)}</small>
                           <strong>{material.title}</strong>
                           <span>{material.file_name || material.external_url || "Material complementario"}</span>
                         </div>
@@ -310,18 +351,58 @@ export default async function ClassroomPage({ searchParams }) {
                 ) : (
                   <p className="muted">Esta clase todavía no tiene materiales cargados.</p>
                 )}
+                  </section>
+
+                  {courseMaterials.length ? (
+                    <section>
+                      <h3>Materiales generales</h3>
+                      <ul className="lesson-list">
+                        {courseMaterials.map((material) => (
+                          <li key={material.id}>
+                            <div>
+                              <small>{formatMaterialType(material.material_type)}</small>
+                              <strong>{material.title}</strong>
+                              <span>{material.file_name || material.external_url || "Material complementario"}</span>
+                            </div>
+                            {material.signedUrl ? (
+                              <a href={material.signedUrl} target="_blank" rel="noreferrer">Descargar</a>
+                            ) : material.external_url ? (
+                              <a href={material.external_url} target="_blank" rel="noreferrer">Abrir link</a>
+                            ) : (
+                              <span>Sin descarga</span>
+                            )}
+                          </li>
+                        ))}
+                      </ul>
+                    </section>
+                  ) : null}
+                </div>
 
                 <div className="lesson-actions">
                   {previousLesson ? (
                     <a className="secondary-button" href={buildLessonHref(activeCourse.slug, previousLesson.id)}>Anterior</a>
                   ) : <span />}
-                  <form action="/aula/progreso" method="post">
+                  <form className="lesson-progress-form" action="/aula/progreso" method="post">
                     <input name="courseId" type="hidden" value={activeCourse.id} />
                     <input name="courseSlug" type="hidden" value={activeCourse.slug} />
                     <input name="lessonId" type="hidden" value={activeLesson.id} />
-                    <button className="button" name="action" value="complete" type="submit">
-                      {completedLessons.has(activeLesson.id) ? "Completada" : "Marcar como completada"}
-                    </button>
+                    <input name="nextLessonId" type="hidden" value={nextLesson?.id || ""} />
+                    {activeLessonCompleted ? (
+                      <button className="secondary-button" name="action" value="incomplete" type="submit">
+                        Marcar como pendiente
+                      </button>
+                    ) : (
+                      <>
+                        <button className="button" name="action" value="complete" type="submit">
+                          Marcar como completada
+                        </button>
+                        {nextLesson ? (
+                          <button className="secondary-button" name="action" value="complete-next" type="submit">
+                            Completar y seguir
+                          </button>
+                        ) : null}
+                      </>
+                    )}
                   </form>
                   {nextLesson ? (
                     <a className="secondary-button" href={buildLessonHref(activeCourse.slug, nextLesson.id)}>Siguiente</a>

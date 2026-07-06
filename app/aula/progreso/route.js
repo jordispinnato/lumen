@@ -7,6 +7,7 @@ export async function POST(request) {
   const courseId = String(formData.get("courseId") || "").trim();
   const courseSlug = String(formData.get("courseSlug") || "").trim();
   const lessonId = String(formData.get("lessonId") || "").trim();
+  const nextLessonId = String(formData.get("nextLessonId") || "").trim();
   const action = String(formData.get("action") || "complete").trim();
   const supabase = await createSupabaseServerClient();
   const { data: userData } = await supabase.auth.getUser();
@@ -20,7 +21,7 @@ export async function POST(request) {
   }
 
   const timestamp = new Date().toISOString();
-  const completedAt = action === "complete" ? timestamp : null;
+  const completedAt = action === "complete" || action === "complete-next" ? timestamp : null;
 
   const { error } = await supabase.from("lesson_progress").upsert(
     {
@@ -61,7 +62,7 @@ export async function POST(request) {
   }
 
   if (!finished) {
-    params.set("lesson", lessonId);
+    params.set("lesson", action === "complete-next" && nextLessonId ? nextLessonId : lessonId);
   } else {
     params.set("finalizado", "1");
   }
