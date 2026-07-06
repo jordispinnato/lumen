@@ -90,7 +90,7 @@ function getInitialSpecialistId(specialists, initialSpecialistSlug, initialSpeci
   }
 
   const matchedSpecialist = specialists.find((specialist) => specialist.slug === initialSpecialistSlug);
-  return matchedSpecialist?.id || specialists[0]?.id;
+  return matchedSpecialist?.id || "";
 }
 
 export default function BookingPicker({
@@ -124,12 +124,12 @@ export default function BookingPicker({
   }, [selectedYear, slots]);
 
   const selectedSpecialist = useMemo(
-    () => specialists.find((specialist) => specialist.id === selectedSpecialistId) || specialists[0],
+    () => specialists.find((specialist) => specialist.id === selectedSpecialistId) || null,
     [selectedSpecialistId, specialists]
   );
 
   const specialistSlots = useMemo(
-    () => slots.filter((slot) => slot.specialist_id === selectedSpecialistId),
+    () => selectedSpecialistId ? slots.filter((slot) => slot.specialist_id === selectedSpecialistId) : [],
     [selectedSpecialistId, slots]
   );
 
@@ -179,19 +179,23 @@ export default function BookingPicker({
   if (!specialists.length) {
     return (
       <section className="panel">
-        <h2>Todavía no hay especialistas disponibles</h2>
+        <h2>Todavia no hay especialistas disponibles</h2>
         <p className="muted">
-          Cuando el equipo cargue especialistas y horarios desde el panel admin, vas a poder reservar desde acá.
+          Cuando el equipo cargue especialistas y horarios desde el panel admin, vas a poder reservar desde aca.
         </p>
       </section>
     );
   }
 
   return (
-    <div className="booking-layout">
-      <section className="panel booking-panel">
-        <p className="eyebrow">1. Elegí especialista</p>
-        <div className="professional-card-list">
+    <div className={`booking-flow ${selectedSpecialist ? "has-selected" : ""}`}>
+      <section className="panel booking-panel booking-professionals-panel">
+        <div className="booking-panel-head">
+          <p className="eyebrow">1. Elegi profesional</p>
+          <h2>Selecciona con quien queres consultar</h2>
+          <p className="muted">Conoce el enfoque de cada especialista y despues elegi dia y horario disponible.</p>
+        </div>
+        <div className="professional-card-list booking-professional-grid">
           {specialists.map((specialist) => (
             <article
               className={`professional-option ${specialist.id === selectedSpecialistId ? "is-active" : ""}`}
@@ -210,7 +214,6 @@ export default function BookingPicker({
                 <span className="professional-meta">
                   <small>{specialist.duration_minutes ? `${specialist.duration_minutes} min` : specialist.session}</small>
                   <small>{formatPrice(specialist.price)}</small>
-                  <small>{specialist.status === "active" ? "Activo" : "Inactivo"}</small>
                 </span>
                 {specialist.short_bio ? <small>{specialist.short_bio}</small> : null}
                 <span className="professional-actions">
@@ -225,218 +228,228 @@ export default function BookingPicker({
         </div>
       </section>
 
-      <section className="panel booking-panel">
-        <p className="eyebrow">2. Elegí un día</p>
-        <div className="calendar-selectors">
-          <label>
-            Mes
-            <select
-              value={selectedMonthIndex}
-              onChange={(event) => {
-                setSelectedMonthIndex(Number(event.target.value));
-                setSelectedDate("");
-                setSelectedSlotId("");
-                setIsReviewing(false);
-              }}
-            >
-              {MONTH_OPTIONS.map((month) => (
-                <option key={month.value} value={month.value}>
-                  {month.label}
-                </option>
-              ))}
-            </select>
-          </label>
-          <label>
-            Año
-            <select
-              value={selectedYear}
-              onChange={(event) => {
-                setSelectedYear(Number(event.target.value));
-                setSelectedDate("");
-                setSelectedSlotId("");
-                setIsReviewing(false);
-              }}
-            >
-              {yearOptions.map((year) => (
-                <option key={year} value={year}>
-                  {year}
-                </option>
-              ))}
-            </select>
-          </label>
-        </div>
-        {nextAvailableDates.length ? (
-          <div className="next-available-dates" aria-label="Próximas fechas disponibles">
-            <span>Próximos disponibles</span>
-            <div>
-              {nextAvailableDates.map((item) => (
-                <button
-                  className={item.date === selectedDate ? "is-active" : ""}
-                  key={item.date}
-                  type="button"
-                  onClick={() => selectDateValue(item.date)}
-                >
-                  {formatShortDate(item.date)}
-                  <small>{slotLabel(item.count)}</small>
-                </button>
-              ))}
-            </div>
-          </div>
-        ) : (
-          <p className="muted">Todavía no hay fechas disponibles para esta especialista.</p>
-        )}
-        <div className="calendar-weekdays" aria-hidden="true">
-          {["Lun", "Mar", "Mié", "Jue", "Vie", "Sáb"].map((day) => (
-            <span key={day}>{day}</span>
-          ))}
-        </div>
-        <div className="calendar-grid" aria-label="Calendario de turnos disponibles">
-          {Array.from({ length: selectedMonth.leadingBlanks }).map((_, index) => (
-            <span className="calendar-empty" key={`empty-${index}`} />
-          ))}
-          {selectedMonth.days.map((day) => {
-            const daySlots = slotsByDate[day.iso] || [];
-            const isSelectable = !day.isPast && daySlots.length > 0;
-
-            return (
-              <button
-                className={`calendar-day ${day.iso === selectedDate ? "is-active" : ""} ${daySlots.length ? "has-slots" : ""}`}
-                disabled={!isSelectable}
-                key={day.iso}
-                type="button"
-                onClick={() => selectDay(day)}
-              >
-                <span>{day.weekday}</span>
-                <strong>{day.dayNumber}</strong>
-                <small>{slotLabel(daySlots.length)}</small>
-              </button>
-            );
-          })}
-        </div>
-
-        <p className="eyebrow">3. Elegí un horario</p>
-        {selectedDate ? (
-          selectedDateSlots.length ? (
-            <div className="slot-grid" aria-label="Horarios disponibles">
-              {selectedDateSlots.map((slot) => (
-                <button
-                  className={`slot-option ${slot.id === selectedSlotId ? "is-active" : ""}`}
-                  key={slot.id}
-                  type="button"
-                  onClick={() => {
-                    setSelectedSlotId(slot.id);
+      {selectedSpecialist ? (
+        <div className="booking-calendar-layout">
+          <section className="panel booking-panel">
+            <p className="eyebrow">2. Elegi un dia</p>
+            <div className="calendar-selectors">
+              <label>
+                Mes
+                <select
+                  value={selectedMonthIndex}
+                  onChange={(event) => {
+                    setSelectedMonthIndex(Number(event.target.value));
+                    setSelectedDate("");
+                    setSelectedSlotId("");
                     setIsReviewing(false);
                   }}
                 >
-                  {formatTime(slot.slot_time)}
-                </button>
+                  {MONTH_OPTIONS.map((month) => (
+                    <option key={month.value} value={month.value}>
+                      {month.label}
+                    </option>
+                  ))}
+                </select>
+              </label>
+              <label>
+                Ano
+                <select
+                  value={selectedYear}
+                  onChange={(event) => {
+                    setSelectedYear(Number(event.target.value));
+                    setSelectedDate("");
+                    setSelectedSlotId("");
+                    setIsReviewing(false);
+                  }}
+                >
+                  {yearOptions.map((year) => (
+                    <option key={year} value={year}>
+                      {year}
+                    </option>
+                  ))}
+                </select>
+              </label>
+            </div>
+            {nextAvailableDates.length ? (
+              <div className="next-available-dates" aria-label="Proximas fechas disponibles">
+                <span>Proximos disponibles</span>
+                <div>
+                  {nextAvailableDates.map((item) => (
+                    <button
+                      className={item.date === selectedDate ? "is-active" : ""}
+                      key={item.date}
+                      type="button"
+                      onClick={() => selectDateValue(item.date)}
+                    >
+                      {formatShortDate(item.date)}
+                      <small>{slotLabel(item.count)}</small>
+                    </button>
+                  ))}
+                </div>
+              </div>
+            ) : (
+              <p className="muted">Todavia no hay fechas disponibles para esta especialista.</p>
+            )}
+            <div className="calendar-weekdays" aria-hidden="true">
+              {["Lun", "Mar", "Mie", "Jue", "Vie", "Sab"].map((day) => (
+                <span key={day}>{day}</span>
               ))}
             </div>
-          ) : (
-            <p className="muted">No hay horarios disponibles para este día.</p>
-          )
-        ) : (
-          <p className="muted">Elegí un día para continuar.</p>
-        )}
-      </section>
+            <div className="calendar-grid" aria-label="Calendario de consultas disponibles">
+              {Array.from({ length: selectedMonth.leadingBlanks }).map((_, index) => (
+                <span className="calendar-empty" key={`empty-${index}`} />
+              ))}
+              {selectedMonth.days.map((day) => {
+                const daySlots = slotsByDate[day.iso] || [];
+                const isSelectable = !day.isPast && daySlots.length > 0;
 
-      <aside className="panel booking-summary">
-        <p className="eyebrow">Resumen</p>
-        <h2>{isRescheduling ? "Reprogramación de turno" : "Reserva de atención psicológica"}</h2>
-        <div className="selected-professional">
-          {selectedSpecialist.photo_url ? (
-            <img alt="" src={selectedSpecialist.photo_url} />
-          ) : (
-            <span className="professional-avatar" aria-hidden="true">{selectedSpecialist.name?.slice(0, 1) || "L"}</span>
-          )}
-          <div>
-            <strong>{selectedSpecialist.name}</strong>
-            <span>{selectedSpecialist.role}</span>
-            {selectedSpecialist.professional_license ? <small>{selectedSpecialist.professional_license}</small> : null}
-          </div>
-        </div>
-        <dl>
-          <div>
-            <dt>Especialista</dt>
-            <dd>{selectedSpecialist.name}</dd>
-          </div>
-          <div>
-            <dt>Modalidad</dt>
-            <dd>Online</dd>
-          </div>
-          <div>
-            <dt>Fecha</dt>
-            <dd>{selectedDate ? new Date(`${selectedDate}T00:00:00`).toLocaleDateString("es-AR") : "Sin seleccionar"}</dd>
-          </div>
-          <div>
-            <dt>Horario</dt>
-            <dd>{selectedSlot ? formatTime(selectedSlot.slot_time) : "Sin seleccionar"}</dd>
-          </div>
-          <div>
-            <dt>Duración</dt>
-            <dd>{selectedSpecialist.duration_minutes ? `${selectedSpecialist.duration_minutes} minutos` : selectedSpecialist.session}</dd>
-          </div>
-        </dl>
-        <p className="price">{formatPrice(selectedSpecialist.price)}</p>
-        {userEmail ? (
-          isReviewing ? (
-            <form
-              className="booking-confirm-form"
-              action={isRescheduling ? "/turnos/reprogramar" : "/turnos/reservar"}
-              method="post"
-              onSubmit={() => setIsSubmitting(true)}
-            >
-              <input name="slotId" type="hidden" value={selectedSlot?.id || ""} />
-              {isRescheduling ? <input name="bookingId" type="hidden" value={rescheduleBookingId} /> : null}
-              <label>
-                Nombre del paciente
-                <input name="patientName" placeholder="Nombre y apellido" />
-              </label>
-              <label>
-                Email de confirmación
-                <input readOnly value={userEmail} />
-              </label>
-              <div className="booking-review-box">
-                <strong>{isRescheduling ? "Confirmación de reprogramación" : "Confirmación previa"}</strong>
-                <p>{isRescheduling ? "El turno anterior se libera y este nuevo horario queda confirmado." : "La reserva quedará registrada en tu cuenta."}</p>
-                <p>El pago todavía no está integrado en esta versión.</p>
-              </div>
-              {!isRescheduling ? (
-                <label className="booking-consent">
-                  <input name="privacyConsent" type="checkbox" value="accepted" required />
-                  <span>
-                    Acepto la <a href="/politica-privacidad" target="_blank">Politica de privacidad</a> y los{" "}
-                    <a href="/terminos-condiciones" target="_blank">Terminos y condiciones</a> de LUMEN.
-                  </span>
-                </label>
-              ) : null}
-              <div className="booking-form-actions">
-                <button className="button" disabled={!selectedSlot || isSubmitting} type="submit">
-                  {isSubmitting
-                    ? isRescheduling ? "Reprogramando..." : "Reservando..."
-                    : isRescheduling ? "Confirmar reprogramación" : "Confirmar reserva"}
-                </button>
-                <button className="button secondary" type="button" onClick={() => setIsReviewing(false)}>Volver</button>
-              </div>
-            </form>
-          ) : (
-            <div className="booking-confirm-form">
-              <button className="button" disabled={!selectedSlot} type="button" onClick={() => setIsReviewing(true)}>
-                {isRescheduling ? "Revisar reprogramación" : "Revisar reserva"}
-              </button>
-              <p className="muted">
-                {selectedSlot ? "Revisá los datos antes de confirmar." : "Elegí un día y horario para continuar."}
-              </p>
+                return (
+                  <button
+                    className={`calendar-day ${day.iso === selectedDate ? "is-active" : ""} ${daySlots.length ? "has-slots" : ""}`}
+                    disabled={!isSelectable}
+                    key={day.iso}
+                    type="button"
+                    onClick={() => selectDay(day)}
+                  >
+                    <span>{day.weekday}</span>
+                    <strong>{day.dayNumber}</strong>
+                    <small>{slotLabel(daySlots.length)}</small>
+                  </button>
+                );
+              })}
             </div>
-          )
-        ) : (
-          <div className="booking-login-box">
-            <p className="muted">Para confirmar la reserva necesitás iniciar sesión.</p>
-            <a className="button" href="/login?next=/turnos">Ingresar</a>
-          </div>
-        )}
-        <p className="muted">El pago se conectará en una etapa posterior.</p>
-      </aside>
+
+            <p className="eyebrow">3. Elegi un horario</p>
+            {selectedDate ? (
+              selectedDateSlots.length ? (
+                <div className="slot-grid" aria-label="Horarios disponibles">
+                  {selectedDateSlots.map((slot) => (
+                    <button
+                      className={`slot-option ${slot.id === selectedSlotId ? "is-active" : ""}`}
+                      key={slot.id}
+                      type="button"
+                      onClick={() => {
+                        setSelectedSlotId(slot.id);
+                        setIsReviewing(false);
+                      }}
+                    >
+                      {formatTime(slot.slot_time)}
+                    </button>
+                  ))}
+                </div>
+              ) : (
+                <p className="muted">No hay horarios disponibles para este dia.</p>
+              )
+            ) : (
+              <p className="muted">Elegi un dia para continuar.</p>
+            )}
+          </section>
+
+          <aside className="panel booking-summary">
+            <p className="eyebrow">Resumen</p>
+            <h2>{isRescheduling ? "Reprogramacion de consulta" : "Reserva de consulta profesional"}</h2>
+            <div className="selected-professional">
+              {selectedSpecialist.photo_url ? (
+                <img alt="" src={selectedSpecialist.photo_url} />
+              ) : (
+                <span className="professional-avatar" aria-hidden="true">{selectedSpecialist.name?.slice(0, 1) || "L"}</span>
+              )}
+              <div>
+                <strong>{selectedSpecialist.name}</strong>
+                <span>{selectedSpecialist.role}</span>
+                {selectedSpecialist.professional_license ? <small>{selectedSpecialist.professional_license}</small> : null}
+              </div>
+            </div>
+            <dl>
+              <div>
+                <dt>Especialista</dt>
+                <dd>{selectedSpecialist.name}</dd>
+              </div>
+              <div>
+                <dt>Modalidad</dt>
+                <dd>Online</dd>
+              </div>
+              <div>
+                <dt>Fecha</dt>
+                <dd>{selectedDate ? new Date(`${selectedDate}T00:00:00`).toLocaleDateString("es-AR") : "Sin seleccionar"}</dd>
+              </div>
+              <div>
+                <dt>Horario</dt>
+                <dd>{selectedSlot ? formatTime(selectedSlot.slot_time) : "Sin seleccionar"}</dd>
+              </div>
+              <div>
+                <dt>Duracion</dt>
+                <dd>{selectedSpecialist.duration_minutes ? `${selectedSpecialist.duration_minutes} minutos` : selectedSpecialist.session}</dd>
+              </div>
+            </dl>
+            <p className="price">{formatPrice(selectedSpecialist.price)}</p>
+            {userEmail ? (
+              isReviewing ? (
+                <form
+                  className="booking-confirm-form"
+                  action={isRescheduling ? "/turnos/reprogramar" : "/turnos/reservar"}
+                  method="post"
+                  onSubmit={() => setIsSubmitting(true)}
+                >
+                  <input name="slotId" type="hidden" value={selectedSlot?.id || ""} />
+                  {isRescheduling ? <input name="bookingId" type="hidden" value={rescheduleBookingId} /> : null}
+                  <label>
+                    Nombre del paciente
+                    <input name="patientName" placeholder="Nombre y apellido" />
+                  </label>
+                  <label>
+                    Email de confirmacion
+                    <input readOnly value={userEmail} />
+                  </label>
+                  <div className="booking-review-box">
+                    <strong>{isRescheduling ? "Confirmacion de reprogramacion" : "Confirmacion previa"}</strong>
+                    <p>{isRescheduling ? "El turno anterior se libera y este nuevo horario queda confirmado." : "La reserva quedara registrada en tu cuenta."}</p>
+                    <p>El pago todavia no esta integrado en esta version.</p>
+                  </div>
+                  {!isRescheduling ? (
+                    <label className="booking-consent">
+                      <input name="privacyConsent" type="checkbox" value="accepted" required />
+                      <span>
+                        Acepto la <a href="/politica-privacidad" target="_blank">Politica de privacidad</a> y los{" "}
+                        <a href="/terminos-condiciones" target="_blank">Terminos y condiciones</a> de LUMEN.
+                      </span>
+                    </label>
+                  ) : null}
+                  <div className="booking-form-actions">
+                    <button className="button" disabled={!selectedSlot || isSubmitting} type="submit">
+                      {isSubmitting
+                        ? isRescheduling ? "Reprogramando..." : "Reservando..."
+                        : isRescheduling ? "Confirmar reprogramacion" : "Confirmar reserva"}
+                    </button>
+                    <button className="button secondary" type="button" onClick={() => setIsReviewing(false)}>Volver</button>
+                  </div>
+                </form>
+              ) : (
+                <div className="booking-confirm-form">
+                  <button className="button" disabled={!selectedSlot} type="button" onClick={() => setIsReviewing(true)}>
+                    {isRescheduling ? "Revisar reprogramacion" : "Revisar reserva"}
+                  </button>
+                  <p className="muted">
+                    {selectedSlot ? "Revisa los datos antes de confirmar." : "Elegi un dia y horario para continuar."}
+                  </p>
+                </div>
+              )
+            ) : (
+              <div className="booking-login-box">
+                <p className="muted">Para confirmar la reserva necesitas iniciar sesion.</p>
+                <a className="button" href="/login?next=/turnos">Ingresar</a>
+              </div>
+            )}
+            <p className="muted">El pago se conectara en una etapa posterior.</p>
+          </aside>
+        </div>
+      ) : (
+        <section className="panel booking-empty-selection">
+          <p className="eyebrow">Calendario</p>
+          <h2>Elegi una especialista para ver disponibilidad</h2>
+          <p className="muted">Cuando selecciones una profesional, se van a mostrar el calendario, los horarios disponibles y el resumen de la consulta.</p>
+        </section>
+      )}
     </div>
   );
 }

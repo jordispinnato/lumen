@@ -2,8 +2,8 @@ import BookingPicker from "./BookingPicker";
 import { createSupabaseServerClient } from "../../lib/supabase/server";
 
 export const metadata = {
-  title: "Reservar turno | LUMEN",
-  description: "Reserva de turnos para atención psicológica online.",
+  title: "Consultas profesionales | LUMEN",
+  description: "Consultas profesionales online con especialistas de LUMEN.",
 };
 
 export default async function TurnosPage({ searchParams }) {
@@ -55,10 +55,10 @@ export default async function TurnosPage({ searchParams }) {
     <main className="section">
       <div className="dashboard-shell">
         <div className="section-head">
-          <p className="eyebrow">Reservar turno</p>
-          <h1>Atención psicológica online.</h1>
+          <p className="eyebrow">Consultas profesionales</p>
+          <h1>Elegi una especialista y reserva tu consulta online.</h1>
           <p className="lead">
-            Elegí una especialista, revisá los días y horarios disponibles y dejá preparada la reserva de tu consulta.
+            Conoce el enfoque de cada profesional, revisa los dias y horarios disponibles y deja preparada tu reserva.
           </p>
           {params?.error ? <p className="notice error">{params.error}</p> : null}
           {params?.message ? <p className="notice success">{params.message}</p> : null}
@@ -66,19 +66,19 @@ export default async function TurnosPage({ searchParams }) {
 
         {rescheduleId && !canReschedule ? (
           <section className="panel booking-success">
-            <p className="eyebrow">Reprogramar turno</p>
-            <h2>No se puede reprogramar este turno</h2>
-            <p className="muted">El turno no existe, no pertenece a tu cuenta, ya fue cancelado o corresponde a una fecha pasada.</p>
+            <p className="eyebrow">Reprogramar consulta</p>
+            <h2>No se puede reprogramar esta consulta</h2>
+            <p className="muted">La reserva no existe, no pertenece a tu cuenta, ya fue cancelada o corresponde a una fecha pasada.</p>
             <a className="button secondary" href="/mi-cuenta#turnos">Volver a Mi Espacio</a>
           </section>
         ) : null}
 
         {canReschedule ? (
           <section className="panel booking-reschedule-banner">
-            <p className="eyebrow">Reprogramar turno</p>
-            <h2>Elegí el nuevo día y horario</h2>
+            <p className="eyebrow">Reprogramar consulta</p>
+            <h2>Elegi el nuevo dia y horario</h2>
             <p className="muted">
-              Vas a cambiar tu turno con {rescheduleBooking.appointment_specialists?.name || "la especialista"} del{" "}
+              Vas a cambiar tu consulta con {rescheduleBooking.appointment_specialists?.name || "la especialista"} del{" "}
               {new Date(`${rescheduleBooking.appointment_slots?.slot_date}T00:00:00`).toLocaleDateString("es-AR")} a las{" "}
               {String(rescheduleBooking.appointment_slots?.slot_time || "").slice(0, 5)} hs.
             </p>
@@ -88,7 +88,7 @@ export default async function TurnosPage({ searchParams }) {
         {params?.success ? (
           <section className="panel booking-success">
             <p className="eyebrow">Reserva exitosa</p>
-            <h2>Tu turno fue reservado correctamente.</h2>
+            <h2>Tu consulta fue reservada correctamente.</h2>
             {params?.message ? <p className="muted">{params.message}</p> : null}
             <dl>
               {params?.specialist ? (
@@ -120,7 +120,7 @@ export default async function TurnosPage({ searchParams }) {
             </dl>
             <div className="actions">
               <a className="button" href="/mi-cuenta">Ir a Mi Espacio</a>
-              <a className="button secondary" href="/turnos">Reservar otro turno</a>
+              <a className="button secondary" href="/turnos">Reservar otra consulta</a>
             </div>
           </section>
         ) : null}

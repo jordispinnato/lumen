@@ -1497,6 +1497,33 @@ h3 {
   line-height: 1.6;
 }
 
+.landing-whatsapp-row {
+  width: min(1180px, calc(100% - 36px));
+  display: flex;
+  justify-content: flex-end;
+  margin: -34px auto 74px;
+}
+
+.landing-whatsapp-button {
+  min-height: 54px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border: 1px solid rgba(11, 74, 83, 0.16);
+  border-radius: 999px;
+  padding: 0 22px;
+  background: linear-gradient(135deg, #0b4a53, #68c7bd);
+  color: white;
+  font-weight: 900;
+  box-shadow: 0 18px 38px rgba(11, 74, 83, 0.22);
+  transition: transform 180ms ease, box-shadow 180ms ease;
+}
+
+.landing-whatsapp-button:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 22px 42px rgba(11, 74, 83, 0.28);
+}
+
 .about-hero {
   padding: clamp(72px, 10vw, 116px) 0 42px;
 }
@@ -1504,6 +1531,98 @@ h3 {
 .about-hero .lead {
   max-width: 800px;
   color: #53627d;
+}
+
+.contact-page {
+  background:
+    linear-gradient(180deg, rgba(237, 243, 235, 0.78), rgba(247, 245, 238, 0.96)),
+    var(--warm);
+}
+
+.contact-hero {
+  max-width: 860px;
+  padding: clamp(28px, 5vw, 54px) 0 12px;
+}
+
+.contact-hero h1 {
+  margin-bottom: 14px;
+  font-size: clamp(3rem, 7vw, 6rem);
+}
+
+.contact-layout {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(300px, 0.42fr);
+  gap: 18px;
+}
+
+.contact-form-panel,
+.contact-info-panel {
+  display: grid;
+  gap: 18px;
+}
+
+.contact-form {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 14px;
+}
+
+.contact-form label {
+  min-width: 0;
+  display: grid;
+  gap: 7px;
+  color: var(--deep);
+  font-weight: 900;
+}
+
+.contact-form input,
+.contact-form textarea {
+  width: 100%;
+  min-width: 0;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  padding: 13px 14px;
+  background: white;
+  color: var(--deep);
+  font: inherit;
+}
+
+.contact-form textarea {
+  resize: vertical;
+}
+
+.contact-channel-list {
+  display: grid;
+  gap: 12px;
+}
+
+.contact-channel-list a {
+  display: grid;
+  gap: 5px;
+  border: 1px solid rgba(11, 74, 83, 0.12);
+  border-radius: 8px;
+  padding: 16px;
+  background: rgba(255, 255, 255, 0.78);
+  color: var(--deep);
+  transition: transform 180ms ease, border-color 180ms ease, box-shadow 180ms ease;
+}
+
+.contact-channel-list a:hover {
+  transform: translateY(-1px);
+  border-color: rgba(11, 74, 83, 0.32);
+  box-shadow: 0 16px 32px rgba(20, 53, 56, 0.1);
+}
+
+.contact-channel-list span {
+  color: var(--petrol);
+  font-size: 0.78rem;
+  font-weight: 900;
+  text-transform: uppercase;
+}
+
+.contact-channel-list small {
+  color: var(--muted);
+  line-height: 1.45;
 }
 
 .course-link {
@@ -2897,16 +3016,34 @@ body:has(.admin-cms-shell) {
   background: rgba(232, 245, 241, 0.92);
 }
 
-.booking-layout {
+.booking-layout,
+.booking-calendar-layout {
   display: grid;
   grid-template-columns: minmax(240px, 0.75fr) minmax(520px, 1.35fr) minmax(320px, 0.9fr);
   gap: 18px;
   align-items: start;
 }
 
+.booking-flow {
+  display: grid;
+  gap: 18px;
+}
+
+.booking-calendar-layout {
+  grid-template-columns: minmax(0, 1fr) minmax(320px, 0.42fr);
+}
+
 .booking-panel {
   display: grid;
   gap: 18px;
+}
+
+.booking-panel-head {
+  max-width: 840px;
+}
+
+.booking-panel-head h2 {
+  margin: 0 0 8px;
 }
 
 .specialist-list,
@@ -2919,6 +3056,17 @@ body:has(.admin-cms-shell) {
 .professional-admin-list {
   display: grid;
   gap: 12px;
+}
+
+.booking-professional-grid {
+  grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+  gap: 16px;
+}
+
+.booking-professional-grid .professional-option {
+  min-height: 100%;
+  align-content: start;
+  padding: clamp(18px, 2.2vw, 24px);
 }
 
 .professional-option,
@@ -2967,12 +3115,22 @@ body:has(.admin-cms-shell) {
 
 .professional-option img,
 .professional-option .professional-avatar {
-  width: min(190px, 78%);
+  width: min(230px, 82%);
   height: auto;
-  max-width: 190px;
+  max-width: 230px;
   aspect-ratio: 1;
   border-radius: 8px;
   box-shadow: 0 16px 34px rgba(20, 53, 56, 0.12);
+}
+
+.booking-empty-selection {
+  min-height: 220px;
+  display: grid;
+  align-content: center;
+  justify-items: center;
+  text-align: center;
+  background:
+    linear-gradient(135deg, rgba(232, 245, 241, 0.76), rgba(255, 253, 248, 0.92));
 }
 
 .professional-avatar {
@@ -5668,6 +5826,8 @@ body:has(.account-app-shell) .site-footer {
   .admin-metrics-grid,
   .admin-dashboard-grid,
   .booking-layout,
+  .booking-calendar-layout,
+  .contact-layout,
   .checkout-card,
   .product-detail,
   .course-landing,
@@ -5692,6 +5852,10 @@ body:has(.account-app-shell) .site-footer {
   .account-actions,
   .admin-quick-actions,
   .profile-panel dl {
+    grid-template-columns: 1fr;
+  }
+
+  .contact-form {
     grid-template-columns: 1fr;
   }
 
@@ -6169,6 +6333,10 @@ body:has(.account-app-shell) .site-footer {
   .admin-layout,
   .admin-form,
   .booking-layout,
+  .booking-calendar-layout,
+  .booking-professional-grid,
+  .contact-layout,
+  .contact-form,
   .month-tabs,
   .calendar-selectors,
   .slot-grid,

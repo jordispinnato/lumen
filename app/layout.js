@@ -128,7 +128,8 @@ export default async function RootLayout({ children }) {
             <a href="/quienes-somos">Quiénes somos</a>
             <a href="/cursos">Cursos</a>
             <a href="/catalogo">Catálogo</a>
-            <a href="/turnos">Turnos</a>
+            <a href="/turnos">Consultas profesionales</a>
+            <a href="/contacto">Contacto</a>
           </nav>
           <nav aria-label="Legal">
             <strong>Legal</strong>

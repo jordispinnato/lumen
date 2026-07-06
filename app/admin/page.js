@@ -202,6 +202,7 @@ export default async function AdminPage({ searchParams }) {
     { data: catalogOrders },
     { data: specialistCalendarConnections },
     { data: invoiceRequests },
+    { data: contactMessages },
   ] = await Promise.all([
     dataSupabase
       .from("courses")
@@ -254,6 +255,10 @@ export default async function AdminPage({ searchParams }) {
       .from("invoice_requests")
       .select("id,user_id,purchase_type,purchase_title,amount,status,invoice_number,invoice_file_url,billing_snapshot,requested_at,issued_at,order_id,catalog_order_id")
       .order("requested_at", { ascending: false }),
+    dataSupabase
+      .from("contact_messages")
+      .select("id,first_name,last_name,email,phone,subject,message,status,admin_notes,created_at")
+      .order("created_at", { ascending: false }),
   ]);
 
   const today = new Date().toISOString().slice(0, 10);
@@ -290,6 +295,7 @@ export default async function AdminPage({ searchParams }) {
   const downloadableDigitalProducts = digitalProducts.filter((product) => product.digital_file_name || product.digital_file_path || product.digital_url);
   const pendingCatalogOrders = (catalogOrders || []).filter((order) => order.status === "pending_payment");
   const pendingInvoiceRequests = (invoiceRequests || []).filter((invoice) => invoice.status === "requested");
+  const pendingContactMessages = (contactMessages || []).filter((message) => message.status === "new");
   const productsWithoutStock = (catalogProducts || []).filter((product) => {
     return product.product_type === "physical" && product.status === "published" && Number(product.stock || 0) <= 0;
   });
@@ -467,6 +473,44 @@ export default async function AdminPage({ searchParams }) {
       ],
     };
   });
+  const contactRows = (contactMessages || []).map((message) => ({
+    id: message.id,
+    name: `${message.first_name || ""} ${message.last_name || ""}`.trim() || "Sin nombre",
+    email: message.email || "Sin email",
+    phone: message.phone || "Sin telefono",
+    subject: message.subject || "Consulta general",
+    message: message.message || "Sin mensaje",
+    date: formatDateTime(message.created_at),
+    status: message.status || "new",
+    notes: message.admin_notes || "",
+    actions: [
+      {
+        label: "En revision",
+        endpoint: "/admin/contact-messages/action",
+        fields: { messageId: message.id, status: "in_review" },
+        confirmTitle: "Marcar consulta en revision",
+        confirmText: "La consulta quedara marcada como en revision.",
+      },
+      {
+        label: "Respondida",
+        endpoint: "/admin/contact-messages/action",
+        fields: { messageId: message.id, status: "answered" },
+        confirmTitle: "Marcar consulta respondida",
+        confirmText: "Usa esta opcion cuando ya hayan respondido al email de la persona.",
+      },
+      {
+        label: "Archivar",
+        endpoint: "/admin/contact-messages/action",
+        fields: { messageId: message.id, status: "archived" },
+        confirmTitle: "Archivar consulta",
+        confirmText: "La consulta quedara archivada.",
+      },
+    ],
+  }));
+  const contactStatusOptions = [...new Set(contactRows.map((row) => row.status))].map((value) => ({
+    value,
+    label: value,
+  }));
   const enrollmentRows = (enrollments || []).map((enrollment) => ({
     id: enrollment.id,
     student: profileById.get(enrollment.user_id)?.email || profileById.get(enrollment.user_id)?.full_name || enrollment.user_id || "Alumno",
@@ -502,6 +546,7 @@ export default async function AdminPage({ searchParams }) {
             <MetricCard label="Productos activos" value={activeProducts.length} helper="Productos publicados del catalogo" href="#catalogo" />
             <MetricCard label="Solicitudes de compra" value={catalogOrders?.length || 0} helper="Pedidos registrados" href="#catalogo" />
             <MetricCard label="Facturas solicitadas" value={pendingInvoiceRequests.length} helper="Pendientes de emision" href="#facturas" />
+            <MetricCard label="Consultas web" value={pendingContactMessages.length} helper="Mensajes nuevos desde contacto" href="#contacto" />
             <MetricCard label="Usuarios registrados" value={profiles?.length || 0} helper="Perfiles creados" href="#inscripciones" />
           </div>
 
@@ -512,6 +557,7 @@ export default async function AdminPage({ searchParams }) {
             <a href="#catalogo">Gestionar catalogo</a>
             <a href="#inscripciones">Ver inscripciones</a>
             <a href="#facturas">Facturas solicitadas</a>
+            <a href="#contacto">Consultas web</a>
             <a href="#contenido">Ver contenido/materiales</a>
           </nav>
 
@@ -596,6 +642,63 @@ export default async function AdminPage({ searchParams }) {
               ) : null}
             </DashboardList>
           </div>
+        </section>
+
+        <section className="admin-section" id="contacto" data-admin-view="contacto">
+          <div className="admin-section-head">
+            <p className="eyebrow">Contacto</p>
+            <h2>Consultas recibidas desde la web</h2>
+          </div>
+
+          <EntityTable
+            title="Bandeja de consultas"
+            description="Mensajes enviados desde la pagina de contacto. Responder por email desde la casilla oficial."
+            columns={[
+              { key: "name", header: "Nombre" },
+              { key: "email", header: "Email" },
+              { key: "phone", header: "Telefono" },
+              { key: "subject", header: "Asunto" },
+              { key: "message", header: "Consulta" },
+              { key: "date", header: "Fecha" },
+              { key: "status", header: "Estado", type: "status" },
+            ]}
+            rows={contactRows}
+            filters={contactStatusOptions.length ? [{ key: "status", label: "Estado", options: contactStatusOptions }] : []}
+            emptyTitle="Todavia no hay consultas."
+            emptyText="Cuando alguien envie el formulario de contacto, el mensaje aparecera aca."
+            searchPlaceholder="Buscar por nombre, email, asunto o consulta"
+          />
+
+          <details className="cms-entity-details spaced-panel">
+            <summary>Actualizar estado o nota interna</summary>
+            <form className="admin-form" action="/admin/contact-messages/action" method="post">
+              <label>
+                Consulta
+                <select name="messageId" required>
+                  <option value="">Seleccionar consulta</option>
+                  {(contactMessages || []).map((message) => (
+                    <option value={message.id} key={message.id}>
+                      {message.email} - {message.subject || "Consulta general"}
+                    </option>
+                  ))}
+                </select>
+              </label>
+              <label>
+                Estado
+                <select name="status" defaultValue="in_review">
+                  <option value="new">Nueva</option>
+                  <option value="in_review">En revision</option>
+                  <option value="answered">Respondida</option>
+                  <option value="archived">Archivada</option>
+                </select>
+              </label>
+              <label className="wide-field">
+                Nota interna opcional
+                <textarea name="adminNotes" rows="3" placeholder="Ej: Respondido por Gmail el 06/07" />
+              </label>
+              <button className="button wide-field" type="submit">Guardar estado</button>
+            </form>
+          </details>
         </section>
 
         <section className="admin-section" id="turnos" data-admin-view="turnos">

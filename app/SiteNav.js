@@ -176,7 +176,8 @@ export default function SiteNav({
           <a href="/quienes-somos" onClick={closeMenu}>Quiénes somos</a>
           <a href="/cursos" onClick={closeMenu}>Cursos</a>
           <a href="/catalogo" onClick={closeMenu}>Catálogo</a>
-          <a href="/turnos" onClick={closeMenu}>Turnos</a>
+          <a href="/turnos" onClick={closeMenu}>Consultas</a>
+          <a href="/contacto" onClick={closeMenu}>Contacto</a>
         </div>
         <div className="site-nav-actions">
           {isLoggedIn ? (

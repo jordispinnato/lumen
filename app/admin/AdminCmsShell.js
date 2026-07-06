@@ -11,6 +11,7 @@ const menuGroups = [
   [
     { label: "Profesionales", href: "#profesionales", icon: "P" },
     { label: "Turnos", href: "#turnos", icon: "T" },
+    { label: "Contacto", href: "#contacto", icon: "Q" },
   ],
   [
     { label: "Cursos", href: "#cursos", icon: "C" },
@@ -48,6 +49,10 @@ const viewActions = {
     { label: "Profesionales", href: "#profesionales" },
     { label: "Horarios", href: "#turnos" },
     { label: "Reservas", href: "#turnos" },
+  ],
+  contacto: [
+    { label: "Consultas", href: "#contacto" },
+    { label: "Sitio", href: "/contacto" },
   ],
   cursos: [
     { label: "Crear curso", href: "#cursos" },
@@ -106,6 +111,7 @@ function getViewFromHash(hash) {
     dashboard: "dashboard",
     profesionales: "turnos",
     turnos: "turnos",
+    contacto: "contacto",
     cursos: "cursos",
     modulos: "modulos",
     lecciones: "lecciones",

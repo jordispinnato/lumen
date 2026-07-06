@@ -12,6 +12,7 @@ function getInitials(name) {
 }
 
 export default async function HomePage() {
+  const whatsappUrl = process.env.NEXT_PUBLIC_WHATSAPP_URL || "https://wa.me/";
   const supabase = await createSupabaseServerClient();
   const [{ data: userData }, { data: courseData }, { data: specialists }, { data: products }] = await Promise.all([
     supabase.auth.getUser(),
@@ -46,13 +47,13 @@ export default async function HomePage() {
       <section className="landing-hero">
         <div className="landing-hero-copy">
           <p className="eyebrow">Plataforma interdisciplinaria online</p>
-          <h1>Un espacio para aprender, acompañarte y sentirte mejor</h1>
+          <h1>Un espacio para aprender, acompanarte y sentirte mejor</h1>
           <p className="lead">
-            Cursos, turnos online y recursos terapéuticos para acompañar tu bienestar personal y profesional.
+            Cursos, consultas online y recursos terapeuticos para acompanar tu bienestar personal y profesional.
           </p>
           <div className="landing-actions">
             <a className="button" href="/cursos">Explorar cursos</a>
-            <a className="secondary-button" href="/turnos">Reservar turno</a>
+            <a className="secondary-button" href="/turnos">Reservar consulta</a>
           </div>
         </div>
       </section>
@@ -60,32 +61,32 @@ export default async function HomePage() {
       <section className="landing-feature-grid" aria-label="Accesos principales">
         <article className="landing-feature-card">
           <h2>Cursos</h2>
-          <p>Aprendé a tu ritmo con contenidos diseñados por profesionales.</p>
+          <p>Aprende a tu ritmo con contenidos disenados por profesionales.</p>
           <a className="secondary-button" href="/cursos">Ver cursos</a>
         </article>
         <article className="landing-feature-card">
-          <h2>Turnos</h2>
-          <p>Reservá atención psicológica online de manera simple y clara.</p>
-          <a className="secondary-button" href="/turnos">Reservar turno</a>
+          <h2>Consultas profesionales</h2>
+          <p>Reserva una consulta online con especialistas de manera simple y clara.</p>
+          <a className="secondary-button" href="/turnos">Reservar consulta</a>
         </article>
         <article className="landing-feature-card">
-          <h2>Catálogo</h2>
-          <p>Recursos físicos y digitales para bienestar, educación y práctica clínica.</p>
-          <a className="secondary-button" href="/catalogo">Ver catálogo</a>
+          <h2>Catalogo</h2>
+          <p>Recursos fisicos y digitales para bienestar, educacion y practica clinica.</p>
+          <a className="secondary-button" href="/catalogo">Ver catalogo</a>
         </article>
       </section>
 
       <section className="landing-section">
         <div className="landing-section-head centered">
-          <p className="eyebrow">Cómo funciona</p>
+          <p className="eyebrow">Como funciona</p>
           <h2>Un recorrido simple para empezar.</h2>
         </div>
         <div className="landing-steps">
           {[
-            ["1", "Registrate", "Creá tu cuenta gratis en pocos pasos."],
-            ["2", "Explorá", "Descubrí cursos, recursos y profesionales."],
-            ["3", "Reservá o accedé", "Elegí turno, curso o recurso según tu necesidad."],
-            ["4", "Comenzá", "Iniciá tu camino de crecimiento y bienestar."],
+            ["1", "Registrate", "Crea tu cuenta gratis en pocos pasos."],
+            ["2", "Explora", "Descubri cursos, recursos y profesionales."],
+            ["3", "Reserva o accede", "Elegi consulta, curso o recurso segun tu necesidad."],
+            ["4", "Comenza", "Inicia tu camino de crecimiento y bienestar."],
           ].map(([number, title, text]) => (
             <article key={number}>
               <span>{number}</span>
@@ -100,9 +101,9 @@ export default async function HomePage() {
         <div className="landing-section-head">
           <div>
             <p className="eyebrow">Profesionales destacados</p>
-            <h2>Acompañamiento profesional, cercano y online.</h2>
+            <h2>Acompanamiento profesional, cercano y online.</h2>
           </div>
-          <a className="secondary-button" href="/turnos">Ver turnos</a>
+          <a className="secondary-button" href="/turnos">Ver consultas</a>
         </div>
         {specialists?.length ? (
           <div className="landing-card-grid">
@@ -118,7 +119,7 @@ export default async function HomePage() {
                   <p>{specialist.role || "Profesional LUMEN"}</p>
                   {specialist.professional_license ? <small>{specialist.professional_license}</small> : null}
                 </div>
-                <p>{specialist.focus || specialist.short_bio || "Perfil profesional preparado para acompañar procesos de bienestar."}</p>
+                <p>{specialist.focus || specialist.short_bio || "Perfil profesional preparado para acompanar procesos de bienestar."}</p>
                 <a className="secondary-button" href={specialist.slug ? `/profesionales/${specialist.slug}` : "/turnos"}>Ver perfil</a>
               </article>
             ))}
@@ -127,7 +128,7 @@ export default async function HomePage() {
           <div className="ds-empty-state">
             <span aria-hidden="true">+</span>
             <h3>Pronto vas a ver profesionales destacados</h3>
-            <p>El equipo de LUMEN se mostrará acá cuando los perfiles estén publicados.</p>
+            <p>El equipo de LUMEN se mostrara aca cuando los perfiles esten publicados.</p>
           </div>
         )}
       </section>
@@ -158,9 +159,9 @@ export default async function HomePage() {
         <div className="landing-section-head">
           <div>
             <p className="eyebrow">Recursos destacados</p>
-            <h2>Herramientas para acompañar el bienestar cotidiano.</h2>
+            <h2>Herramientas para acompanar el bienestar cotidiano.</h2>
           </div>
-          <a className="secondary-button" href="/catalogo">Ver catálogo</a>
+          <a className="secondary-button" href="/catalogo">Ver catalogo</a>
         </div>
         <div className="landing-card-grid">
           {productCards.map((product) => {
@@ -180,9 +181,9 @@ export default async function HomePage() {
 
       <section className="landing-final-cta">
         <div>
-          <p className="eyebrow">Empezá hoy</p>
-          <h2>Empezá tu recorrido en LUMEN</h2>
-          <p>Creamos un espacio simple para aprender, reservar turnos y acceder a recursos de bienestar.</p>
+          <p className="eyebrow">Empeza hoy</p>
+          <h2>Empeza tu recorrido en LUMEN</h2>
+          <p>Creamos un espacio simple para aprender, reservar consultas y acceder a recursos de bienestar.</p>
         </div>
         <div className="landing-actions">
           {isLoggedIn ? (
@@ -190,9 +191,15 @@ export default async function HomePage() {
           ) : (
             <a className="button" href="/registro">Crear cuenta</a>
           )}
-          <a className="secondary-button" href="/turnos">Reservar turno</a>
+          <a className="secondary-button" href="/turnos">Reservar consulta</a>
         </div>
       </section>
+
+      <div className="landing-whatsapp-row">
+        <a className="landing-whatsapp-button" href={whatsappUrl} target="_blank" rel="noreferrer">
+          WhatsApp
+        </a>
+      </div>
     </main>
   );
 }
