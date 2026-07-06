@@ -8,6 +8,13 @@ export const metadata = {
   description: "Orientación profesional, formación y recursos para transformar información en acciones concretas.",
 };
 
+function applyReadReceipts(items, receiptSet, itemType) {
+  return (items || []).map((item) => ({
+    ...item,
+    read_at: item.read_at || (receiptSet.has(`${itemType}:${item.id}`) ? "read" : null),
+  }));
+}
+
 export default async function RootLayout({ children }) {
   const supabase = await createSupabaseServerClient();
   const { data: userData } = await supabase.auth.getUser();
@@ -42,22 +49,23 @@ export default async function RootLayout({ children }) {
     }
 
     const [
-      { count: notificationCount },
-      { count: messageCount },
+      { data: notificationCountRows },
+      { data: messageCountRows },
       { count: cartCount },
       { data: notificationRows },
       { data: messageRows },
+      { data: readReceipts },
     ] = await Promise.all([
       supabase
         .from("user_notifications")
-        .select("id", { count: "exact", head: true })
+        .select("id,read_at")
         .or(`user_id.eq.${userData.user.id},user_id.is.null`)
-        .is("read_at", null),
+        .limit(200),
       supabase
         .from("user_messages")
-        .select("id", { count: "exact", head: true })
+        .select("id,read_at")
         .or(`user_id.eq.${userData.user.id},user_id.is.null`)
-        .is("read_at", null),
+        .limit(200),
       supabase
         .from("catalog_cart_items")
         .select("id", { count: "exact", head: true })
@@ -74,12 +82,17 @@ export default async function RootLayout({ children }) {
         .or(`user_id.eq.${userData.user.id},user_id.is.null`)
         .order("created_at", { ascending: false })
         .limit(4),
+      supabase
+        .from("user_notification_reads")
+        .select("item_type,item_id")
+        .eq("user_id", userData.user.id),
     ]);
 
-    unreadNotifications = notificationCount || 0;
-    unreadMessages = messageCount || 0;
-    notificationPreview = notificationRows || [];
-    messagePreview = messageRows || [];
+    const receiptSet = new Set((readReceipts || []).map((item) => `${item.item_type}:${item.item_id}`));
+    notificationPreview = applyReadReceipts(notificationRows || [], receiptSet, "notification");
+    messagePreview = applyReadReceipts(messageRows || [], receiptSet, "message");
+    unreadNotifications = applyReadReceipts(notificationCountRows || [], receiptSet, "notification").filter((item) => !item.read_at).length;
+    unreadMessages = applyReadReceipts(messageCountRows || [], receiptSet, "message").filter((item) => !item.read_at).length;
     cartItems = cartCount || 0;
   }
 

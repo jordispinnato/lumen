@@ -74,6 +74,13 @@ function StatCard({ icon, tone, label, value, helper, href, action }) {
   );
 }
 
+function applyReadReceipts(items, receiptSet, itemType) {
+  return (items || []).map((item) => ({
+    ...item,
+    read_at: item.read_at || (receiptSet.has(`${itemType}:${item.id}`) ? "read" : null),
+  }));
+}
+
 function getCourseState(progress) {
   if (progress.percent >= 100) {
     return "Completado";
@@ -184,6 +191,7 @@ export default async function MiCuentaPage({ searchParams }) {
     { data: courseOrders },
     { data: billingProfile },
     { data: invoiceRequests },
+    { data: readReceipts },
   ] = await Promise.all([
     supabase
       .from("profiles")
@@ -283,6 +291,10 @@ export default async function MiCuentaPage({ searchParams }) {
       .select("id,order_id,catalog_order_id,purchase_type,status,invoice_number,invoice_file_url,requested_at,issued_at")
       .eq("user_id", userData.user.id)
       .order("requested_at", { ascending: false }),
+    supabase
+      .from("user_notification_reads")
+      .select("item_type,item_id")
+      .eq("user_id", userData.user.id),
   ]);
 
   const upcomingBookings = (bookings || [])
@@ -342,8 +354,9 @@ export default async function MiCuentaPage({ searchParams }) {
     }),
   ].sort((a, b) => String(b.date || "").localeCompare(String(a.date || "")));
   const invoiceEligiblePurchases = purchaseRows.filter((purchase) => purchase.canRequestInvoice);
-  const notificationList = notifications || [];
-  const messageList = messages || [];
+  const receiptSet = new Set((readReceipts || []).map((item) => `${item.item_type}:${item.item_id}`));
+  const notificationList = applyReadReceipts(notifications || [], receiptSet, "notification");
+  const messageList = applyReadReceipts(messages || [], receiptSet, "message");
   const cartItemList = cartItems || [];
   const pendingAccountAlerts =
     notificationList.filter((item) => !item.read_at).length + messageList.filter((item) => !item.read_at).length;

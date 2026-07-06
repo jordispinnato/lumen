@@ -61,7 +61,7 @@ function SiteNotificationMenu({
       body: item.body,
       href: item.href || "/mi-cuenta#notificaciones",
       date: item.created_at,
-      unread: !item.read_at,
+      unread: pendingAlerts > 0 && !item.read_at,
     })),
     ...messagePreview.map((item) => ({
       id: `message-${item.id}`,
@@ -70,7 +70,7 @@ function SiteNotificationMenu({
       body: item.body,
       href: "/mi-cuenta#mensajes",
       date: item.created_at,
-      unread: !item.read_at,
+      unread: pendingAlerts > 0 && !item.read_at,
     })),
   ]
     .sort((a, b) => String(b.date || "").localeCompare(String(a.date || "")))
@@ -132,11 +132,18 @@ export default function SiteNav({
   const [isOpen, setIsOpen] = useState(false);
   const [isNotificationOpen, setIsNotificationOpen] = useState(false);
   const [isUserMenuOpen, setIsUserMenuOpen] = useState(false);
+  const [visibleUnreadNotifications, setVisibleUnreadNotifications] = useState(unreadNotifications);
+  const [visibleUnreadMessages, setVisibleUnreadMessages] = useState(unreadMessages);
   const closeTimerRef = useRef(null);
   const userMenuRef = useRef(null);
   const initials = getInitials(displayName || email);
 
   useCloseOnOutsideClick(userMenuRef, isUserMenuOpen, () => setIsUserMenuOpen(false));
+
+  useEffect(() => {
+    setVisibleUnreadNotifications(unreadNotifications);
+    setVisibleUnreadMessages(unreadMessages);
+  }, [unreadNotifications, unreadMessages]);
 
   function clearCloseTimer() {
     if (closeTimerRef.current) {
@@ -157,6 +164,23 @@ export default function SiteNav({
     clearCloseTimer();
     setIsOpen(false);
     setIsNotificationOpen(false);
+    setIsUserMenuOpen(false);
+  }
+
+  function markNotificationsRead() {
+    if (!visibleUnreadNotifications && !visibleUnreadMessages) {
+      return;
+    }
+
+    setVisibleUnreadNotifications(0);
+    setVisibleUnreadMessages(0);
+    fetch("/notifications/read", { method: "POST" }).catch(() => {});
+  }
+
+  function openNotifications() {
+    clearCloseTimer();
+    markNotificationsRead();
+    setIsNotificationOpen(true);
     setIsUserMenuOpen(false);
   }
 
@@ -183,21 +207,23 @@ export default function SiteNav({
           {isLoggedIn ? (
             <>
               <SiteNotificationMenu
-                unreadMessages={unreadMessages}
-                unreadNotifications={unreadNotifications}
+                unreadMessages={visibleUnreadMessages}
+                unreadNotifications={visibleUnreadNotifications}
                 notificationPreview={notificationPreview}
                 messagePreview={messagePreview}
                 isOpen={isNotificationOpen}
                 onClose={() => setIsNotificationOpen(false)}
-                onHoverStart={() => {
-                  clearCloseTimer();
-                  setIsNotificationOpen(true);
-                  setIsUserMenuOpen(false);
-                }}
+                onHoverStart={openNotifications}
                 onHoverEnd={closeDropdownsWithDelay}
                 onToggle={() => {
                   clearCloseTimer();
-                  setIsNotificationOpen((value) => !value);
+                  setIsNotificationOpen((value) => {
+                    if (!value) {
+                      markNotificationsRead();
+                    }
+
+                    return !value;
+                  });
                   setIsUserMenuOpen(false);
                 }}
               />

@@ -37,7 +37,7 @@ function NotificationDropdown({ messages = [], notifications = [], count = 0, is
       href: item.href || "#notificaciones",
       type: item.notification_type || "notificacion",
       date: item.created_at,
-      unread: !item.read_at,
+      unread: count > 0 && !item.read_at,
     })),
     ...messages.slice(0, 4).map((item) => ({
       id: `message-${item.id}`,
@@ -46,7 +46,7 @@ function NotificationDropdown({ messages = [], notifications = [], count = 0, is
       href: "#mensajes",
       type: item.message_type || "mensaje",
       date: item.created_at,
-      unread: !item.read_at,
+      unread: count > 0 && !item.read_at,
     })),
   ]
     .sort((a, b) => String(b.date || "").localeCompare(String(a.date || "")))
@@ -103,14 +103,28 @@ export default function AccountDashboardShell({
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [isNotificationOpen, setIsNotificationOpen] = useState(false);
   const [isUserMenuOpen, setIsUserMenuOpen] = useState(false);
+  const [visibleNotificationCount, setVisibleNotificationCount] = useState(notificationCount);
   const userMenuRef = useRef(null);
 
   useCloseOnOutsideClick(userMenuRef, isUserMenuOpen, () => setIsUserMenuOpen(false));
+
+  useEffect(() => {
+    setVisibleNotificationCount(notificationCount);
+  }, [notificationCount]);
 
   function closeMenu() {
     setIsMenuOpen(false);
     setIsNotificationOpen(false);
     setIsUserMenuOpen(false);
+  }
+
+  function markNotificationsRead() {
+    if (!visibleNotificationCount) {
+      return;
+    }
+
+    setVisibleNotificationCount(0);
+    fetch("/notifications/read", { method: "POST" }).catch(() => {});
   }
 
   return (
@@ -162,13 +176,19 @@ export default function AccountDashboardShell({
           </button>
           <div className="account-header-actions">
             <NotificationDropdown
-              count={notificationCount}
+              count={visibleNotificationCount}
               messages={messages}
               notifications={notifications}
               isOpen={isNotificationOpen}
               onClose={() => setIsNotificationOpen(false)}
               onToggle={() => {
-                setIsNotificationOpen((value) => !value);
+                setIsNotificationOpen((value) => {
+                  if (!value) {
+                    markNotificationsRead();
+                  }
+
+                  return !value;
+                });
                 setIsUserMenuOpen(false);
               }}
             />
