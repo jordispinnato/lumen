@@ -6,7 +6,7 @@ export default async function TransferPage({ searchParams }) {
 
   return (
     <main className="section">
-      <form className="form-card">
+      <section className="form-card">
         <p className="eyebrow">Transferencia manual</p>
         <h1>{course.title}</h1>
         <p className="lead">{formatPrice(course.price)}</p>
@@ -15,17 +15,12 @@ export default async function TransferPage({ searchParams }) {
           <br />
           CBU: {process.env.NEXT_PUBLIC_BANK_CBU || "0000000000000000000000"}
         </p>
-        <label>
-          Email de la cuenta
-          <input type="email" name="email" required />
-        </label>
-        <label>
-          Mensaje o número de comprobante
-          <textarea name="message" rows="4" />
-        </label>
-        <button className="button" type="button">Enviar comprobante</button>
-        <p className="muted">Luego esto guardará una solicitud para aprobar desde el panel admin.</p>
-      </form>
+        <p className="muted">
+          Realiza la transferencia por el importe indicado y luego envianos el comprobante desde la pagina de contacto.
+          El equipo de LUMEN revisara el pago y te confirmara el acceso correspondiente.
+        </p>
+        <a className="button" href="/contacto">Enviar comprobante por contacto</a>
+      </section>
     </main>
   );
 }

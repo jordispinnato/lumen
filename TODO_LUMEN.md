@@ -65,7 +65,7 @@ Lista corta y curada de lo que tiene sentido atacar primero, no el backlog compl
 ### Tecnico
 - `[~]` Productos digitales: subir archivo en admin y habilitar descarga post-compra con link firmado **ya estan implementados**. Falta que exista un flujo de pago real para que una orden llegue a estado `paid` fuera de pruebas manuales.
 - `[~]` Productos fisicos: se piden datos de envio y el pedido guarda estado (`catalog_orders`), incluida columna de codigo de seguimiento. Falta confirmar si el admin expone edicion de ese codigo y si se notifica al cliente por email en cada cambio de estado.
-- `[ ]` Arreglar el formulario de transferencia bancaria manual (`app/transferencia/page.js`): hoy no envia nada, falta `action`/`method` en el `<form>` y el boton no es de tipo `submit`. Identificado en la auditoria tecnica, no corregido todavia.
+- `[~]` Transferencia bancaria manual (`app/transferencia/page.js`): alcance minimo resuelto. Ya no promete enviar comprobantes desde un formulario sin backend; indica transferir y enviar comprobante por `/contacto`.
 - `[BLOQUEADO: Mercado Pago Checkout, no tocar sin pedido explicito]` Flujo real de pago para productos fisicos y digitales.
 
 ### Producto
