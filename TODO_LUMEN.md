@@ -106,7 +106,7 @@ Nota: la mejora de configuracion de cuenta (telefono, cambio de email con confir
 ### Tecnico
 - `[DECISION]` Definir casillas reales: `contacto@espaciolumen.com`, `turnos@espaciolumen.com`, `notificaciones@espaciolumen.com`.
 - `[BLOQUEADO: depende de definir las casillas reales]` Configurar DNS de email si se usa un servicio de correo externo.
-- `[ ]` Sincronizar `.env.example` del repo con la lista completa de variables de `PROJECT_STATUS.md` (hoy faltan las de Google Calendar, `CONTACT_EMAIL` y `NEXT_PUBLIC_WHATSAPP_URL`).
+- `[~]` `.env.example` sincronizado con la lista completa de variables de `PROJECT_STATUS.md` y agrupado por categoria. Completado el 2026-07-08.
 
 Nota: "revisar RLS de tablas nuevas despues de cada modulo" y "mantener SQLs versionados y pasados por chat" ya no son tareas de esta lista — son convenciones de trabajo permanentes, documentadas en `PROJECT_STATUS.md` → "Convencion De Trabajo Entre IAs".
 
