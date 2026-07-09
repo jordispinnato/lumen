@@ -816,6 +816,10 @@ export default async function MiCuentaPage({ searchParams }) {
                       <strong>{item.catalog_products?.title || "Producto"}</strong>
                       <small>Cantidad: {item.quantity} Â· {formatPrice((item.catalog_products?.price || 0) * item.quantity)}</small>
                       <a className="account-secondary-action" href={`/catalogo/${item.catalog_products?.id}`}>Ver producto</a>
+                      <form action="/catalogo/cart/remove" method="post">
+                        <input name="cartItemId" type="hidden" value={item.id} />
+                        <button className="account-secondary-action" type="submit">Quitar</button>
+                      </form>
                     </article>
                   ))}
                 </div>

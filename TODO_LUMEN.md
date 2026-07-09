@@ -4,7 +4,7 @@
 |---|---|
 | Version | 1.0 |
 | Ultima actualizacion | 2026-07-08 |
-| Ultimo responsable | Claude (IA) - sincronizacion Google Calendar en reprogramar/cancelar |
+| Ultimo responsable | Claude (IA) - LUM-003.1 quitar item del carrito |
 | Revisado por | Pendiente de revision del usuario |
 | Estado | En desarrollo activo |
 
@@ -26,7 +26,7 @@ Lista corta y curada de lo que tiene sentido atacar primero, no el backlog compl
 2. `[~]` Sincronizacion de Google Calendar completa en codigo (creacion, actualizacion al reprogramar y borrado al cancelar). Falta probarlo en produccion con una cuenta de Google real conectada (ver checklist de pruebas manuales pendientes).
 3. `[ ]` Confirmar si `NEXT_PUBLIC_WHATSAPP_URL` tiene un numero real cargado en Vercel (si quedo con el valor por defecto, el boton de WhatsApp de la landing no lleva a ningun lado).
 4. `[~]` Auditar cobertura de `AdminConfirmButton` en las acciones destructivas del panel admin (ya se usa en varios lugares, falta confirmar que no queden borrados sin confirmacion).
-5. `[~]` Completar carrito de compras: hoy solo se puede agregar (`catalog_cart_items`); falta sacar item, editar cantidad y finalizar.
+5. `[~]` Completar carrito de compras (plan LUM-003): LUM-003.1 (quitar item) completada; falta editar cantidad, mostrar subtotal/total y finalizar compra (ver seccion "Usuarios / Mi Cuenta").
 
 ## Prioridad Alta
 
@@ -73,7 +73,12 @@ Lista corta y curada de lo que tiene sentido atacar primero, no el backlog compl
 ## Usuarios / Mi Cuenta
 
 ### Tecnico
-- `[~]` Completar carrito de compras: agregar funciona, falta sacar item, editar cantidad y finalizar compra.
+- `[~]` Completar carrito de compras (plan LUM-003, ver detalle abajo):
+  - `[x]` LUM-003.1 — Quitar item del carrito: **completado** (2026-07-09). Nueva ruta `app/catalogo/cart/remove/route.js` + boton "Quitar" en `/mi-cuenta#carrito`.
+  - `[ ]` LUM-003.2 — Editar cantidad de un item.
+  - `[ ]` LUM-003.3 — Mostrar subtotal por item y total del carrito.
+  - `[ ]` LUM-003.4 — Finalizar compra (crea pedidos en `catalog_orders` y vacia el carrito, sin Mercado Pago todavia).
+  - `[DECISION]` LUM-003.5 (opcional) — columna `checkout_group_id` en `catalog_orders` para preparar Mercado Pago futuro.
 - `[DECISION]` Completar wishlist/lista de deseos, si se decide usar.
 - `[~]` Notificaciones estilo dropdown: ya muestra preview con titulo, cuerpo y fecha en el menu de campana. Confirmar con el usuario si falta algo especifico de "contenido completo" o si ya se considera resuelto.
 - `[ ]` Revisar responsive en todas las pantallas para evitar textos fuera de recuadro (bug de layout, no rediseño — no choca con la restriccion de esperar el Figma).
