@@ -117,6 +117,9 @@ Nota: "revisar RLS de tablas nuevas despues de cada modulo" y "mantener SQLs ver
 
 ## UX / Diseño
 
+### Documentacion
+- `[~]` Principios de producto documentados en `docs/PRODUCT_PRINCIPLES.md`. Usar este documento como guía para futuras decisiones de UX, copy, onboarding y diseño cuando llegue el Figma.
+
 ### Tecnico (no choca con la restriccion de UI — son bugs de layout, no rediseño)
 - `[ ]` Revisar todo mobile.
 - `[ ]` Evitar texto comprimido o vertical en pantallas angostas.
