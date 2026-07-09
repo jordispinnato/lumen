@@ -141,6 +141,30 @@ export default function AccountDashboardShell({
         </a>
 
         <nav className="account-sidebar-nav">
+          <a href="/mi-cuenta" onClick={closeMenu}>
+            <span>I</span>
+            Mi Espacio
+          </a>
+          <a href="/mi-perfil" onClick={closeMenu}>
+            <span>U</span>
+            Mi Perfil
+          </a>
+          <a href="/carrito" onClick={closeMenu}>
+            <span>K</span>
+            Carrito
+          </a>
+          <a href="/mis-pedidos" onClick={closeMenu}>
+            <span>P</span>
+            Mis pedidos
+          </a>
+          <a href="/facturacion" onClick={closeMenu}>
+            <span>F</span>
+            Facturación
+          </a>
+          <a href="/configuracion" onClick={closeMenu}>
+            <span>S</span>
+            Configuración
+          </a>
           <a href="/" onClick={closeMenu}>
             <span>H</span>
             Sitio principal
@@ -204,14 +228,14 @@ export default function AccountDashboardShell({
                 <strong>{displayName}</strong>
               </summary>
               <div>
-                <a href="#cursos" onClick={closeMenu}>Mi aprendizaje</a>
-                <a href="#carrito" onClick={closeMenu}>Mi carrito</a>
-                <a href="#compras" onClick={closeMenu}>Mis compras</a>
-                <a href="#facturacion" onClick={closeMenu}>Facturacion</a>
-                <a href="#configuracion" onClick={closeMenu}>Configuracion de la cuenta</a>
-                <a href="#pedidos" onClick={closeMenu}>Historial de compra</a>
-                <a href="/" onClick={closeMenu}>Ir al sitio principal</a>
+                <a href="/mi-cuenta" onClick={closeMenu}>Mi Espacio</a>
+                <a href="/mi-perfil" onClick={closeMenu}>Mi Perfil</a>
                 {isAdmin ? <a href="/admin" onClick={closeMenu}>Ir al Admin</a> : null}
+                <a href="/carrito" onClick={closeMenu}>Carrito</a>
+                <a href="/mis-pedidos" onClick={closeMenu}>Mis pedidos</a>
+                <a href="/facturacion" onClick={closeMenu}>Facturación</a>
+                <a href="/configuracion" onClick={closeMenu}>Configuración</a>
+                <a href="/" onClick={closeMenu}>Ir al sitio principal</a>
                 <form action="/auth/logout" method="post">
                   <button type="submit">Cerrar sesión</button>
                 </form>

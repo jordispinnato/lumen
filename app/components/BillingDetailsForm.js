@@ -14,7 +14,7 @@ export default function BillingDetailsForm({
   userEmail,
   purchaseType = "",
   orderId = "",
-  returnTo = "/mi-cuenta#facturacion",
+  returnTo = "/facturacion",
   submitLabel = "Guardar datos",
   intro,
 }) {

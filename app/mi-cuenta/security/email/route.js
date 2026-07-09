@@ -2,7 +2,7 @@ import { NextResponse } from "next/server";
 import { createSupabaseServerClient } from "../../../../lib/supabase/server";
 
 function redirectWith(origin, params) {
-  return NextResponse.redirect(`${origin}/mi-cuenta?${new URLSearchParams(params).toString()}#configuracion`, {
+  return NextResponse.redirect(`${origin}/configuracion?${new URLSearchParams(params).toString()}`, {
     status: 303,
   });
 }
@@ -15,7 +15,7 @@ export async function POST(request) {
   const { data: userData } = await supabase.auth.getUser();
 
   if (!userData.user) {
-    return NextResponse.redirect(`${origin}/login?next=/mi-cuenta`, { status: 303 });
+    return NextResponse.redirect(`${origin}/login?next=/configuracion`, { status: 303 });
   }
 
   if (!newEmail || !newEmail.includes("@")) {
@@ -28,7 +28,7 @@ export async function POST(request) {
 
   const { error } = await supabase.auth.updateUser(
     { email: newEmail },
-    { emailRedirectTo: `${origin}/mi-cuenta?message=Email confirmado correctamente.#configuracion` }
+    { emailRedirectTo: `${origin}/configuracion?message=Email confirmado correctamente.` }
   );
 
   if (error) {

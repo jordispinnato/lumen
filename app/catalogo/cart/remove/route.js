@@ -9,12 +9,12 @@ export async function POST(request) {
   const { data: userData } = await supabase.auth.getUser();
 
   if (!userData.user) {
-    return NextResponse.redirect(`${origin}/login?next=/mi-cuenta`, { status: 303 });
+    return NextResponse.redirect(`${origin}/login?next=/carrito`, { status: 303 });
   }
 
   if (!cartItemId) {
     const params = new URLSearchParams({ error: "Item de carrito no valido" });
-    return NextResponse.redirect(`${origin}/mi-cuenta?${params.toString()}#carrito`, { status: 303 });
+    return NextResponse.redirect(`${origin}/carrito?${params.toString()}`, { status: 303 });
   }
 
   const { data: existingItem } = await supabase
@@ -25,7 +25,7 @@ export async function POST(request) {
 
   if (!existingItem || existingItem.user_id !== userData.user.id) {
     const params = new URLSearchParams({ error: "No se encontro el item en tu carrito" });
-    return NextResponse.redirect(`${origin}/mi-cuenta?${params.toString()}#carrito`, { status: 303 });
+    return NextResponse.redirect(`${origin}/carrito?${params.toString()}`, { status: 303 });
   }
 
   const { error } = await supabase
@@ -36,9 +36,9 @@ export async function POST(request) {
 
   if (error) {
     const params = new URLSearchParams({ error: error.message });
-    return NextResponse.redirect(`${origin}/mi-cuenta?${params.toString()}#carrito`, { status: 303 });
+    return NextResponse.redirect(`${origin}/carrito?${params.toString()}`, { status: 303 });
   }
 
   const params = new URLSearchParams({ message: "Producto quitado del carrito." });
-  return NextResponse.redirect(`${origin}/mi-cuenta?${params.toString()}#carrito`, { status: 303 });
+  return NextResponse.redirect(`${origin}/carrito?${params.toString()}`, { status: 303 });
 }

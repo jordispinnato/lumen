@@ -4,7 +4,7 @@
 |---|---|
 | Version | 1.0 |
 | Ultima actualizacion | 2026-07-09 |
-| Ultimo responsable | Claude (IA) - LUM-003.3 subtotal y total del carrito |
+| Ultimo responsable | Claude (IA) - etapa 1 de arquitectura de navegacion (Mi Espacio / Carrito / Mis pedidos / Facturacion / Configuracion) |
 | Revisado por | Pendiente de revision del usuario |
 | Estado | En desarrollo activo |
 
@@ -70,20 +70,33 @@ Lista corta y curada de lo que tiene sentido atacar primero, no el backlog compl
 ### Producto
 - `[DECISION]` Imagenes reales de productos.
 
+## Arquitectura de navegacion
+
+Ver `docs/INFORMATION_ARCHITECTURE.md` para la especificacion completa (arquitectura objetivo, no necesariamente el estado actual del codigo en su totalidad).
+
+- `[x]` Etapa 1 — Separar actividad del usuario (Mi Espacio) de administracion de cuenta: **completado** (2026-07-09).
+  - `/mi-cuenta` (Mi Espacio) queda como Dashboard, solo con Mis turnos, Mis cursos, Mis recursos, Certificados, Mensajes, Notificaciones.
+  - Nuevas paginas independientes: `/carrito`, `/mis-pedidos` (fusiona las antiguas secciones "Mis compras" y "Mis pedidos" en dos bloques: cursos/productos digitales y productos fisicos/envios), `/facturacion`.
+  - `/configuracion` — nueva pagina independiente con la funcionalidad real que antes vivia en `/mi-cuenta#configuracion` (editar nombre/telefono, cambiar email, cambiar contraseña). No es un placeholder.
+  - `/mi-perfil` — placeholder simple ("se implementara en una etapa posterior"), enlazado desde el menu del avatar. Todavia no tiene desarrollo real.
+  - Menu del avatar (sitio publico y shell privado) reorganizado: Mi Espacio / Mi Perfil, Carrito / Mis pedidos / Facturacion, Configuracion / Cerrar sesion.
+  - Logica compartida (helpers de formato, labels de estado, `EmptyState`, `AccountIcon`, construccion de filas de compra) extraida a `app/mi-cuenta/accountShared.js` para reutilizar entre las paginas nuevas sin duplicar codigo.
+- `[ ]` Etapa futura (no iniciada): desarrollar `/mi-perfil` con datos personales reales (hoy esos datos viven en `/configuracion`, ver arriba). Definir si en ese momento se migran ahi.
+
 ## Usuarios / Mi Cuenta
 
 ### Tecnico
 - `[~]` Completar carrito de compras (plan LUM-003, ver detalle abajo):
-  - `[x]` LUM-003.1 — Quitar item del carrito: **completado** (2026-07-09). Nueva ruta `app/catalogo/cart/remove/route.js` + boton "Quitar" en `/mi-cuenta#carrito`.
-  - `[x]` LUM-003.2 — Editar cantidad de un item: **completado** (2026-07-09). Nueva ruta `app/catalogo/cart/update/route.js` + input de cantidad y boton "Actualizar" en `/mi-cuenta#carrito`. Si la cantidad ingresada es 0 o menor, se comporta igual que "Quitar".
-  - `[x]` LUM-003.3 — Mostrar subtotal por item y total del carrito: **completado** (2026-07-09). En `/mi-cuenta#carrito` cada item muestra precio unitario, cantidad y subtotal, y se agrego el total general del carrito al final de la lista.
+  - `[x]` LUM-003.1 — Quitar item del carrito: **completado** (2026-07-09). Ruta `app/catalogo/cart/remove/route.js` + boton "Quitar" en `/carrito`.
+  - `[x]` LUM-003.2 — Editar cantidad de un item: **completado** (2026-07-09). Ruta `app/catalogo/cart/update/route.js` + input de cantidad y boton "Actualizar" en `/carrito`. Si la cantidad ingresada es 0 o menor, se comporta igual que "Quitar".
+  - `[x]` LUM-003.3 — Mostrar subtotal por item y total del carrito: **completado** (2026-07-09). En `/carrito` cada item muestra precio unitario, cantidad y subtotal, y se agrego el total general del carrito al final de la lista.
   - `[ ]` LUM-003.4 — Finalizar compra (crea pedidos en `catalog_orders` y vacia el carrito, sin Mercado Pago todavia).
   - `[DECISION]` LUM-003.5 (opcional) — columna `checkout_group_id` en `catalog_orders` para preparar Mercado Pago futuro.
 - `[DECISION]` Completar wishlist/lista de deseos, si se decide usar.
 - `[~]` Notificaciones estilo dropdown: ya muestra preview con titulo, cuerpo y fecha en el menu de campana. Confirmar con el usuario si falta algo especifico de "contenido completo" o si ya se considera resuelto.
 - `[ ]` Revisar responsive en todas las pantallas para evitar textos fuera de recuadro (bug de layout, no rediseño — no choca con la restriccion de esperar el Figma).
 
-Nota: la mejora de configuracion de cuenta (telefono, cambio de email con confirmacion, cambio de contraseña con confirmacion) que aparecia aca **ya esta implementada** en `app/mi-cuenta/profile/update/route.js` y `app/mi-cuenta/security/*`. Se saca de esta lista; queda documentada como funcionando en `PROJECT_STATUS.md`.
+Nota: la funcionalidad de configuracion de cuenta (telefono, cambio de email con confirmacion, cambio de contraseña con confirmacion) vive ahora en `/configuracion` (antes en `/mi-cuenta#configuracion`), usando las mismas rutas `app/mi-cuenta/profile/update/route.js` y `app/mi-cuenta/security/*`. Ver "Arquitectura de navegacion" arriba.
 
 ## Admin
 

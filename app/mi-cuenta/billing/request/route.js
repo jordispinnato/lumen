@@ -28,11 +28,11 @@ export async function POST(request) {
   const { data: userData } = await supabase.auth.getUser();
 
   if (!userData.user) {
-    return NextResponse.redirect(`${origin}/login?next=/mi-cuenta#facturacion`, { status: 303 });
+    return NextResponse.redirect(`${origin}/login?next=/facturacion`, { status: 303 });
   }
 
   if (!adminSupabase) {
-    return redirectWith(origin, "/mi-cuenta#facturacion", "error", "Falta configurar la clave segura de Supabase.");
+    return redirectWith(origin, "/facturacion", "error", "Falta configurar la clave segura de Supabase.");
   }
 
   const buyerType = clean(formData.get("buyerType")) || "person";
@@ -48,7 +48,7 @@ export async function POST(request) {
   const [purchaseKeyType, purchaseKeyId] = purchaseKey.includes(":") ? purchaseKey.split(":") : ["", ""];
   const purchaseType = clean(formData.get("purchaseType")) || purchaseKeyType;
   const orderId = clean(formData.get("orderId")) || purchaseKeyId;
-  const returnTo = clean(formData.get("returnTo")) || "/mi-cuenta#facturacion";
+  const returnTo = clean(formData.get("returnTo")) || "/facturacion";
 
   if (!buyerTypes.has(buyerType) || !taxConditions.has(taxCondition)) {
     return redirectWith(origin, returnTo, "error", "Revisa el tipo de comprador y condicion fiscal.");
@@ -100,7 +100,7 @@ export async function POST(request) {
   }
 
   if (!purchaseType) {
-    return redirectWith(origin, "/mi-cuenta#facturacion", "message", "Datos de facturacion guardados.");
+    return redirectWith(origin, "/facturacion", "message", "Datos de facturacion guardados.");
   }
 
   const purchaseQuery = purchaseType === "course"

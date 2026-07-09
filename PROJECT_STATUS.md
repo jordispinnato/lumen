@@ -3,8 +3,8 @@
 | Campo | Valor |
 |---|---|
 | Version | 1.0 |
-| Ultima actualizacion | 2026-07-08 |
-| Ultimo responsable | Claude (IA) - sincronizacion Google Calendar en reprogramar/cancelar |
+| Ultima actualizacion | 2026-07-09 |
+| Ultimo responsable | Claude (IA) - etapa 1 de arquitectura de navegacion (Mi Espacio / Carrito / Mis pedidos / Facturacion / Configuracion) |
 | Revisado por | Pendiente de revision del usuario |
 | Estado | En desarrollo activo |
 
@@ -166,27 +166,29 @@ Reglas de trabajo vigentes para cualquier IA o persona que modifique este repo. 
 
 ### Mi Cuenta / Mi Espacio
 
-- `/mi-cuenta` protegido por sesion.
-- Dashboard privado con:
+Navegacion reorganizada (2026-07-09, etapa 1 de `docs/INFORMATION_ARCHITECTURE.md`): se separo la actividad del usuario (Mi Espacio) de la administracion de su cuenta, que ahora vive en paginas independientes.
+
+- `/mi-cuenta` (Mi Espacio) protegido por sesion. Dashboard privado con:
   - Inicio
   - Mis turnos
   - Mis cursos
   - Mis recursos
-  - Mis pedidos
-  - Carrito
   - Notificaciones
   - Mensajes
   - Certificados (placeholder, ver seccion Cursos y aula)
-  - Configuracion
-- Configuracion de cuenta **ya funcionando**: edicion de nombre y telefono, cambio de email con confirmacion y cambio de contraseña con confirmacion (usando los flujos nativos de Supabase Auth).
-- Carrito: agregar productos ya funciona (`catalog_cart_items`). Falta sacar un item, editar cantidad y finalizar la compra desde el carrito.
-- Dropdown de usuario y campana de notificaciones con preview de notificaciones y mensajes recientes.
+- `/carrito` — pagina independiente. Agregar, quitar y editar cantidad ya funciona (`catalog_cart_items`), con subtotal por item y total general. Falta finalizar la compra (LUM-003.4 en `TODO_LUMEN.md`).
+- `/mis-pedidos` — pagina independiente. Fusiona el antiguo historial combinado (cursos + catalogo) y el historial de pedidos de catalogo en dos bloques: cursos/productos digitales, y productos fisicos/envios.
+- `/facturacion` — pagina independiente con perfil fiscal y solicitud de factura (ver seccion Facturacion mas abajo).
+- `/configuracion` — pagina independiente y funcional: edicion de nombre y telefono, cambio de email con confirmacion y cambio de contraseña con confirmacion (usando los flujos nativos de Supabase Auth). Antes vivia dentro de `/mi-cuenta`.
+- `/mi-perfil` — pagina placeholder ("se implementara en una etapa posterior"). Todavia sin desarrollo real; los datos personales se editan hoy desde `/configuracion`.
+- Menu del avatar (sitio publico en `SiteNav.js` y shell privado en `AccountDashboardShell.js`) reorganizado: Mi Espacio / Mi Perfil, Carrito / Mis pedidos / Facturacion, Configuracion / Cerrar sesion.
+- Dropdown de usuario y campana de notificaciones con preview de notificaciones y mensajes recientes, disponible en todas las paginas privadas.
 - Lectura de notificaciones persistente mediante `user_notification_reads`.
 
 ### Facturacion
 
 - Modelo completo ya implementado: perfil de facturacion por usuario (`billing_profiles`) y solicitud de factura (`invoice_requests`), con RLS.
-- El usuario puede cargar sus datos fiscales y solicitar factura de una compra desde "Mi Cuenta" (seccion Facturacion).
+- El usuario puede cargar sus datos fiscales y solicitar factura de una compra desde `/facturacion` (pagina independiente, ver seccion "Mi Cuenta / Mi Espacio").
 - El admin puede ver las facturas solicitadas y marcarlas como emitidas.
 - Pendiente: evaluar si el pedido de factura se dispara automaticamente tras un pago aprobado, e integracion futura con AFIP/ARCA o un generador de comprobantes real.
 

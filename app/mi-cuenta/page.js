@@ -1,9 +1,9 @@
 import { redirect } from "next/navigation";
 import ConfirmSubmitButton from "../components/ConfirmSubmitButton";
-import BillingDetailsForm from "../components/BillingDetailsForm";
 import { createSupabaseServerClient } from "../../lib/supabase/server";
 import { formatPrice } from "../../lib/courses";
 import AccountDashboardShell from "./AccountDashboardShell";
+import { formatDateTime, applyReadReceipts, EmptyState, AccountIcon } from "./accountShared";
 
 function formatDate(value) {
   if (!value) {
@@ -18,14 +18,6 @@ function formatDate(value) {
   });
 }
 
-function formatDateTime(value) {
-  if (!value) {
-    return "";
-  }
-
-  return new Date(value).toLocaleDateString("es-AR");
-}
-
 function formatTime(value) {
   return value?.slice(0, 5) || "";
 }
@@ -37,21 +29,6 @@ function initialsFromName(name) {
     .slice(0, 2)
     .map((part) => part.slice(0, 1).toUpperCase())
     .join("");
-}
-
-function EmptyState({ title, text, href, action }) {
-  return (
-    <div className="account-empty-state">
-      <span className="account-empty-icon" aria-hidden="true">+</span>
-      <h3>{title}</h3>
-      <p>{text}</p>
-      {href ? <a className="account-secondary-action" href={href}>{action}</a> : null}
-    </div>
-  );
-}
-
-function AccountIcon({ children, tone = "blue" }) {
-  return <span className={`account-icon is-${tone}`} aria-hidden="true">{children}</span>;
 }
 
 function StatCard({ icon, tone, label, value, helper, href, action }) {
@@ -72,13 +49,6 @@ function StatCard({ icon, tone, label, value, helper, href, action }) {
   ) : (
     <article className="account-stat-card">{content}</article>
   );
-}
-
-function applyReadReceipts(items, receiptSet, itemType) {
-  return (items || []).map((item) => ({
-    ...item,
-    read_at: item.read_at || (receiptSet.has(`${itemType}:${item.id}`) ? "read" : null),
-  }));
 }
 
 function getCourseState(progress) {
@@ -105,70 +75,6 @@ function getCourseTone(progress) {
   return "pending";
 }
 
-function getOrderStatusLabel(status) {
-  const labels = {
-    pending_payment: "Pendiente de pago",
-    paid: "Pagado",
-    cancelled: "Cancelado",
-    delivered: "Entregado",
-  };
-
-  return labels[status] || status || "Sin estado";
-}
-
-function getOrderTypeLabel(type) {
-  return type === "digital" ? "Digital" : "Físico";
-}
-
-function getCoursePaymentStatusLabel(status) {
-  const labels = {
-    pending: "Pendiente",
-    approved: "Pagado",
-    rejected: "Rechazado",
-    cancelled: "Cancelado",
-  };
-
-  return labels[status] || status || "Sin estado";
-}
-
-function getInvoiceStatusLabel(status) {
-  const labels = {
-    requested: "Solicitada",
-    issued: "Emitida",
-    cancelled: "Cancelada",
-    not_requested: "No solicitada",
-  };
-
-  return labels[status] || "No solicitada";
-}
-
-function getTaxConditionLabel(value) {
-  const labels = {
-    consumidor_final: "Consumidor final",
-    monotributo: "Monotributo",
-    responsable_inscripto: "Responsable inscripto",
-    exento: "Exento",
-  };
-
-  return labels[value] || "Sin datos";
-}
-
-function getShippingSummary(order) {
-  if (order.product_type !== "physical") {
-    return "Entrega digital";
-  }
-
-  const address = [
-    `${order.shipping_street || ""} ${order.shipping_number || ""}`.trim(),
-    order.shipping_floor_apartment ? `Piso/depto ${order.shipping_floor_apartment}` : "",
-    order.shipping_city,
-    order.shipping_province,
-    order.shipping_postal_code ? `CP ${order.shipping_postal_code}` : "",
-  ].filter(Boolean);
-
-  return address.length ? address.join(", ") : "Dirección pendiente";
-}
-
 export default async function MiCuentaPage({ searchParams }) {
   const params = await searchParams;
   const supabase = await createSupabaseServerClient();
@@ -187,10 +93,6 @@ export default async function MiCuentaPage({ searchParams }) {
     { data: catalogOrders },
     { data: notifications },
     { data: messages },
-    { data: cartItems },
-    { data: courseOrders },
-    { data: billingProfile },
-    { data: invoiceRequests },
     { data: readReceipts },
   ] = await Promise.all([
     supabase
@@ -260,38 +162,6 @@ export default async function MiCuentaPage({ searchParams }) {
       .or(`user_id.eq.${userData.user.id},user_id.is.null`)
       .order("created_at", { ascending: false }),
     supabase
-      .from("catalog_cart_items")
-      .select(`
-        id,
-        quantity,
-        created_at,
-        catalog_products:product_id (
-          id,
-          title,
-          summary,
-          product_type,
-          price
-        )
-      `)
-      .eq("user_id", userData.user.id)
-      .order("created_at", { ascending: false }),
-    supabase
-      .from("orders")
-      .select("id,status,amount,created_at,courses:course_id (id,slug,title)")
-      .eq("user_id", userData.user.id)
-      .order("created_at", { ascending: false }),
-    supabase
-      .from("billing_profiles")
-      .select("buyer_type,legal_name,tax_id,tax_condition,billing_email,fiscal_address,province,city,postal_code")
-      .eq("user_id", userData.user.id)
-      .eq("is_default", true)
-      .maybeSingle(),
-    supabase
-      .from("invoice_requests")
-      .select("id,order_id,catalog_order_id,purchase_type,status,invoice_number,invoice_file_url,requested_at,issued_at")
-      .eq("user_id", userData.user.id)
-      .order("requested_at", { ascending: false }),
-    supabase
       .from("user_notification_reads")
       .select("item_type,item_id")
       .eq("user_id", userData.user.id),
@@ -313,55 +183,9 @@ export default async function MiCuentaPage({ searchParams }) {
     });
   const nextBooking = upcomingBookings[0];
   const catalogOrderList = catalogOrders || [];
-  const courseOrderList = courseOrders || [];
-  const invoiceRequestList = invoiceRequests || [];
-  const invoiceByCourseOrderId = new Map(invoiceRequestList.filter((item) => item.order_id).map((item) => [item.order_id, item]));
-  const invoiceByCatalogOrderId = new Map(invoiceRequestList.filter((item) => item.catalog_order_id).map((item) => [item.catalog_order_id, item]));
-  const purchaseRows = [
-    ...courseOrderList.map((order) => {
-      const invoice = invoiceByCourseOrderId.get(order.id);
-
-      return {
-        id: `course-${order.id}`,
-        purchaseKey: `course:${order.id}`,
-        type: "Curso",
-        title: order.courses?.title || "Curso LUMEN",
-        date: order.created_at,
-        amount: order.amount || 0,
-        paymentStatus: getCoursePaymentStatusLabel(order.status),
-        invoiceStatus: getInvoiceStatusLabel(invoice?.status),
-        invoiceNumber: invoice?.invoice_number,
-        canRequestInvoice: order.status === "approved" && !invoice,
-        href: order.courses?.slug ? `/aula?curso=${order.courses.slug}` : "/aula",
-      };
-    }),
-    ...catalogOrderList.map((order) => {
-      const invoice = invoiceByCatalogOrderId.get(order.id);
-
-      return {
-        id: `catalog-${order.id}`,
-        purchaseKey: `catalog:${order.id}`,
-        type: getOrderTypeLabel(order.product_type),
-        title: order.catalog_products?.title || "Producto LUMEN",
-        date: order.created_at,
-        amount: order.amount || 0,
-        paymentStatus: getOrderStatusLabel(order.status),
-        invoiceStatus: getInvoiceStatusLabel(invoice?.status),
-        invoiceNumber: invoice?.invoice_number,
-        canRequestInvoice: ["paid", "delivered"].includes(order.status) && !invoice,
-        href: order.catalog_products?.id ? `/catalogo/${order.catalog_products.id}` : "/catalogo",
-      };
-    }),
-  ].sort((a, b) => String(b.date || "").localeCompare(String(a.date || "")));
-  const invoiceEligiblePurchases = purchaseRows.filter((purchase) => purchase.canRequestInvoice);
   const receiptSet = new Set((readReceipts || []).map((item) => `${item.item_type}:${item.item_id}`));
   const notificationList = applyReadReceipts(notifications || [], receiptSet, "notification");
   const messageList = applyReadReceipts(messages || [], receiptSet, "message");
-  const cartItemList = cartItems || [];
-  const cartTotal = cartItemList.reduce(
-    (sum, item) => sum + (item.catalog_products?.price || 0) * item.quantity,
-    0
-  );
   const pendingAccountAlerts =
     notificationList.filter((item) => !item.read_at).length + messageList.filter((item) => !item.read_at).length;
   const featuredAccountNotice = [
@@ -394,7 +218,6 @@ export default async function MiCuentaPage({ searchParams }) {
   const digitalOrders = catalogOrderList.filter((order) => order.product_type === "digital");
   const approvedDigitalOrders = digitalOrders.filter((order) => order.status === "paid" || order.status === "delivered");
   const profileName = profile?.full_name || userData.user.user_metadata?.full_name || "";
-  const profilePhone = profile?.phone || userData.user.user_metadata?.phone || "";
   const displayName = profileName || userData.user.email;
   const firstName = profileName?.split(" ")?.[0] || userData.user.email?.split("@")?.[0] || "LUMEN";
   const avatarInitials = initialsFromName(displayName);
@@ -490,14 +313,9 @@ export default async function MiCuentaPage({ searchParams }) {
     { href: "#turnos", icon: "T", label: "Mis turnos" },
     { href: "#cursos", icon: "C", label: "Mis cursos" },
     { href: "#recursos", icon: "R", label: "Mis recursos" },
-    { href: "#pedidos", icon: "P", label: "Mis pedidos" },
-    { href: "#compras", icon: "$", label: "Mis compras" },
-    { href: "#facturacion", icon: "F", label: "Facturacion" },
-    { href: "#carrito", icon: "K", label: "Carrito" },
     { href: "#notificaciones", icon: "N", label: "Notificaciones" },
     { href: "#mensajes", icon: "M", label: "Mensajes" },
     { href: "#certificados", icon: "D", label: "Certificados" },
-    { href: "#configuracion", icon: "S", label: "Configuración" },
   ];
 
   return (
@@ -749,100 +567,6 @@ export default async function MiCuentaPage({ searchParams }) {
           </section>
 
           <div className="account-lower-grid">
-            <section className="account-panel" id="compras">
-              <div className="account-panel-head">
-                <div>
-                  <AccountIcon tone="green">$</AccountIcon>
-                  <h2>Mis compras</h2>
-                </div>
-              </div>
-              {purchaseRows.length ? (
-                <div className="account-history-list">
-                  {purchaseRows.map((purchase) => (
-                    <article key={purchase.id}>
-                      <span>{purchase.type}</span>
-                      <strong>{purchase.title}</strong>
-                      <small>
-                        {formatPrice(purchase.amount)} - {formatDateTime(purchase.date)}
-                      </small>
-                      <small>Pago: {purchase.paymentStatus}</small>
-                      <small>
-                        Factura: {purchase.invoiceStatus}
-                        {purchase.invoiceNumber ? ` - ${purchase.invoiceNumber}` : ""}
-                      </small>
-                      <a className="account-secondary-action" href={purchase.href}>Ver compra</a>
-                    </article>
-                  ))}
-                </div>
-              ) : (
-                <EmptyState title="Todavia no tenes compras" text="Cuando compres cursos, servicios o recursos, el historial va a aparecer aca." href="/cursos" action="Explorar cursos" />
-              )}
-            </section>
-
-            <section className="account-panel" id="pedidos">
-              <div className="account-panel-head">
-                <div>
-                  <AccountIcon tone="blue">P</AccountIcon>
-                  <h2>Mis pedidos</h2>
-                </div>
-              </div>
-              {catalogOrderList.length ? (
-                <div className="account-history-list">
-                  {catalogOrderList.map((order) => (
-                    <article key={order.id}>
-                      <span>{getOrderStatusLabel(order.status)}</span>
-                      <strong>{order.catalog_products?.title || "Pedido"}</strong>
-                      <small>
-                        {getOrderTypeLabel(order.product_type)} · {formatPrice(order.amount)} · {formatDateTime(order.created_at)}
-                      </small>
-                      <small>{getShippingSummary(order)}</small>
-                    </article>
-                  ))}
-                </div>
-              ) : (
-                <EmptyState title="Todavía no tenés pedidos" text="Cuando solicites un producto o recurso, el seguimiento va a aparecer acá." href="/catalogo" action="Explorar catálogo" />
-              )}
-            </section>
-
-            <section className="account-panel" id="carrito">
-              <div className="account-panel-head">
-                <div>
-                  <AccountIcon tone="orange">K</AccountIcon>
-                  <h2>Carrito</h2>
-                </div>
-                <a href="/catalogo">Ir al catalogo</a>
-              </div>
-              {cartItemList.length ? (
-                <div className="account-history-list">
-                  {cartItemList.map((item) => (
-                    <article key={item.id}>
-                      <span>{item.catalog_products?.product_type === "digital" ? "Digital" : "Fisico"}</span>
-                      <strong>{item.catalog_products?.title || "Producto"}</strong>
-                      <small>
-                        Precio unitario: {formatPrice(item.catalog_products?.price || 0)} Â· Cantidad: {item.quantity} Â· Subtotal: {formatPrice((item.catalog_products?.price || 0) * item.quantity)}
-                      </small>
-                      <a className="account-secondary-action" href={`/catalogo/${item.catalog_products?.id}`}>Ver producto</a>
-                      <form action="/catalogo/cart/update" method="post">
-                        <input name="cartItemId" type="hidden" value={item.id} />
-                        <input name="quantity" type="number" min="1" step="1" defaultValue={item.quantity} />
-                        <button className="account-secondary-action" type="submit">Actualizar</button>
-                      </form>
-                      <form action="/catalogo/cart/remove" method="post">
-                        <input name="cartItemId" type="hidden" value={item.id} />
-                        <button className="account-secondary-action" type="submit">Quitar</button>
-                      </form>
-                    </article>
-                  ))}
-                  <article>
-                    <strong>Total del carrito</strong>
-                    <small>{formatPrice(cartTotal)}</small>
-                  </article>
-                </div>
-              ) : (
-                <EmptyState title="Tu carrito esta vacio" text="Agrega productos o recursos desde el catalogo para prepararlos antes de comprar." href="/catalogo" action="Explorar catalogo" />
-              )}
-            </section>
-
             <section className="account-panel" id="certificados">
               <div className="account-panel-head">
                 <div>
@@ -906,155 +630,6 @@ export default async function MiCuentaPage({ searchParams }) {
             </section>
           </div>
 
-          <section className="account-panel" id="facturacion">
-            <div className="account-panel-head">
-              <div>
-                <AccountIcon tone="orange">F</AccountIcon>
-                <h2>Facturacion</h2>
-              </div>
-            </div>
-            <div className="account-profile-grid">
-              <div>
-                <span>Nombre / razon social</span>
-                <strong>{billingProfile?.legal_name || "Sin datos cargados"}</strong>
-              </div>
-              <div>
-                <span>DNI / CUIL / CUIT</span>
-                <strong>{billingProfile?.tax_id || "Sin datos cargados"}</strong>
-              </div>
-              <div>
-                <span>Condicion fiscal</span>
-                <strong>{getTaxConditionLabel(billingProfile?.tax_condition)}</strong>
-              </div>
-              <div>
-                <span>Email de facturacion</span>
-                <strong>{billingProfile?.billing_email || userData.user.email}</strong>
-              </div>
-            </div>
-            <div className="account-settings-grid is-wide">
-              <BillingDetailsForm
-                billingProfile={billingProfile}
-                userEmail={userData.user.email}
-                returnTo="/mi-cuenta#facturacion"
-                submitLabel="Guardar datos de facturacion"
-                intro="Estos datos quedan guardados para futuras compras. La factura siempre se solicita despues del pago."
-              />
-              <div className="account-settings-card">
-                <h3>Solicitar factura de una compra</h3>
-                <p>Si ya guardaste tus datos fiscales, podes pedir factura para una compra pagada.</p>
-                {billingProfile && invoiceEligiblePurchases.length ? (
-                  <form className="billing-quick-request" action="/mi-cuenta/billing/request" method="post">
-                    <input name="buyerType" type="hidden" value={billingProfile.buyer_type || "person"} />
-                    <input name="legalName" type="hidden" value={billingProfile.legal_name || ""} />
-                    <input name="taxId" type="hidden" value={billingProfile.tax_id || ""} />
-                    <input name="taxCondition" type="hidden" value={billingProfile.tax_condition || "consumidor_final"} />
-                    <input name="billingEmail" type="hidden" value={billingProfile.billing_email || userData.user.email || ""} />
-                    <input name="fiscalAddress" type="hidden" value={billingProfile.fiscal_address || ""} />
-                    <input name="province" type="hidden" value={billingProfile.province || ""} />
-                    <input name="city" type="hidden" value={billingProfile.city || ""} />
-                    <input name="postalCode" type="hidden" value={billingProfile.postal_code || ""} />
-                    <input name="returnTo" type="hidden" value="/mi-cuenta#facturacion" />
-                    <label>
-                      Compra
-                      <select name="purchaseKey" required>
-                        <option value="">Seleccionar compra</option>
-                        {invoiceEligiblePurchases.map((purchase) => (
-                          <option value={purchase.purchaseKey} key={purchase.id}>
-                            {purchase.title} - {formatPrice(purchase.amount)}
-                          </option>
-                        ))}
-                      </select>
-                    </label>
-                    <button className="account-secondary-action" type="submit">Solicitar factura</button>
-                  </form>
-                ) : (
-                  <p className="muted">
-                    {billingProfile ? "No hay compras pagadas pendientes de factura." : "Primero guarda tus datos fiscales."}
-                  </p>
-                )}
-              </div>
-              <div className="account-settings-card">
-                <h3>Estado de facturas</h3>
-                <p>Por ahora LUMEN registra la solicitud y permite al admin marcarla como emitida. Mas adelante aca se puede integrar AFIP/ARCA o un generador automatico de comprobantes.</p>
-                {invoiceRequestList.length ? (
-                  <div className="account-message-list">
-                    {invoiceRequestList.slice(0, 4).map((invoice) => (
-                      <article key={invoice.id}>
-                        <span>{getInvoiceStatusLabel(invoice.status)}</span>
-                        <strong>{invoice.purchase_type === "course" ? "Curso" : "Catalogo"}</strong>
-                        <small>{formatDateTime(invoice.requested_at)}</small>
-                        {invoice.invoice_number ? <small>Numero: {invoice.invoice_number}</small> : null}
-                        {invoice.invoice_file_url ? <a href={invoice.invoice_file_url}>Ver comprobante</a> : null}
-                      </article>
-                    ))}
-                  </div>
-                ) : (
-                  <p className="muted">Todavia no solicitaste facturas.</p>
-                )}
-              </div>
-            </div>
-          </section>
-
-          <section className="account-panel" id="configuracion">
-            <div className="account-panel-head">
-              <div>
-                <AccountIcon tone="green">S</AccountIcon>
-                <h2>Configuración</h2>
-              </div>
-            </div>
-            <div className="account-profile-grid">
-              <div>
-                <span>Email</span>
-                <strong>{userData.user.email}</strong>
-              </div>
-              <div>
-                <span>Nombre</span>
-                <strong>{profileName || "Sin nombre cargado"}</strong>
-              </div>
-              <div>
-                <span>Telefono</span>
-                <strong>{profilePhone || "Sin telefono cargado"}</strong>
-              </div>
-              <div>
-                <span>Rol</span>
-                <strong>{profile?.role || "student"}</strong>
-              </div>
-              <div>
-                <span>Fecha de creación</span>
-                <strong>{formatDateTime(profile?.created_at || userData.user.created_at)}</strong>
-              </div>
-            </div>
-            <div className="account-settings-grid">
-              <form className="account-settings-card" action="/mi-cuenta/profile/update" method="post">
-                <h3>Datos personales</h3>
-                <label>
-                  Nombre y apellido
-                  <input name="fullName" defaultValue={profileName} placeholder="Tu nombre" />
-                </label>
-                <label>
-                  Telefono
-                  <input name="phone" defaultValue={profilePhone} placeholder="Ej: 11 1234 5678" />
-                </label>
-                <button className="account-primary-action" type="submit">Guardar cambios</button>
-              </form>
-
-              <form className="account-settings-card" action="/mi-cuenta/security/email" method="post">
-                <h3>Cambiar email</h3>
-                <p>Te vamos a enviar un email de confirmacion a la nueva direccion antes de aplicar el cambio.</p>
-                <label>
-                  Nuevo email
-                  <input name="newEmail" type="email" placeholder="nuevo@email.com" required />
-                </label>
-                <button className="account-secondary-action" type="submit">Enviar confirmacion</button>
-              </form>
-
-              <form className="account-settings-card" action="/mi-cuenta/security/password" method="post">
-                <h3>Cambiar contrasena</h3>
-                <p>Por seguridad, te enviamos un enlace al email actual para iniciar el cambio.</p>
-                <button className="account-secondary-action" type="submit">Enviar enlace seguro</button>
-              </form>
-            </div>
-          </section>
         </div>
     </AccountDashboardShell>
   );

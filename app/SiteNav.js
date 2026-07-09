@@ -258,17 +258,17 @@ export default function SiteNav({
                   </div>
                   <div className="site-user-section">
                     <a href="/mi-cuenta" onClick={closeMenu}>Mi Espacio</a>
-                    <a href="/mi-cuenta#cursos" onClick={closeMenu}>Mi aprendizaje</a>
-                    <a href="/mi-cuenta#carrito" onClick={closeMenu}>Mi carrito</a>
-                    <a href="/mi-cuenta#favoritos" onClick={closeMenu}>Lista de deseos</a>
-                    <a href="/mi-cuenta#compras" onClick={closeMenu}>Mis compras</a>
-                    <a href="/mi-cuenta#facturacion" onClick={closeMenu}>Facturacion</a>
+                    <a href="/mi-perfil" onClick={closeMenu}>Mi Perfil</a>
                     {isSpecialist ? <a href="/especialista" onClick={closeMenu}>Panel especialista</a> : null}
                     {isAdmin ? <a href="/admin" onClick={closeMenu}>Admin</a> : null}
                   </div>
                   <div className="site-user-section">
-                    <a href="/mi-cuenta#configuracion" onClick={closeMenu}>Configuracion de la cuenta</a>
-                    <a href="/mi-cuenta#pedidos" onClick={closeMenu}>Historial de compra</a>
+                    <a href="/carrito" onClick={closeMenu}>Carrito</a>
+                    <a href="/mis-pedidos" onClick={closeMenu}>Mis pedidos</a>
+                    <a href="/facturacion" onClick={closeMenu}>Facturación</a>
+                  </div>
+                  <div className="site-user-section">
+                    <a href="/configuracion" onClick={closeMenu}>Configuración</a>
                   </div>
                   <form action="/auth/logout" method="post">
                     <button type="submit">Cerrar sesion</button>
