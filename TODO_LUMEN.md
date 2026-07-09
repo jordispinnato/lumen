@@ -104,6 +104,7 @@ Nota: la mejora de configuracion de cuenta (telefono, cambio de email con confir
 
 ### Tecnico
 - `[DECISION]` Definir casillas reales: `contacto@espaciolumen.com`, `turnos@espaciolumen.com`, `notificaciones@espaciolumen.com`.
+- `[DECISION]` Revisar por qué hay 3 proyectos de Vercel conectados al mismo repo (`lumen-app`, `lumen-rptp`, `lumen-project`) y confirmar cuál es el proyecto real asociado a `espaciolumen.com`. No desconectar ni modificar nada sin confirmación explícita del usuario.
 - `[BLOQUEADO: depende de definir las casillas reales]` Configurar DNS de email si se usa un servicio de correo externo.
 - `[~]` `.env.example` sincronizado con la lista completa de variables de `PROJECT_STATUS.md` y agrupado por categoria. Completado el 2026-07-08.
 
