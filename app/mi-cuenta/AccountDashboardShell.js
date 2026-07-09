@@ -141,40 +141,6 @@ export default function AccountDashboardShell({
         </a>
 
         <nav className="account-sidebar-nav">
-          <a href="/mi-cuenta" onClick={closeMenu}>
-            <span>I</span>
-            Mi Espacio
-          </a>
-          <a href="/mi-perfil" onClick={closeMenu}>
-            <span>U</span>
-            Mi Perfil
-          </a>
-          <a href="/carrito" onClick={closeMenu}>
-            <span>K</span>
-            Carrito
-          </a>
-          <a href="/mis-pedidos" onClick={closeMenu}>
-            <span>P</span>
-            Mis pedidos
-          </a>
-          <a href="/facturacion" onClick={closeMenu}>
-            <span>F</span>
-            Facturación
-          </a>
-          <a href="/configuracion" onClick={closeMenu}>
-            <span>S</span>
-            Configuración
-          </a>
-          <a href="/" onClick={closeMenu}>
-            <span>H</span>
-            Sitio principal
-          </a>
-          {isAdmin ? (
-            <a href="/admin" onClick={closeMenu}>
-              <span>A</span>
-              Ir al Admin
-            </a>
-          ) : null}
           {navItems.map((item) => (
             <a className={item.href === "#inicio" ? "is-active" : ""} href={item.href} key={item.href} onClick={closeMenu}>
               <span>{item.icon}</span>

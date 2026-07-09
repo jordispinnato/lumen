@@ -64,7 +64,7 @@ export default async function ConfiguracionPage({ searchParams }) {
 
   return (
     <AccountDashboardShell
-      navItems={[]}
+      navItems={[{ href: "/mi-cuenta", icon: "I", label: "Volver a Mi Espacio" }]}
       displayName={displayName}
       avatarInitials={avatarInitials}
       isAdmin={profile?.role === "admin"}
