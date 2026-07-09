@@ -4,7 +4,7 @@
 |---|---|
 | Version | 1.0 |
 | Ultima actualizacion | 2026-07-08 |
-| Ultimo responsable | Claude (IA) - LUM-003.1 quitar item del carrito |
+| Ultimo responsable | Claude (IA) - LUM-003.2 editar cantidad del carrito |
 | Revisado por | Pendiente de revision del usuario |
 | Estado | En desarrollo activo |
 
@@ -26,7 +26,7 @@ Lista corta y curada de lo que tiene sentido atacar primero, no el backlog compl
 2. `[~]` Sincronizacion de Google Calendar completa en codigo (creacion, actualizacion al reprogramar y borrado al cancelar). Falta probarlo en produccion con una cuenta de Google real conectada (ver checklist de pruebas manuales pendientes).
 3. `[ ]` Confirmar si `NEXT_PUBLIC_WHATSAPP_URL` tiene un numero real cargado en Vercel (si quedo con el valor por defecto, el boton de WhatsApp de la landing no lleva a ningun lado).
 4. `[~]` Auditar cobertura de `AdminConfirmButton` en las acciones destructivas del panel admin (ya se usa en varios lugares, falta confirmar que no queden borrados sin confirmacion).
-5. `[~]` Completar carrito de compras (plan LUM-003): LUM-003.1 (quitar item) completada; falta editar cantidad, mostrar subtotal/total y finalizar compra (ver seccion "Usuarios / Mi Cuenta").
+5. `[~]` Completar carrito de compras (plan LUM-003): LUM-003.1 (quitar item) y LUM-003.2 (editar cantidad) completadas; falta mostrar subtotal/total y finalizar compra (ver seccion "Usuarios / Mi Cuenta").
 
 ## Prioridad Alta
 
@@ -75,7 +75,7 @@ Lista corta y curada de lo que tiene sentido atacar primero, no el backlog compl
 ### Tecnico
 - `[~]` Completar carrito de compras (plan LUM-003, ver detalle abajo):
   - `[x]` LUM-003.1 — Quitar item del carrito: **completado** (2026-07-09). Nueva ruta `app/catalogo/cart/remove/route.js` + boton "Quitar" en `/mi-cuenta#carrito`.
-  - `[ ]` LUM-003.2 — Editar cantidad de un item.
+  - `[x]` LUM-003.2 — Editar cantidad de un item: **completado** (2026-07-09). Nueva ruta `app/catalogo/cart/update/route.js` + input de cantidad y boton "Actualizar" en `/mi-cuenta#carrito`. Si la cantidad ingresada es 0 o menor, se comporta igual que "Quitar".
   - `[ ]` LUM-003.3 — Mostrar subtotal por item y total del carrito.
   - `[ ]` LUM-003.4 — Finalizar compra (crea pedidos en `catalog_orders` y vacia el carrito, sin Mercado Pago todavia).
   - `[DECISION]` LUM-003.5 (opcional) — columna `checkout_group_id` en `catalog_orders` para preparar Mercado Pago futuro.
