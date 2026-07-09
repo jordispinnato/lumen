@@ -4,7 +4,7 @@
 |---|---|
 | Version | 1.0 |
 | Ultima actualizacion | 2026-07-08 |
-| Ultimo responsable | Claude (IA) - Fase 0 de documentacion |
+| Ultimo responsable | Claude (IA) - sincronizacion Google Calendar en reprogramar/cancelar |
 | Revisado por | Pendiente de revision del usuario |
 | Estado | En desarrollo activo |
 
@@ -23,7 +23,7 @@ Reglas generales de trabajo (multi-tenant, TypeScript, rediseño, Mercado Pago, 
 Lista corta y curada de lo que tiene sentido atacar primero, no el backlog completo (eso esta mas abajo por area).
 
 1. `[BLOQUEADO: verificar dominio espaciolumen.com en Resend]` Habilitar envio real de emails (turnos, recordatorios, contacto) a cualquier destinatario. El codigo ya esta listo; falta la verificacion del dominio y actualizar `EMAIL_FROM`/`CONTACT_EMAIL`/`EMAIL_REPLY_TO` en Vercel.
-2. `[ ]` Sincronizar reprogramacion y cancelacion de turnos con Google Calendar (hoy solo la creacion del evento esta conectada; reprogramar/cancelar dejan el evento viejo huerfano). Hay uso real en produccion, conviene priorizarlo.
+2. `[~]` Sincronizacion de Google Calendar completa en codigo (creacion, actualizacion al reprogramar y borrado al cancelar). Falta probarlo en produccion con una cuenta de Google real conectada (ver checklist de pruebas manuales pendientes).
 3. `[ ]` Confirmar si `NEXT_PUBLIC_WHATSAPP_URL` tiene un numero real cargado en Vercel (si quedo con el valor por defecto, el boton de WhatsApp de la landing no lleva a ningun lado).
 4. `[~]` Auditar cobertura de `AdminConfirmButton` en las acciones destructivas del panel admin (ya se usa en varios lugares, falta confirmar que no queden borrados sin confirmacion).
 5. `[~]` Completar carrito de compras: hoy solo se puede agregar (`catalog_cart_items`); falta sacar item, editar cantidad y finalizar.
@@ -41,8 +41,7 @@ Lista corta y curada de lo que tiene sentido atacar primero, no el backlog compl
 ## Consultas Profesionales
 
 ### Tecnico
-- `[ ]` Actualizar el evento de Google Calendar cuando se reprograma un turno (`app/turnos/reprogramar/route.js` no llama hoy a la API de Calendar).
-- `[ ]` Cancelar/eliminar el evento de Google Calendar cuando se cancela un turno (`app/turnos/cancelar/route.js` no llama hoy a la API de Calendar).
+- `[~]` Google Calendar: actualizar el evento al reprogramar y borrarlo al cancelar **ya implementado** (2026-07-08). Se agrego `google_calendar_event_id` a `appointment_bookings` (migracion `020_appointment_calendar_event_id.sql`, pendiente de correr en Supabase), y `lib/googleCalendar.js` ahora tiene `updateGoogleCalendarEvent()` y `deleteGoogleCalendarEvent()`. Si se reprograma a otro especialista, se borra el evento viejo y se crea uno nuevo. Todo el flujo de Calendar sigue siendo best-effort (try/catch despues del cambio local, nunca bloquea la reprogramacion/cancelacion). Falta: correr la migracion en Supabase y probar con una cuenta real conectada.
 - `[ ]` Agregar video de presentacion del especialista junto a la foto de perfil.
 - `[ ]` Mejorar disponibilidad/calendario si se detectan fricciones de uso reales.
 

@@ -1,6 +1,19 @@
 import { NextResponse } from "next/server";
 import { createSupabaseAdminClient } from "../../../lib/supabase/admin";
 import { createSupabaseServerClient } from "../../../lib/supabase/server";
+import { deleteGoogleCalendarEvent } from "../../../lib/googleCalendar";
+
+async function getCalendarConnection(supabase, specialistId) {
+  const { data } = await supabase
+    .from("specialist_calendar_connections")
+    .select(
+      "id,specialist_id,calendar_sync_enabled,google_calendar_id,google_calendar_access_token,google_calendar_refresh_token,google_calendar_token_expires_at"
+    )
+    .eq("specialist_id", specialistId)
+    .maybeSingle();
+
+  return data;
+}
 
 function redirectToAccount(origin, type, message) {
   return NextResponse.redirect(`${origin}/mi-cuenta?${type}=${encodeURIComponent(message)}#turnos`, { status: 303 });
@@ -54,7 +67,9 @@ export async function POST(request) {
       id,
       user_id,
       slot_id,
+      specialist_id,
       status,
+      google_calendar_event_id,
       appointment_slots:slot_id (
         slot_date
       )
@@ -88,6 +103,20 @@ export async function POST(request) {
 
   if (booking.slot_id) {
     await writeSupabase.from("appointment_slots").update({ status: "available" }).eq("id", booking.slot_id);
+  }
+
+  if (booking.google_calendar_event_id && booking.specialist_id) {
+    try {
+      const connection = await getCalendarConnection(writeSupabase, booking.specialist_id);
+
+      await deleteGoogleCalendarEvent({
+        supabase: writeSupabase,
+        connection,
+        eventId: booking.google_calendar_event_id,
+      });
+    } catch (calendarError) {
+      console.error("Google Calendar event deletion (cancel) failed", calendarError);
+    }
   }
 
   return redirectToAccount(origin, "message", "Turno cancelado correctamente");

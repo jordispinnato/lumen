@@ -4,7 +4,7 @@
 |---|---|
 | Version | 1.0 |
 | Ultima actualizacion | 2026-07-08 |
-| Ultimo responsable | Claude (IA) - Fase 0 de documentacion |
+| Ultimo responsable | Claude (IA) - sincronizacion Google Calendar en reprogramar/cancelar |
 | Revisado por | Pendiente de revision del usuario |
 | Estado | En desarrollo activo |
 
@@ -138,7 +138,7 @@ Reglas de trabajo vigentes para cualquier IA o persona que modifique este repo. 
 - Reprogramacion y cancelacion funcionando (con motivo de cancelacion y trazabilidad de quien reprogramo/cancelo).
 - Panel especialista disponible en `/especialista`.
 - Panel especialista incluye turnos, pacientes, historial y notas clinicas por paciente, con **auditoria de cambios** (se registra cada creacion/edicion/borrado de nota, quien y cuando).
-- Google Calendar: el especialista puede conectar su cuenta y, al confirmarse una reserva, se crea el evento correspondiente. **Falta**: reprogramar o cancelar un turno no actualiza ni cancela el evento ya creado en Google Calendar (ver `TODO_LUMEN.md`).
+- Google Calendar: el especialista puede conectar su cuenta y, al confirmarse una reserva, se crea el evento correspondiente. Reprogramar y cancelar un turno **ya actualizan/borran** el evento en Google Calendar (implementado 2026-07-08, requiere correr la migracion `020_appointment_calendar_event_id.sql` en Supabase y probar con una cuenta real conectada antes de darlo por verificado en produccion — ver `TODO_LUMEN.md`).
 - Email al paciente y especialista preparado a nivel codigo (confirmacion, reprogramacion, recordatorio automatico via cron), pero envio real a terceros requiere dominio verificado en Resend.
 
 ### Cursos y aula
@@ -212,6 +212,9 @@ Archivos presentes en `supabase/`:
 - `016_billing_invoices.sql`
 - `017_contact_messages.sql`
 - `018_notification_read_receipts.sql`
+- `020_appointment_calendar_event_id.sql` (agrega `google_calendar_event_id` a `appointment_bookings`; **pendiente de correr en Supabase**, generado el 2026-07-08)
+
+Se salteo intencionalmente el numero `019`: no se pudo confirmar si ya se uso manualmente en Supabase para el tema del perfil de Carla Riccio (ver nota mas abajo), asi que se prefirio no arriesgar una colision de numeracion.
 
 Ademas existe, fuera de la carpeta `supabase/` y sin numerar, `supabase-specialist-calendar.sql` (crea `specialist_calendar_connections` y columnas relacionadas en `appointment_specialists`). Identificado en la auditoria tecnica como migracion huerfana — sigue sin mover ni renumerar, es un cambio de codigo/estructura, no de documentacion.
 

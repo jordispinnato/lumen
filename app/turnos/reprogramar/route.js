@@ -5,6 +5,20 @@ import {
 } from "../../../lib/email";
 import { createSupabaseAdminClient } from "../../../lib/supabase/admin";
 import { createSupabaseServerClient } from "../../../lib/supabase/server";
+import { createGoogleCalendarEvent, deleteGoogleCalendarEvent, updateGoogleCalendarEvent } from "../../../lib/googleCalendar";
+
+const CALENDAR_CONNECTION_COLUMNS =
+  "id,specialist_id,calendar_sync_enabled,google_calendar_id,google_calendar_access_token,google_calendar_refresh_token,google_calendar_token_expires_at";
+
+async function getCalendarConnection(supabase, specialistId) {
+  const { data } = await supabase
+    .from("specialist_calendar_connections")
+    .select(CALENDAR_CONNECTION_COLUMNS)
+    .eq("specialist_id", specialistId)
+    .maybeSingle();
+
+  return data;
+}
 
 function redirectToTurnos(origin, type, message, bookingId = "") {
   const params = new URLSearchParams({ [type]: message });
@@ -71,13 +85,16 @@ export async function POST(request) {
       patient_name,
       patient_email,
       status,
+      google_calendar_event_id,
       appointment_slots:slot_id (
         slot_date,
         slot_time
       ),
       appointment_specialists:specialist_id (
+        id,
         name,
-        professional_email
+        professional_email,
+        duration_minutes
       )
     `)
     .eq("id", bookingId)
@@ -110,8 +127,10 @@ export async function POST(request) {
       slot_time,
       status,
       appointment_specialists:specialist_id (
+        id,
         name,
-        professional_email
+        professional_email,
+        duration_minutes
       )
     `)
     .eq("id", slotId)
@@ -174,6 +193,54 @@ export async function POST(request) {
     });
   } catch (error) {
     console.error("Specialist rescheduled email failed", error);
+  }
+
+  try {
+    const sameSpecialist = newSlot.specialist_id === booking.specialist_id;
+    const bookingForCalendar = { ...booking, patient_name: finalPatientName };
+
+    if (sameSpecialist) {
+      if (booking.google_calendar_event_id) {
+        const oldConnection = await getCalendarConnection(writeSupabase, booking.specialist_id);
+
+        await updateGoogleCalendarEvent({
+          supabase: writeSupabase,
+          specialist: newSlot.appointment_specialists,
+          connection: oldConnection,
+          eventId: booking.google_calendar_event_id,
+          slot: newSlot,
+          booking: bookingForCalendar,
+        });
+      }
+    } else {
+      if (booking.google_calendar_event_id) {
+        const oldConnection = await getCalendarConnection(writeSupabase, booking.specialist_id);
+
+        await deleteGoogleCalendarEvent({
+          supabase: writeSupabase,
+          connection: oldConnection,
+          eventId: booking.google_calendar_event_id,
+        });
+      }
+
+      const newConnection = await getCalendarConnection(writeSupabase, newSlot.specialist_id);
+      const calendarResult = await createGoogleCalendarEvent({
+        supabase: writeSupabase,
+        specialist: newSlot.appointment_specialists,
+        connection: newConnection,
+        slot: newSlot,
+        booking: bookingForCalendar,
+      });
+
+      if (calendarResult?.created && calendarResult.event?.id) {
+        await writeSupabase
+          .from("appointment_bookings")
+          .update({ google_calendar_event_id: calendarResult.event.id })
+          .eq("id", booking.id);
+      }
+    }
+  } catch (error) {
+    console.error("Google Calendar event sync (reschedule) failed", error);
   }
 
   const successParams = new URLSearchParams({

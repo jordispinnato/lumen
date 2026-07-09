@@ -183,13 +183,20 @@ export async function POST(request) {
           .maybeSingle()
       : { data: null };
 
-    await createGoogleCalendarEvent({
+    const calendarResult = await createGoogleCalendarEvent({
       supabase: adminSupabase,
       specialist: slot.appointment_specialists,
       connection: calendarConnection,
       slot,
       booking: booking || bookingPayload,
     });
+
+    if (calendarResult?.created && calendarResult.event?.id && booking?.id && adminSupabase) {
+      await adminSupabase
+        .from("appointment_bookings")
+        .update({ google_calendar_event_id: calendarResult.event.id })
+        .eq("id", booking.id);
+    }
   } catch (error) {
     console.error("Google Calendar event creation failed", error);
   }
