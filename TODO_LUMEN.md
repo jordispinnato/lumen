@@ -118,6 +118,7 @@ Nota: "revisar RLS de tablas nuevas despues de cada modulo" y "mantener SQLs ver
 
 ### Bloqueadas por identidad visual (esperar Figma)
 - `[BLOQUEADO: Figma definitivo pendiente]` Unificar botones, tarjetas y estados vacios.
+- `[BLOQUEADO: Figma definitivo pendiente]` Revisar textos visibles usando `docs/UX_TEXT_INVENTORY.md` cuando llegue el Figma y se defina el tono final.
 - `[DECISION]` Mejorar landing con contenido real cuando este definido.
 - `[DECISION]` Reemplazar textos provisorios.
 - `[DECISION]` Reemplazar imagenes provisorias.
