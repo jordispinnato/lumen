@@ -358,6 +358,10 @@ export default async function MiCuentaPage({ searchParams }) {
   const notificationList = applyReadReceipts(notifications || [], receiptSet, "notification");
   const messageList = applyReadReceipts(messages || [], receiptSet, "message");
   const cartItemList = cartItems || [];
+  const cartTotal = cartItemList.reduce(
+    (sum, item) => sum + (item.catalog_products?.price || 0) * item.quantity,
+    0
+  );
   const pendingAccountAlerts =
     notificationList.filter((item) => !item.read_at).length + messageList.filter((item) => !item.read_at).length;
   const featuredAccountNotice = [
@@ -814,7 +818,9 @@ export default async function MiCuentaPage({ searchParams }) {
                     <article key={item.id}>
                       <span>{item.catalog_products?.product_type === "digital" ? "Digital" : "Fisico"}</span>
                       <strong>{item.catalog_products?.title || "Producto"}</strong>
-                      <small>Cantidad: {item.quantity} Â· {formatPrice((item.catalog_products?.price || 0) * item.quantity)}</small>
+                      <small>
+                        Precio unitario: {formatPrice(item.catalog_products?.price || 0)} Â· Cantidad: {item.quantity} Â· Subtotal: {formatPrice((item.catalog_products?.price || 0) * item.quantity)}
+                      </small>
                       <a className="account-secondary-action" href={`/catalogo/${item.catalog_products?.id}`}>Ver producto</a>
                       <form action="/catalogo/cart/update" method="post">
                         <input name="cartItemId" type="hidden" value={item.id} />
@@ -827,6 +833,10 @@ export default async function MiCuentaPage({ searchParams }) {
                       </form>
                     </article>
                   ))}
+                  <article>
+                    <strong>Total del carrito</strong>
+                    <small>{formatPrice(cartTotal)}</small>
+                  </article>
                 </div>
               ) : (
                 <EmptyState title="Tu carrito esta vacio" text="Agrega productos o recursos desde el catalogo para prepararlos antes de comprar." href="/catalogo" action="Explorar catalogo" />
