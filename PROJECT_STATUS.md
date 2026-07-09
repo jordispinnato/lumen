@@ -60,7 +60,14 @@ Repo GitHub:
 
 Proyecto local:
 
-- C:\Users\jordi\Documents\Codex\2026-06-26\mi\outputs\lumen-platform
+- C:\Dev\Lumen
+
+Nota de entorno local (2026-07-09):
+
+- El repo fue clonado limpio fuera de OneDrive.
+- OneDrive ya no debe usarse como ruta activa de desarrollo.
+- La carpeta vieja queda solo como backup temporal/no usar.
+- Nuevas sesiones de Claude Code, Codex y VS Code deben abrirse en `C:\Dev\Lumen`.
 
 ## Restricciones del proyecto
 
