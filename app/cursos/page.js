@@ -1,3 +1,4 @@
+import Link from "next/link";
 import { createSupabaseServerClient } from "../../lib/supabase/server";
 import { demoCourses, formatPrice, normalizeCourse } from "../../lib/courses";
 
@@ -34,8 +35,8 @@ export default async function CoursesPage() {
             </p>
             <p className="price">{formatPrice(course.price)}</p>
             <div className="actions">
-              <a className="button" href={`/cursos/${course.slug}`}>Ver detalle</a>
-              <a className="secondary-button" href={`/checkout?curso=${course.slug}`}>Comprar</a>
+              <Link className="button" href={`/cursos/${course.slug}`}>Ver detalle</Link>
+              <Link className="secondary-button" href={`/checkout?curso=${course.slug}`}>Comprar</Link>
             </div>
           </article>
         ))}

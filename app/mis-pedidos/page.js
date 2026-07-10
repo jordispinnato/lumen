@@ -1,4 +1,5 @@
 import { redirect } from "next/navigation";
+import Link from "next/link";
 import { createSupabaseServerClient } from "../../lib/supabase/server";
 import { formatPrice } from "../../lib/courses";
 import AccountDashboardShell from "../mi-cuenta/AccountDashboardShell";
@@ -149,7 +150,7 @@ export default async function MisPedidosPage({ searchParams }) {
                       Factura: {purchase.invoiceStatus}
                       {purchase.invoiceNumber ? ` - ${purchase.invoiceNumber}` : ""}
                     </small>
-                    <a className="account-secondary-action" href={purchase.href}>Ver compra</a>
+                    <Link className="account-secondary-action" href={purchase.href}>Ver compra</Link>
                   </article>
                 ))}
               </div>

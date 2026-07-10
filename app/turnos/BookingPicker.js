@@ -1,5 +1,6 @@
 "use client";
 
+import Link from "next/link";
 import { useMemo, useState } from "react";
 
 function pad(value) {
@@ -220,7 +221,7 @@ export default function BookingPicker({
                   <button type="button" onClick={() => selectSpecialist(specialist.id)}>
                     {specialist.id === selectedSpecialistId ? "Seleccionado" : "Ver disponibilidad"}
                   </button>
-                  {specialist.slug ? <a href={`/profesionales/${specialist.slug}`}>Ver perfil</a> : null}
+                  {specialist.slug ? <Link href={`/profesionales/${specialist.slug}`}>Ver perfil</Link> : null}
                 </span>
               </span>
             </article>
@@ -437,7 +438,7 @@ export default function BookingPicker({
             ) : (
               <div className="booking-login-box">
                 <p className="muted">Para confirmar la reserva necesitas iniciar sesion.</p>
-                <a className="button" href="/login?next=/turnos">Ingresar</a>
+                <Link className="button" href="/login?next=/turnos">Ingresar</Link>
               </div>
             )}
             <p className="muted">El pago se conectara en una etapa posterior.</p>

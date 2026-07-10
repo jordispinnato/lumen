@@ -1,5 +1,6 @@
 "use client";
 
+import Link from "next/link";
 import { useEffect, useRef, useState } from "react";
 
 function useCloseOnOutsideClick(ref, isOpen, onClose) {
@@ -112,7 +113,7 @@ function SiteNotificationMenu({
         ) : (
           <p className="site-notification-empty">No tenes novedades por ahora.</p>
         )}
-        <a className="site-notification-all" href="/mi-cuenta#notificaciones" onClick={onClose}>Ver todas</a>
+        <Link className="site-notification-all" href="/mi-cuenta#notificaciones" onClick={onClose}>Ver todas</Link>
       </div>
     </details>
   );
@@ -198,16 +199,16 @@ export default function SiteNav({
       </button>
       <nav className="site-nav" id="site-nav" aria-label="Principal">
         <div className="site-nav-links">
-          <a href="/quienes-somos" onClick={closeMenu}>Quiénes somos</a>
-          <a href="/cursos" onClick={closeMenu}>Cursos</a>
-          <a href="/catalogo" onClick={closeMenu}>Catálogo</a>
-          <a href="/turnos" onClick={closeMenu}>Consultas profesionales</a>
-          <a href="/contacto" onClick={closeMenu}>Contacto</a>
+          <Link href="/quienes-somos" onClick={closeMenu}>Quiénes somos</Link>
+          <Link href="/cursos" onClick={closeMenu}>Cursos</Link>
+          <Link href="/catalogo" onClick={closeMenu}>Catálogo</Link>
+          <Link href="/turnos" onClick={closeMenu}>Consultas profesionales</Link>
+          <Link href="/contacto" onClick={closeMenu}>Contacto</Link>
         </div>
         <div className="site-nav-actions">
           {isLoggedIn ? (
             <>
-              <a
+              <Link
                 className="site-cart-link"
                 href="/carrito"
                 aria-label="Ir al carrito"
@@ -229,7 +230,7 @@ export default function SiteNav({
                   <path d="M2 3h2.4l2.24 11.2a2 2 0 0 0 2 1.6h8.4a2 2 0 0 0 2-1.6L21 7H6" />
                 </svg>
                 <NavCounter value={cartCount} />
-              </a>
+              </Link>
               <SiteNotificationMenu
                 unreadMessages={visibleUnreadMessages}
                 unreadNotifications={visibleUnreadNotifications}
@@ -281,18 +282,18 @@ export default function SiteNav({
                     </div>
                   </div>
                   <div className="site-user-section">
-                    <a href="/mi-cuenta" onClick={closeMenu}>Mi Espacio</a>
-                    <a href="/mi-perfil" onClick={closeMenu}>Mi Perfil</a>
-                    {isSpecialist ? <a href="/especialista" onClick={closeMenu}>Panel especialista</a> : null}
-                    {isAdmin ? <a href="/admin" onClick={closeMenu}>Admin</a> : null}
+                    <Link href="/mi-cuenta" onClick={closeMenu}>Mi Espacio</Link>
+                    <Link href="/mi-perfil" onClick={closeMenu}>Mi Perfil</Link>
+                    {isSpecialist ? <Link href="/especialista" onClick={closeMenu}>Panel especialista</Link> : null}
+                    {isAdmin ? <Link href="/admin" onClick={closeMenu}>Admin</Link> : null}
                   </div>
                   <div className="site-user-section">
-                    <a href="/carrito" onClick={closeMenu}>Carrito</a>
-                    <a href="/mis-pedidos" onClick={closeMenu}>Mis pedidos</a>
-                    <a href="/facturacion" onClick={closeMenu}>Facturación</a>
+                    <Link href="/carrito" onClick={closeMenu}>Carrito</Link>
+                    <Link href="/mis-pedidos" onClick={closeMenu}>Mis pedidos</Link>
+                    <Link href="/facturacion" onClick={closeMenu}>Facturación</Link>
                   </div>
                   <div className="site-user-section">
-                    <a href="/configuracion" onClick={closeMenu}>Configuración</a>
+                    <Link href="/configuracion" onClick={closeMenu}>Configuración</Link>
                   </div>
                   <form action="/auth/logout" method="post">
                     <button type="submit">Cerrar sesion</button>
@@ -302,8 +303,8 @@ export default function SiteNav({
             </>
           ) : (
             <>
-              <a className="secondary-button" href="/login" onClick={closeMenu}>Iniciar sesión</a>
-              <a className="button" href="/registro" onClick={closeMenu}>Registrarse</a>
+              <Link className="secondary-button" href="/login" onClick={closeMenu}>Iniciar sesión</Link>
+              <Link className="button" href="/registro" onClick={closeMenu}>Registrarse</Link>
             </>
           )}
         </div>

@@ -1,4 +1,5 @@
 import { redirect } from "next/navigation";
+import Link from "next/link";
 import { createSupabaseServerClient } from "../../lib/supabase/server";
 import { formatPrice } from "../../lib/courses";
 import AccountDashboardShell from "../mi-cuenta/AccountDashboardShell";
@@ -116,7 +117,7 @@ export default async function CarritoPage({ searchParams }) {
               <AccountIcon tone="orange">K</AccountIcon>
               <h2>Carrito</h2>
             </div>
-            <a href="/catalogo">Ir al catalogo</a>
+            <Link href="/catalogo">Ir al catalogo</Link>
           </div>
           {cartItemList.length ? (
             <div className="account-history-list">
@@ -127,7 +128,7 @@ export default async function CarritoPage({ searchParams }) {
                   <small>
                     Precio unitario: {formatPrice(item.catalog_products?.price || 0)} · Cantidad: {item.quantity} · Subtotal: {formatPrice((item.catalog_products?.price || 0) * item.quantity)}
                   </small>
-                  <a className="account-secondary-action" href={`/catalogo/${item.catalog_products?.id}`}>Ver producto</a>
+                  <Link className="account-secondary-action" href={`/catalogo/${item.catalog_products?.id}`}>Ver producto</Link>
                   <form action="/catalogo/cart/update" method="post">
                     <input name="cartItemId" type="hidden" value={item.id} />
                     <input name="quantity" type="number" min="1" step="1" defaultValue={item.quantity} />

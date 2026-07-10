@@ -1,5 +1,6 @@
 "use client";
 
+import Link from "next/link";
 import { useMemo, useState } from "react";
 import { formatPrice } from "../../lib/courses";
 import { getProductTypeLabel } from "../../lib/catalog";
@@ -52,7 +53,7 @@ export default function CatalogFilters({ products }) {
             )}
             <p className="price">{formatPrice(product.price)}</p>
             <div className="actions">
-              <a className="button" href={`/catalogo/${product.id}`}>Ver producto</a>
+              <Link className="button" href={`/catalogo/${product.id}`}>Ver producto</Link>
             </div>
           </article>
         ))}

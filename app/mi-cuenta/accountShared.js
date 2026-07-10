@@ -1,3 +1,5 @@
+import Link from "next/link";
+
 export function formatDateTime(value) {
   if (!value) {
     return "";
@@ -12,7 +14,7 @@ export function EmptyState({ title, text, href, action }) {
       <span className="account-empty-icon" aria-hidden="true">+</span>
       <h3>{title}</h3>
       <p>{text}</p>
-      {href ? <a className="account-secondary-action" href={href}>{action}</a> : null}
+      {href ? <Link className="account-secondary-action" href={href}>{action}</Link> : null}
     </div>
   );
 }

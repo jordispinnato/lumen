@@ -1,4 +1,5 @@
 import { notFound } from "next/navigation";
+import Link from "next/link";
 import { createSupabaseServerClient } from "../../../lib/supabase/server";
 import { demoCourses, formatPrice, normalizeCourse } from "../../../lib/courses";
 
@@ -95,13 +96,13 @@ export default async function CourseDetailPage({ params }) {
             <p className="price">{formatPrice(course.price)}</p>
             <div className="actions">
               {isEnrolled ? (
-                <a className="button" href={`/aula?curso=${course.slug}`}>Acceder al aula</a>
+                <Link className="button" href={`/aula?curso=${course.slug}`}>Acceder al aula</Link>
               ) : userData.user ? (
-                <a className="button" href={`/checkout?curso=${course.slug}`}>Comprar curso</a>
+                <Link className="button" href={`/checkout?curso=${course.slug}`}>Comprar curso</Link>
               ) : (
-                <a className="button" href={`/login?next=/checkout?curso=${course.slug}`}>Ingresar para comprar</a>
+                <Link className="button" href={`/login?next=/checkout?curso=${course.slug}`}>Ingresar para comprar</Link>
               )}
-              <a className="secondary-button" href="/cursos">Ver otros cursos</a>
+              <Link className="secondary-button" href="/cursos">Ver otros cursos</Link>
             </div>
           </div>
 

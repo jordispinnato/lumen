@@ -1,4 +1,5 @@
 import { redirect } from "next/navigation";
+import Link from "next/link";
 import ConfirmSubmitButton from "../components/ConfirmSubmitButton";
 import { createSupabaseServerClient } from "../../lib/supabase/server";
 import { formatPrice } from "../../lib/courses";
@@ -342,7 +343,7 @@ export default async function MiCuentaPage({ searchParams }) {
               <h1>¡Hola, {firstName}!</h1>
               <p>Bienvenido a tu espacio personal. Aca tenes un resumen de tu actividad.</p>
             </div>
-            <a className="account-primary-action" href="/turnos">Reservar turno</a>
+            <Link className="account-primary-action" href="/turnos">Reservar turno</Link>
           </section>
 
           {featuredAccountNotice ? (
@@ -401,7 +402,7 @@ export default async function MiCuentaPage({ searchParams }) {
                 <AccountIcon tone="purple">C</AccountIcon>
                 <h2>Mis cursos</h2>
               </div>
-              <a href="/cursos">Ver todos los cursos</a>
+              <Link href="/cursos">Ver todos los cursos</Link>
             </div>
             <div className="account-course-tabs" aria-label="Estados de cursos">
               <span className="is-active">Todos</span>
@@ -430,7 +431,7 @@ export default async function MiCuentaPage({ searchParams }) {
                         <span>{item.progress.completed} de {item.progress.total} clases</span>
                       </div>
                       <div className="account-course-actions">
-                        <a href={item.continueUrl}>Continuar</a>
+                        <Link href={item.continueUrl}>Continuar</Link>
                         {item.progress.percent >= 100 ? <a href="#certificados">Ver certificado</a> : null}
                       </div>
                     </div>
@@ -454,7 +455,7 @@ export default async function MiCuentaPage({ searchParams }) {
                   <AccountIcon tone="blue">T</AccountIcon>
                   <h2>Próximos turnos</h2>
                 </div>
-                <a href="/turnos">Ver todos</a>
+                <Link href="/turnos">Ver todos</Link>
               </div>
               {upcomingBookings.length ? (
                 <div className="account-appointment-list">
@@ -469,7 +470,7 @@ export default async function MiCuentaPage({ searchParams }) {
                         <strong>{formatDate(booking.appointment_slots?.slot_date)}</strong>
                         <span>{formatTime(booking.appointment_slots?.slot_time)} hs</span>
                         <div className="account-appointment-actions">
-                          <a href={`/turnos?reprogramar=${booking.id}`}>Reprogramar</a>
+                          <Link href={`/turnos?reprogramar=${booking.id}`}>Reprogramar</Link>
                           <form action="/turnos/cancelar" method="post">
                             <input name="bookingId" type="hidden" value={booking.id} />
                             <input name="reason" type="hidden" value="Cancelado por el paciente desde Mi Espacio" />
@@ -489,7 +490,7 @@ export default async function MiCuentaPage({ searchParams }) {
               ) : (
                 <EmptyState title="No tenés turnos próximos" text="Podés reservar un nuevo turno cuando lo necesites." href="/turnos" action="Reservar turno" />
               )}
-              <a className="account-wide-action" href="/turnos">Reservar nuevo turno</a>
+              <Link className="account-wide-action" href="/turnos">Reservar nuevo turno</Link>
 
               <div className="account-subsection">
                 <h3>Historial de turnos</h3>
@@ -539,7 +540,7 @@ export default async function MiCuentaPage({ searchParams }) {
                 <AccountIcon tone="orange">R</AccountIcon>
                 <h2>Mis recursos</h2>
               </div>
-              <a href="/catalogo">Ir al catálogo</a>
+              <Link href="/catalogo">Ir al catálogo</Link>
             </div>
             {approvedDigitalOrders.length ? (
               <div className="account-resource-grid">

@@ -1,4 +1,5 @@
 import BookingPicker from "./BookingPicker";
+import Link from "next/link";
 import { createSupabaseServerClient } from "../../lib/supabase/server";
 
 export const metadata = {
@@ -69,7 +70,7 @@ export default async function TurnosPage({ searchParams }) {
             <p className="eyebrow">Reprogramar consulta</p>
             <h2>No se puede reprogramar esta consulta</h2>
             <p className="muted">La reserva no existe, no pertenece a tu cuenta, ya fue cancelada o corresponde a una fecha pasada.</p>
-            <a className="button secondary" href="/mi-cuenta#turnos">Volver a Mi Espacio</a>
+            <Link className="button secondary" href="/mi-cuenta#turnos">Volver a Mi Espacio</Link>
           </section>
         ) : null}
 
@@ -119,8 +120,8 @@ export default async function TurnosPage({ searchParams }) {
               </div>
             </dl>
             <div className="actions">
-              <a className="button" href="/mi-cuenta">Ir a Mi Espacio</a>
-              <a className="button secondary" href="/turnos">Reservar otra consulta</a>
+              <Link className="button" href="/mi-cuenta">Ir a Mi Espacio</Link>
+              <Link className="button secondary" href="/turnos">Reservar otra consulta</Link>
             </div>
           </section>
         ) : null}

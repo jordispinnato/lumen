@@ -1,5 +1,6 @@
 "use client";
 
+import Link from "next/link";
 import { useEffect, useRef, useState } from "react";
 
 function useCloseOnOutsideClick(ref, isOpen, onClose) {
@@ -133,21 +134,33 @@ export default function AccountDashboardShell({
       <button className="account-app-overlay" type="button" aria-label="Cerrar menu" onClick={closeMenu} />
 
       <aside className="account-sidebar" aria-label="Navegacion de Mi Espacio">
-        <a className="account-brand" href="/" onClick={closeMenu}>
+        <Link className="account-brand" href="/" onClick={closeMenu}>
           <span className="account-brand-mark" aria-hidden="true" />
           <span>
             <strong>LUMEN</strong>
             <small>Mi Espacio</small>
           </span>
-        </a>
+        </Link>
 
         <nav className="account-sidebar-nav">
-          {navItems.map((item) => (
-            <a className={item.href === "#inicio" ? "is-active" : ""} href={item.href} key={item.href} onClick={closeMenu}>
-              <span>{item.icon}</span>
-              {item.label}
-            </a>
-          ))}
+          {navItems.map((item) => {
+            const content = (
+              <>
+                <span>{item.icon}</span>
+                {item.label}
+              </>
+            );
+
+            return item.href.startsWith("#") ? (
+              <a className={item.href === "#inicio" ? "is-active" : ""} href={item.href} key={item.href} onClick={closeMenu}>
+                {content}
+              </a>
+            ) : (
+              <Link className={item.href === "#inicio" ? "is-active" : ""} href={item.href} key={item.href} onClick={closeMenu}>
+                {content}
+              </Link>
+            );
+          })}
         </nav>
 
         <form className="account-logout-form" action="/auth/logout" method="post">
@@ -166,7 +179,7 @@ export default function AccountDashboardShell({
             <span />
           </button>
           <div className="account-header-actions">
-            <a
+            <Link
               className="account-cart-link"
               href="/carrito"
               aria-label="Ir al carrito"
@@ -189,7 +202,7 @@ export default function AccountDashboardShell({
               {cartCount > 0 ? (
                 <span className="account-notification-badge">{cartCount > 9 ? "9+" : cartCount}</span>
               ) : null}
-            </a>
+            </Link>
             <NotificationDropdown
               count={visibleNotificationCount}
               messages={messages}
@@ -219,14 +232,14 @@ export default function AccountDashboardShell({
                 <strong>{displayName}</strong>
               </summary>
               <div>
-                <a href="/mi-cuenta" onClick={closeMenu}>Mi Espacio</a>
-                <a href="/mi-perfil" onClick={closeMenu}>Mi Perfil</a>
-                {isAdmin ? <a href="/admin" onClick={closeMenu}>Ir al Admin</a> : null}
-                <a href="/carrito" onClick={closeMenu}>Carrito</a>
-                <a href="/mis-pedidos" onClick={closeMenu}>Mis pedidos</a>
-                <a href="/facturacion" onClick={closeMenu}>Facturación</a>
-                <a href="/configuracion" onClick={closeMenu}>Configuración</a>
-                <a href="/" onClick={closeMenu}>Ir al sitio principal</a>
+                <Link href="/mi-cuenta" onClick={closeMenu}>Mi Espacio</Link>
+                <Link href="/mi-perfil" onClick={closeMenu}>Mi Perfil</Link>
+                {isAdmin ? <Link href="/admin" onClick={closeMenu}>Ir al Admin</Link> : null}
+                <Link href="/carrito" onClick={closeMenu}>Carrito</Link>
+                <Link href="/mis-pedidos" onClick={closeMenu}>Mis pedidos</Link>
+                <Link href="/facturacion" onClick={closeMenu}>Facturación</Link>
+                <Link href="/configuracion" onClick={closeMenu}>Configuración</Link>
+                <Link href="/" onClick={closeMenu}>Ir al sitio principal</Link>
                 <form action="/auth/logout" method="post">
                   <button type="submit">Cerrar sesión</button>
                 </form>

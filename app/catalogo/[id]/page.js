@@ -1,4 +1,5 @@
 import { notFound } from "next/navigation";
+import Link from "next/link";
 import { createSupabaseServerClient } from "../../../lib/supabase/server";
 import { formatPrice } from "../../../lib/courses";
 import { demoProducts, getProductTypeLabel } from "../../../lib/catalog";
@@ -74,7 +75,7 @@ export default async function ProductDetailPage({ params, searchParams }) {
                 Recurso digital. {product.digital_file_name ? `Archivo cargado: ${product.digital_file_name}.` : "La descarga se habilitará cuando el pago esté confirmado."}
               </p>
             )}
-            <a className="secondary-button" href="/catalogo">Volver al catálogo</a>
+            <Link className="secondary-button" href="/catalogo">Volver al catálogo</Link>
           </section>
 
           <aside className="panel">
@@ -150,7 +151,7 @@ export default async function ProductDetailPage({ params, searchParams }) {
             ) : (
               <div className="booking-login-box">
                 <p className="muted">Para comprar o solicitar este producto necesitás iniciar sesión.</p>
-                <a className="button" href="/login">Ingresar</a>
+                <Link className="button" href="/login">Ingresar</Link>
               </div>
             )}
           </aside>
