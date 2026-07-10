@@ -380,38 +380,9 @@ h3 {
 }
 
 .cart-icon-shape {
-  position: relative;
-  width: 18px;
-  height: 13px;
-  display: inline-block;
-  border: 2px solid currentColor;
-  border-top: 0;
-  border-radius: 1px 1px 3px 3px;
-  margin-top: 3px;
-}
-
-.cart-icon-shape::before {
-  content: "";
-  position: absolute;
-  left: -6px;
-  top: -8px;
-  width: 6px;
-  height: 6px;
-  border-left: 2px solid currentColor;
-  border-top: 2px solid currentColor;
-  transform: rotate(-40deg);
-}
-
-.cart-icon-shape::after {
-  content: "";
-  position: absolute;
-  left: 2px;
-  bottom: -6px;
-  width: 4px;
-  height: 4px;
-  border-radius: 999px;
-  background: currentColor;
-  box-shadow: 10px 0 0 currentColor;
+  width: 20px;
+  height: 20px;
+  color: currentColor;
 }
 
 .site-cart-link {

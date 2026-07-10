@@ -172,7 +172,20 @@ export default function AccountDashboardShell({
               aria-label="Ir al carrito"
               title="Carrito"
             >
-              <span className="cart-icon-shape" aria-hidden="true" />
+              <svg
+                className="cart-icon-shape"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                strokeWidth="2"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                aria-hidden="true"
+              >
+                <circle cx="9" cy="20" r="1.4" />
+                <circle cx="18" cy="20" r="1.4" />
+                <path d="M2 3h2.4l2.24 11.2a2 2 0 0 0 2 1.6h8.4a2 2 0 0 0 2-1.6L21 7H6" />
+              </svg>
               {cartCount > 0 ? (
                 <span className="account-notification-badge">{cartCount > 9 ? "9+" : cartCount}</span>
               ) : null}
