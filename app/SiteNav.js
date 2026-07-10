@@ -188,6 +188,17 @@ export default function SiteNav({
 
   return (
     <div className={`nav-shell ${isOpen ? "is-open" : ""}`}>
+      {isLoggedIn ? (
+        <Link
+          className="mobile-account-link"
+          href="/mi-cuenta"
+          aria-label="Ir a Mi Espacio"
+          title="Mi Espacio"
+          onClick={closeMenu}
+        >
+          <span className="site-user-avatar">{initials}</span>
+        </Link>
+      ) : null}
       <button
         aria-expanded={isOpen}
         aria-controls="site-nav"

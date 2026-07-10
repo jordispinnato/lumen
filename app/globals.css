@@ -263,6 +263,10 @@ h3 {
   font-weight: 800;
 }
 
+.mobile-account-link {
+  display: none;
+}
+
 .site-nav a:not(.button),
 .nav-button {
   min-height: 40px;
@@ -503,6 +507,8 @@ h3 {
 
 .site-user-menu summary {
   position: relative;
+  display: inline-flex;
+  align-items: center;
   list-style: none;
   cursor: pointer;
 }
@@ -5959,6 +5965,12 @@ body:has(.account-app-shell) .site-footer {
     align-items: center;
   }
 
+  .mobile-account-link {
+    display: inline-flex;
+    align-items: center;
+    margin-right: 10px;
+  }
+
   .site-nav {
     position: absolute;
     top: calc(100% + 1px);
@@ -5982,6 +5994,7 @@ body:has(.account-app-shell) .site-footer {
   .site-nav-actions {
     width: 100%;
     display: grid;
+    grid-template-columns: minmax(0, 1fr);
     gap: 0;
   }
 
@@ -6008,7 +6021,8 @@ body:has(.account-app-shell) .site-footer {
 
   .site-nav a:not(.button),
   .nav-button,
-  .site-notification-menu summary {
+  .site-notification-menu summary,
+  .site-user-menu summary {
     min-height: 48px;
     width: 100%;
     justify-content: flex-start;
