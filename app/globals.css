@@ -4869,6 +4869,78 @@ body:has(.account-app-shell) .site-footer {
   color: #f97316;
 }
 
+.account-skeleton-shell { pointer-events: none; }
+
+.account-skeleton-block,
+.account-skeleton-icon,
+.account-skeleton-line,
+.account-skeleton-media,
+.account-skeleton-nav-item span {
+  animation: account-skeleton-pulse 1.8s ease-in-out infinite;
+  border-radius: 999px;
+  background: #e8edf5;
+}
+
+.account-skeleton-block { display: inline-flex; min-width: 42px; min-height: 42px; }
+
+.account-skeleton-nav-item {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  min-height: 46px;
+  border-radius: var(--ds-radius);
+  padding: 0 14px;
+  color: #64748b;
+  font-weight: 850;
+}
+
+.account-skeleton-nav-item.is-active { background: #eef4ff; color: #0757e3; }
+
+.account-skeleton-nav-item span,
+.account-skeleton-icon { flex: 0 0 auto; width: 46px; height: 46px; }
+
+.account-skeleton-menu { display: none; width: 42px; height: 42px; padding: 12px; }
+
+.account-skeleton-menu span {
+  display: block;
+  width: 18px;
+  height: 2px;
+  margin: 0 auto 5px;
+  border-radius: 999px;
+  background: rgba(100, 116, 139, 0.45);
+}
+
+.account-skeleton-card { display: grid; gap: 10px; pointer-events: none; }
+
+.account-skeleton-line { display: block; width: min(100%, 320px); height: 12px; }
+
+.account-skeleton-line.is-small { width: min(58%, 180px); }
+
+.account-skeleton-line.is-medium { width: min(74%, 250px); height: 16px; }
+
+.account-skeleton-line.is-large { width: min(88%, 360px); height: 20px; }
+
+.account-skeleton-action { width: 154px; height: 44px; }
+
+.account-skeleton-media { min-height: 122px; border-radius: 0; }
+
+.account-skeleton-user { min-width: 132px; }
+
+@keyframes account-skeleton-pulse {
+  0%, 100% { opacity: 0.7; }
+  50% { opacity: 1; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .account-skeleton-block,
+  .account-skeleton-icon,
+  .account-skeleton-line,
+  .account-skeleton-media,
+  .account-skeleton-nav-item span {
+    animation: none;
+  }
+}
+
 .account-panel {
   display: grid;
   gap: 18px;
@@ -6215,6 +6287,10 @@ body:has(.account-app-shell) .site-footer {
     display: block;
     border-radius: 999px;
     background: #0f172a;
+  }
+
+  .account-skeleton-menu {
+    display: inline-grid;
   }
 
   .account-dashboard {
