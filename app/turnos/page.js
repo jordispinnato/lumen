@@ -129,6 +129,9 @@ export default async function TurnosPage({ searchParams }) {
         <BookingPicker
           initialSpecialistSlug={params?.especialista || ""}
           initialSpecialistId={canReschedule ? rescheduleBooking.specialist_id : ""}
+          initialDate={typeof params?.fecha === "string" ? params.fecha : ""}
+          initialSlotId={typeof params?.slot === "string" ? params.slot : ""}
+          autoReview={params?.revisar === "1"}
           mode={canReschedule ? "reschedule" : "book"}
           rescheduleBookingId={canReschedule ? rescheduleBooking.id : ""}
           specialists={specialists || []}

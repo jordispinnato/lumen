@@ -3,8 +3,8 @@
 | Campo | Valor |
 |---|---|
 | Version | 1.0 |
-| Ultima actualizacion | 2026-07-09 |
-| Ultimo responsable | Claude (IA) - etapa 1 de arquitectura de navegacion (Mi Espacio / Carrito / Mis pedidos / Facturacion / Configuracion) |
+| Ultima actualizacion | 2026-07-10 |
+| Ultimo responsable | Claude (IA) - BOOKING-UX-01: modal de reserva de consultas + persistencia de seleccion a traves de login/registro |
 | Revisado por | Pendiente de revision del usuario |
 | Estado | En desarrollo activo |
 
@@ -41,6 +41,16 @@ Lista corta y curada de lo que tiene sentido atacar primero, no el backlog compl
 ## Consultas Profesionales
 
 ### Tecnico
+- `[x]` BOOKING-UX-01 — Modal de reserva + persistencia de seleccion a traves de login/registro: **completado** (2026-07-10).
+  - Elegir especialista abre un modal (amplio en desktop, pantalla completa en mobile) con dos pasos internos: calendario/horarios (boton Continuar) y resumen ("Confirmar consulta", con boton "← Cambiar profesional" para cerrar y limpiar fecha/horario/aviso).
+  - Un usuario sin sesion puede elegir especialista, fecha y horario antes de autenticarse; recien en el resumen se le ofrece Ingresar o Crear cuenta, ambos con la seleccion codificada en `next` (`especialista`, `fecha`, `slot`, `revisar=1`, via `URLSearchParams` + `encodeURIComponent`).
+  - Al volver de login/registro, `/turnos` reabre el modal solo, valida el horario contra los slots frescos de esa carga y, si ya no esta disponible, muestra "Ese horario ya no está disponible. Elegí otro." y vuelve al paso de horarios conservando especialista y fecha. La URL se normaliza con `router.replace` para no reintentar en un reload.
+  - Elegir una especialista distinta desde la grilla siempre limpia fecha/horario/resumen previos; cerrar con X/Escape/backdrop conserva la seleccion en memoria.
+  - Modal con `role="dialog"`, `aria-modal`, `aria-labelledby`, `aria-label` en el boton de cierre, foco inicial en el modal, restauracion de foco al elemento que lo abrio, y bloqueo de scroll del body con cleanup.
+  - `/login` y `/registro` tienen ahora un link cruzado permanente entre si, preservando `next`.
+  - No se toco `lib/safeRedirect.js`, las rutas server de login/registro/reservar/reprogramar/cancelar, Supabase, Mercado Pago, Google Calendar ni Figma.
+  - Reprogramacion (`mode="reschedule"`) sigue el mismo camino sin cambios de logica; no se pudo probar end-to-end en el navegador por falta de credenciales de prueba y un turno real para reprogramar — verificado solo por lectura de codigo.
+- `[ ]` ACCESSIBILITY-001 — Implementar focus trap para el Booking Modal: hoy Tab/Shift+Tab puede mover el foco de teclado a elementos detras del modal (aunque no son clickeables por el backdrop). Mejora futura, no bloqueante.
 - `[~]` Google Calendar: actualizar el evento al reprogramar y borrarlo al cancelar **ya implementado** (2026-07-08). Se agrego `google_calendar_event_id` a `appointment_bookings` (migracion `020_appointment_calendar_event_id.sql`, pendiente de correr en Supabase), y `lib/googleCalendar.js` ahora tiene `updateGoogleCalendarEvent()` y `deleteGoogleCalendarEvent()`. Si se reprograma a otro especialista, se borra el evento viejo y se crea uno nuevo. Todo el flujo de Calendar sigue siendo best-effort (try/catch despues del cambio local, nunca bloquea la reprogramacion/cancelacion). Falta: correr la migracion en Supabase y probar con una cuenta real conectada.
 - `[ ]` Agregar video de presentacion del especialista junto a la foto de perfil.
 - `[ ]` Mejorar disponibilidad/calendario si se detectan fricciones de uso reales.

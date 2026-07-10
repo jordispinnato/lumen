@@ -3,8 +3,8 @@
 | Campo | Valor |
 |---|---|
 | Version | 1.0 |
-| Ultima actualizacion | 2026-07-09 |
-| Ultimo responsable | Claude (IA) - etapa 1 de arquitectura de navegacion (Mi Espacio / Carrito / Mis pedidos / Facturacion / Configuracion) |
+| Ultima actualizacion | 2026-07-10 |
+| Ultimo responsable | Claude (IA) - BOOKING-UX-01: modal de reserva de consultas + persistencia de seleccion a traves de login/registro |
 | Revisado por | Pendiente de revision del usuario |
 | Estado | En desarrollo activo |
 
@@ -140,8 +140,11 @@ Reglas de trabajo vigentes para cualquier IA o persona que modifique este repo. 
 - Ruta `/turnos`.
 - Nombre visible: Consultas profesionales.
 - Primero se elige especialista.
-- Luego se ve calendario/horarios disponibles.
-- Reservas reales funcionando, con manejo de condicion de carrera para evitar doble reserva del mismo horario.
+- Al elegir especialista se abre un modal (amplio en desktop, pantalla completa en mobile) con calendario y horarios; ya no hace falta scrollear la pagina para verlos (BOOKING-UX-01, 2026-07-10).
+- Dentro del modal: paso "calendario y horarios" con boton Continuar, y paso "Confirmar consulta" (resumen) con boton "← Cambiar profesional" para volver a la grilla.
+- Un usuario no autenticado puede elegir especialista, fecha y horario antes de iniciar sesion. Recien en el paso de resumen se le pide Ingresar o Crear cuenta, y ambos enlaces conservan la seleccion (especialista, fecha, horario) via query params en `next`. Al volver de login/registro, el modal se reabre solo y, si el horario elegido ya no esta disponible, se muestra un aviso y se vuelve al paso de horarios sin perder especialista ni fecha.
+- `/login` y `/registro` ahora tienen un link cruzado permanente entre si ("¿No tenes cuenta? Crear cuenta" / "¿Ya tenes cuenta? Ingresar"), preservando `next` cuando corresponde.
+- Reservas reales funcionando, con manejo de condicion de carrera para evitar doble reserva del mismo horario (logica de reserva/confirmacion sin cambios en esta mejora).
 - Reprogramacion y cancelacion funcionando (con motivo de cancelacion y trazabilidad de quien reprogramo/cancelo).
 - Panel especialista disponible en `/especialista`.
 - Panel especialista incluye turnos, pacientes, historial y notas clinicas por paciente, con **auditoria de cambios** (se registra cada creacion/edicion/borrado de nota, quien y cuando).

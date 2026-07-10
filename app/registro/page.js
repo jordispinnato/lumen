@@ -1,7 +1,10 @@
+import Link from "next/link";
+
 export default async function RegisterPage({ searchParams }) {
   const params = await searchParams;
   const error = params?.error;
   const nextPath = typeof params?.next === "string" ? params.next : "";
+  const loginHref = nextPath ? `/login?next=${encodeURIComponent(nextPath)}` : "/login";
 
   return (
     <main className="section">
@@ -23,6 +26,7 @@ export default async function RegisterPage({ searchParams }) {
         </label>
         <button className="button" type="submit">Crear cuenta</button>
         {error ? <p className="notice error">{error}</p> : null}
+        <p className="muted">¿Ya tenés cuenta? <Link href={loginHref}>Ingresar</Link></p>
       </form>
     </main>
   );

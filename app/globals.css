@@ -3770,6 +3770,67 @@ body:has(.admin-cms-shell) {
   gap: 10px;
 }
 
+.booking-modal-backdrop {
+  position: fixed;
+  inset: 0;
+  z-index: 120;
+  display: grid;
+  place-items: center;
+  padding: 24px;
+  background: rgba(20, 53, 56, 0.32);
+}
+
+.booking-modal {
+  width: min(760px, 94vw);
+  max-height: 88vh;
+  overflow-y: auto;
+  border-radius: var(--ds-radius);
+  background: var(--paper);
+  box-shadow: var(--ds-shadow-md);
+}
+
+.booking-modal-head {
+  position: sticky;
+  top: 0;
+  z-index: 1;
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 20px 24px;
+  border-bottom: 1px solid var(--line);
+  background: var(--paper);
+}
+
+.booking-modal-head .selected-professional {
+  margin: 10px 0 0;
+}
+
+.booking-modal-close {
+  border: 0;
+  background: transparent;
+  color: var(--muted);
+  font-size: 1.6rem;
+  line-height: 1;
+  cursor: pointer;
+}
+
+.booking-modal-body {
+  display: grid;
+  gap: 18px;
+  padding: 20px 24px 24px;
+}
+
+.booking-auth-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+
+.booking-modal .booking-summary {
+  position: static;
+}
+
 .booking-success {
   margin-bottom: 20px;
 }
@@ -6016,6 +6077,17 @@ body:has(.account-app-shell) .site-footer {
 }
 
 @media (max-width: 760px) {
+  .booking-modal-backdrop {
+    padding: 0;
+  }
+
+  .booking-modal {
+    width: 100%;
+    height: 100%;
+    max-height: 100vh;
+    border-radius: 0;
+  }
+
   .site-header,
   .site-footer {
     align-items: flex-start;
