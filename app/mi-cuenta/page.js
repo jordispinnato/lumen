@@ -4,6 +4,7 @@ import { createSupabaseServerClient } from "../../lib/supabase/server";
 import { formatPrice } from "../../lib/courses";
 import AccountDashboardShell from "./AccountDashboardShell";
 import { formatDateTime, applyReadReceipts, EmptyState, AccountIcon } from "./accountShared";
+import { getCartQuantityTotal } from "../../lib/cart";
 
 function formatDate(value) {
   if (!value) {
@@ -167,6 +168,8 @@ export default async function MiCuentaPage({ searchParams }) {
       .eq("user_id", userData.user.id),
   ]);
 
+  const cartCount = await getCartQuantityTotal(supabase, userData.user.id);
+
   const upcomingBookings = (bookings || [])
     .filter((booking) => booking.appointment_slots?.slot_date >= today && booking.status !== "cancelled")
     .sort((a, b) => {
@@ -327,6 +330,7 @@ export default async function MiCuentaPage({ searchParams }) {
       notificationCount={pendingAccountAlerts}
       notifications={notificationList}
       messages={messageList}
+      cartCount={cartCount}
     >
         <div className="account-dashboard" id="inicio">
           {params?.message ? <p className="notice success">{params.message}</p> : null}

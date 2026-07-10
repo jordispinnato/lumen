@@ -183,6 +183,7 @@ Navegacion reorganizada (2026-07-09, etapa 1 de `docs/INFORMATION_ARCHITECTURE.m
 - `/mi-perfil` — pagina placeholder ("se implementara en una etapa posterior"). Todavia sin desarrollo real; los datos personales se editan hoy desde `/configuracion`.
 - Menu del avatar (sitio publico en `SiteNav.js` y shell privado en `AccountDashboardShell.js`) reorganizado: Mi Espacio / Mi Perfil, Carrito / Mis pedidos / Facturacion, Configuracion / Cerrar sesion.
 - Dropdown de usuario y campana de notificaciones con preview de notificaciones y mensajes recientes, disponible en todas las paginas privadas.
+- Icono de carrito en la barra superior (junto a la campana), visible para usuarios con sesion iniciada en cualquier pagina. Muestra una insignia con la suma de cantidades de `catalog_cart_items` (oculta si el carrito esta vacio) y lleva a `/carrito` al hacer click.
 - Lectura de notificaciones persistente mediante `user_notification_reads`.
 
 ### Facturacion

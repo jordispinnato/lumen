@@ -1,5 +1,6 @@
 import "./globals.css";
 import { createSupabaseServerClient } from "../lib/supabase/server";
+import { getCartQuantityTotal } from "../lib/cart";
 import SiteNav from "./SiteNav";
 import PWARegister from "./PWARegister";
 
@@ -25,7 +26,7 @@ export default async function RootLayout({ children }) {
   let unreadMessages = 0;
   let notificationPreview = [];
   let messagePreview = [];
-  let cartItems = 0;
+  let cartCount = 0;
 
   if (userData.user) {
     const { data: profile } = await supabase
@@ -51,7 +52,7 @@ export default async function RootLayout({ children }) {
     const [
       { data: notificationCountRows },
       { data: messageCountRows },
-      { count: cartCount },
+      cartQuantityTotal,
       { data: notificationRows },
       { data: messageRows },
       { data: readReceipts },
@@ -66,10 +67,7 @@ export default async function RootLayout({ children }) {
         .select("id,read_at")
         .or(`user_id.eq.${userData.user.id},user_id.is.null`)
         .limit(200),
-      supabase
-        .from("catalog_cart_items")
-        .select("id", { count: "exact", head: true })
-        .eq("user_id", userData.user.id),
+      getCartQuantityTotal(supabase, userData.user.id),
       supabase
         .from("user_notifications")
         .select("id,title,body,href,notification_type,read_at,created_at")
@@ -93,7 +91,7 @@ export default async function RootLayout({ children }) {
     messagePreview = applyReadReceipts(messageRows || [], receiptSet, "message");
     unreadNotifications = applyReadReceipts(notificationCountRows || [], receiptSet, "notification").filter((item) => !item.read_at).length;
     unreadMessages = applyReadReceipts(messageCountRows || [], receiptSet, "message").filter((item) => !item.read_at).length;
-    cartItems = cartCount || 0;
+    cartCount = cartQuantityTotal;
   }
 
   return (
@@ -115,7 +113,7 @@ export default async function RootLayout({ children }) {
             <span>LUMEN</span>
           </a>
           <SiteNav
-            cartItems={cartItems}
+            cartCount={cartCount}
             displayName={displayName}
             email={userData.user?.email}
             isAdmin={isAdmin}

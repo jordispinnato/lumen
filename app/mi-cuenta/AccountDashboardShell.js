@@ -98,6 +98,7 @@ export default function AccountDashboardShell({
   notificationCount = 0,
   notifications = [],
   messages = [],
+  cartCount = 0,
   children,
 }) {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
@@ -165,6 +166,17 @@ export default function AccountDashboardShell({
             <span />
           </button>
           <div className="account-header-actions">
+            <a
+              className="account-cart-link"
+              href="/carrito"
+              aria-label="Ir al carrito"
+              title="Carrito"
+            >
+              <span className="cart-icon-shape" aria-hidden="true" />
+              {cartCount > 0 ? (
+                <span className="account-notification-badge">{cartCount > 9 ? "9+" : cartCount}</span>
+              ) : null}
+            </a>
             <NotificationDropdown
               count={visibleNotificationCount}
               messages={messages}

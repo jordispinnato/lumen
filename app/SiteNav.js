@@ -128,6 +128,7 @@ export default function SiteNav({
   unreadNotifications = 0,
   notificationPreview = [],
   messagePreview = [],
+  cartCount = 0,
 }) {
   const [isOpen, setIsOpen] = useState(false);
   const [isNotificationOpen, setIsNotificationOpen] = useState(false);
@@ -206,6 +207,16 @@ export default function SiteNav({
         <div className="site-nav-actions">
           {isLoggedIn ? (
             <>
+              <a
+                className="site-cart-link"
+                href="/carrito"
+                aria-label="Ir al carrito"
+                title="Carrito"
+                onClick={closeMenu}
+              >
+                <span className="cart-icon-shape" aria-hidden="true" />
+                <NavCounter value={cartCount} />
+              </a>
               <SiteNotificationMenu
                 unreadMessages={visibleUnreadMessages}
                 unreadNotifications={visibleUnreadNotifications}

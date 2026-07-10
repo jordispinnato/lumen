@@ -2,6 +2,7 @@ import { redirect } from "next/navigation";
 import { createSupabaseServerClient } from "../../lib/supabase/server";
 import AccountDashboardShell from "../mi-cuenta/AccountDashboardShell";
 import { applyReadReceipts, formatDateTime, AccountIcon } from "../mi-cuenta/accountShared";
+import { getCartQuantityTotal } from "../../lib/cart";
 
 export const metadata = {
   title: "Configuración | LUMEN",
@@ -52,6 +53,8 @@ export default async function ConfiguracionPage({ searchParams }) {
       .eq("user_id", userData.user.id),
   ]);
 
+  const cartCount = await getCartQuantityTotal(supabase, userData.user.id);
+
   const receiptSet = new Set((readReceipts || []).map((item) => `${item.item_type}:${item.item_id}`));
   const notificationList = applyReadReceipts(notifications || [], receiptSet, "notification");
   const messageList = applyReadReceipts(messages || [], receiptSet, "message");
@@ -71,6 +74,7 @@ export default async function ConfiguracionPage({ searchParams }) {
       notificationCount={pendingAccountAlerts}
       notifications={notificationList}
       messages={messageList}
+      cartCount={cartCount}
     >
       <div className="account-dashboard">
         {params?.message ? <p className="notice success">{params.message}</p> : null}

@@ -379,6 +379,64 @@ h3 {
   transform: translateX(-50%);
 }
 
+.cart-icon-shape {
+  position: relative;
+  width: 18px;
+  height: 13px;
+  display: inline-block;
+  border: 2px solid currentColor;
+  border-top: 0;
+  border-radius: 1px 1px 3px 3px;
+  margin-top: 3px;
+}
+
+.cart-icon-shape::before {
+  content: "";
+  position: absolute;
+  left: -6px;
+  top: -8px;
+  width: 6px;
+  height: 6px;
+  border-left: 2px solid currentColor;
+  border-top: 2px solid currentColor;
+  transform: rotate(-40deg);
+}
+
+.cart-icon-shape::after {
+  content: "";
+  position: absolute;
+  left: 2px;
+  bottom: -6px;
+  width: 4px;
+  height: 4px;
+  border-radius: 999px;
+  background: currentColor;
+  box-shadow: 10px 0 0 currentColor;
+}
+
+.site-cart-link {
+  position: relative;
+  width: 44px;
+  height: 44px;
+  display: inline-grid;
+  place-items: center;
+  border: 1px solid rgba(20, 53, 56, 0.14);
+  border-radius: 8px;
+  background: rgba(255, 255, 255, 0.78);
+  color: #173b3f;
+  box-shadow: 0 10px 24px rgba(14, 45, 49, 0.08);
+  transition: color 160ms ease, border-color 160ms ease, background 160ms ease, box-shadow 160ms ease, transform 160ms ease;
+}
+
+.site-cart-link:hover,
+.site-cart-link:focus-visible {
+  border-color: rgba(104, 199, 189, 0.62);
+  background: rgba(232, 251, 247, 0.88);
+  color: var(--petrol);
+  transform: translateY(-1px);
+  box-shadow: 0 14px 30px rgba(14, 45, 49, 0.12);
+}
+
 .site-notification-dropdown {
   position: absolute;
   top: calc(100% + 12px);
@@ -4377,6 +4435,18 @@ body:has(.account-app-shell) .site-footer {
 
 .account-notification-menu summary::-webkit-details-marker {
   display: none;
+}
+
+.account-cart-link {
+  position: relative;
+  width: 44px;
+  height: 44px;
+  display: inline-grid;
+  place-items: center;
+  border: 1px solid #e5e9f2;
+  border-radius: 8px;
+  background: white;
+  color: #0f172a;
 }
 
 .account-notification-badge {

@@ -2,6 +2,7 @@ import { redirect } from "next/navigation";
 import { createSupabaseServerClient } from "../../lib/supabase/server";
 import AccountDashboardShell from "../mi-cuenta/AccountDashboardShell";
 import { applyReadReceipts, EmptyState } from "../mi-cuenta/accountShared";
+import { getCartQuantityTotal } from "../../lib/cart";
 
 export const metadata = {
   title: "Mi Perfil | LUMEN",
@@ -51,6 +52,8 @@ export default async function MiPerfilPage() {
       .eq("user_id", userData.user.id),
   ]);
 
+  const cartCount = await getCartQuantityTotal(supabase, userData.user.id);
+
   const receiptSet = new Set((readReceipts || []).map((item) => `${item.item_type}:${item.item_id}`));
   const notificationList = applyReadReceipts(notifications || [], receiptSet, "notification");
   const messageList = applyReadReceipts(messages || [], receiptSet, "message");
@@ -69,6 +72,7 @@ export default async function MiPerfilPage() {
       notificationCount={pendingAccountAlerts}
       notifications={notificationList}
       messages={messageList}
+      cartCount={cartCount}
     >
       <div className="account-dashboard">
         <section className="account-hero">

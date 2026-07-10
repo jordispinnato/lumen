@@ -83,6 +83,10 @@ export default async function CarritoPage({ searchParams }) {
     (sum, item) => sum + (item.catalog_products?.price || 0) * item.quantity,
     0
   );
+  const cartQuantityTotal = cartItemList.reduce((sum, item) => {
+    const quantity = Number(item.quantity);
+    return Number.isFinite(quantity) && quantity > 0 ? sum + quantity : sum;
+  }, 0);
 
   return (
     <AccountDashboardShell
@@ -93,6 +97,7 @@ export default async function CarritoPage({ searchParams }) {
       notificationCount={pendingAccountAlerts}
       notifications={notificationList}
       messages={messageList}
+      cartCount={cartQuantityTotal}
     >
       <div className="account-dashboard">
         {params?.message ? <p className="notice success">{params.message}</p> : null}
