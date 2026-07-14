@@ -1,6 +1,7 @@
+import Link from "next/link";
 import { createSupabaseServerClient } from "../lib/supabase/server";
-import { demoCourses, formatPrice, normalizeCourse } from "../lib/courses";
-import { demoProducts, getProductTypeLabel } from "../lib/catalog";
+import { formatPrice, normalizeCourse } from "../lib/courses";
+import { getProductTypeLabel } from "../lib/catalog";
 
 function getInitials(name) {
   return String(name || "L")
@@ -14,8 +15,7 @@ function getInitials(name) {
 export default async function HomePage() {
   const whatsappUrl = process.env.NEXT_PUBLIC_WHATSAPP_URL || "https://wa.me/";
   const supabase = await createSupabaseServerClient();
-  const [{ data: userData }, { data: courseData }, { data: specialists }, { data: products }] = await Promise.all([
-    supabase.auth.getUser(),
+  const [{ data: courseData }, { data: specialists }, { data: products }] = await Promise.all([
     supabase
       .from("courses")
       .select("id,slug,title,summary,price,status,cover_image_url,instructor,level,total_duration,category,featured,display_order")
@@ -38,55 +38,53 @@ export default async function HomePage() {
       .limit(3),
   ]);
 
-  const courses = courseData?.length ? courseData.map(normalizeCourse) : demoCourses;
-  const productCards = products?.length ? products : demoProducts.slice(0, 3);
-  const isLoggedIn = Boolean(userData.user);
+  const courses = courseData?.length ? courseData.map(normalizeCourse) : [];
+  const productCards = products?.length ? products : [];
 
   return (
     <main className="landing-page">
       <section className="landing-hero">
         <div className="landing-hero-copy">
-          <p className="eyebrow">Plataforma interdisciplinaria online</p>
-          <h1>Un espacio para aprender, acompanarte y sentirte mejor</h1>
+          <p className="eyebrow">Consultas, cursos y recursos online</p>
+          <h1>Acompañamiento profesional para aprender, consultar y avanzar con claridad</h1>
           <p className="lead">
-            Cursos, consultas online y recursos terapeuticos para acompanar tu bienestar personal y profesional.
+            LUMEN reúne consultas profesionales, cursos online y recursos seleccionados en un espacio simple, cuidado y fácil de gestionar.
           </p>
           <div className="landing-actions">
-            <a className="button" href="/cursos">Explorar cursos</a>
-            <a className="secondary-button" href="/turnos">Reservar consulta</a>
+            <Link className="button" href="/turnos">Reservar consulta</Link>
+            <Link className="secondary-button" href="/cursos">Explorar cursos</Link>
           </div>
         </div>
       </section>
 
       <section className="landing-feature-grid" aria-label="Accesos principales">
         <article className="landing-feature-card">
-          <h2>Cursos</h2>
-          <p>Aprende a tu ritmo con contenidos disenados por profesionales.</p>
-          <a className="secondary-button" href="/cursos">Ver cursos</a>
-        </article>
-        <article className="landing-feature-card">
           <h2>Consultas profesionales</h2>
-          <p>Reserva una consulta online con especialistas de manera simple y clara.</p>
-          <a className="secondary-button" href="/turnos">Reservar consulta</a>
+          <p>Elegí una especialista, revisá su disponibilidad y reservá una consulta online.</p>
+          <Link className="secondary-button" href="/turnos">Reservar consulta</Link>
         </article>
         <article className="landing-feature-card">
-          <h2>Catalogo</h2>
-          <p>Recursos fisicos y digitales para bienestar, educacion y practica clinica.</p>
-          <a className="secondary-button" href="/catalogo">Ver catalogo</a>
+          <h2>Cursos online</h2>
+          <p>Accedé a contenidos asincrónicos y aprendé a tu ritmo.</p>
+          <Link className="secondary-button" href="/cursos">Explorar cursos</Link>
+        </article>
+        <article className="landing-feature-card">
+          <h2>Recursos</h2>
+          <p>Encontrá materiales físicos y digitales para acompañar procesos personales, educativos o profesionales.</p>
+          <Link className="secondary-button" href="/catalogo">Ver recursos</Link>
         </article>
       </section>
 
       <section className="landing-section landing-section--marfil">
         <div className="landing-section-head centered">
-          <p className="eyebrow">Como funciona</p>
-          <h2>Un recorrido simple para empezar.</h2>
+          <p className="eyebrow">Cómo funciona</p>
+          <h2>Un recorrido simple, con todo en un mismo lugar</h2>
         </div>
         <div className="landing-steps">
           {[
-            ["1", "Registrate", "Crea tu cuenta gratis en pocos pasos."],
-            ["2", "Explora", "Descubri cursos, recursos y profesionales."],
-            ["3", "Reserva o accede", "Elegi consulta, curso o recurso segun tu necesidad."],
-            ["4", "Comenza", "Inicia tu camino de crecimiento y bienestar."],
+            ["1", "Elegí el acompañamiento que necesitás", "Podés reservar una consulta, explorar cursos o buscar recursos."],
+            ["2", "Reservá o accedé al contenido", "Revisá la información disponible y avanzá desde la plataforma."],
+            ["3", "Gestioná tu actividad desde Mi Espacio", "Tus consultas, cursos, recursos y mensajes quedan organizados en tu área privada."],
           ].map(([number, title, text]) => (
             <article key={number}>
               <span>{number}</span>
@@ -98,12 +96,32 @@ export default async function HomePage() {
       </section>
 
       <section className="landing-section landing-section--blanco">
+        <div className="landing-section-head centered">
+          <p className="eyebrow">Confianza</p>
+          <h2>Un espacio pensado para avanzar con confianza</h2>
+        </div>
+        <div className="landing-trust-grid">
+          {[
+            "Conocé a cada profesional antes de reservar",
+            "Procesos claros de reserva y acceso",
+            "Un área privada para organizar tu actividad",
+            "Una experiencia online simple y acompañada",
+          ].map((item) => (
+            <article key={item}>
+              <span aria-hidden="true">+</span>
+              <strong>{item}</strong>
+            </article>
+          ))}
+        </div>
+      </section>
+
+      <section className="landing-section landing-section--blanco">
         <div className="landing-section-head">
           <div>
             <p className="eyebrow">Profesionales destacados</p>
-            <h2>Acompanamiento profesional, cercano y online.</h2>
+            <h2>Acompañamiento profesional, cercano y online.</h2>
           </div>
-          <a className="secondary-button" href="/turnos">Ver consultas</a>
+          <Link className="secondary-button" href="/turnos">Ver consultas</Link>
         </div>
         {specialists?.length ? (
           <div className="landing-card-grid">
@@ -119,16 +137,15 @@ export default async function HomePage() {
                   <p>{specialist.role || "Profesional LUMEN"}</p>
                   {specialist.professional_license ? <small>{specialist.professional_license}</small> : null}
                 </div>
-                <p>{specialist.focus || specialist.short_bio || "Perfil profesional preparado para acompanar procesos de bienestar."}</p>
-                <a className="secondary-button" href={specialist.slug ? `/profesionales/${specialist.slug}` : "/turnos"}>Ver perfil</a>
+                <p>{specialist.focus || specialist.short_bio || "Consultá su perfil para conocer su enfoque y disponibilidad."}</p>
+                <Link className="secondary-button" href={specialist.slug ? `/profesionales/${specialist.slug}` : "/turnos"}>Ver perfil</Link>
               </article>
             ))}
           </div>
         ) : (
           <div className="ds-empty-state">
             <span aria-hidden="true">+</span>
-            <h3>Pronto vas a ver profesionales destacados</h3>
-            <p>El equipo de LUMEN se mostrara aca cuando los perfiles esten publicados.</p>
+            <h3>Los perfiles profesionales disponibles van a aparecer acá.</h3>
           </div>
         )}
       </section>
@@ -139,59 +156,69 @@ export default async function HomePage() {
             <p className="eyebrow">Cursos destacados</p>
             <h2>Aprendizaje online para procesos reales.</h2>
           </div>
-          <a className="secondary-button" href="/cursos">Ver todos</a>
+          <Link className="secondary-button" href="/cursos">Ver todos</Link>
         </div>
-        <div className="landing-card-grid">
-          {courses.map((course) => (
-            <article className="landing-course-card" key={course.slug}>
-              <span className="ds-badge is-published">{course.category || course.type}</span>
-              <h3>{course.title}</h3>
-              <p>{course.summary}</p>
-              <small>{course.totalDuration || course.duration}</small>
-              <strong>{formatPrice(course.price)}</strong>
-              <a className="secondary-button" href={`/cursos/${course.slug}`}>Ver curso</a>
-            </article>
-          ))}
-        </div>
+        {courses.length ? (
+          <div className="landing-card-grid">
+            {courses.map((course) => (
+              <article className="landing-course-card" key={course.slug}>
+                <span className="ds-badge is-published">{course.category || course.type}</span>
+                <h3>{course.title}</h3>
+                <p>{course.summary}</p>
+                <small>{course.totalDuration || course.duration}</small>
+                <strong>{formatPrice(course.price)}</strong>
+                <Link className="secondary-button" href={`/cursos/${course.slug}`}>Ver curso</Link>
+              </article>
+            ))}
+          </div>
+        ) : (
+          <div className="ds-empty-state">
+            <span aria-hidden="true">+</span>
+            <h3>Los próximos cursos disponibles van a aparecer acá.</h3>
+          </div>
+        )}
       </section>
 
       <section className="landing-section landing-section--blanco">
         <div className="landing-section-head">
           <div>
             <p className="eyebrow">Recursos destacados</p>
-            <h2>Herramientas para acompanar el bienestar cotidiano.</h2>
+            <h2>Herramientas para acompañar el bienestar cotidiano.</h2>
           </div>
-          <a className="secondary-button" href="/catalogo">Ver catalogo</a>
+          <Link className="secondary-button" href="/catalogo">Ver recursos</Link>
         </div>
-        <div className="landing-card-grid">
-          {productCards.map((product) => {
-            const productUrl = String(product.id || "").startsWith("demo-") ? "/catalogo" : `/catalogo/${product.id}`;
+        {productCards.length ? (
+          <div className="landing-card-grid">
+            {productCards.map((product) => {
+              const productUrl = `/catalogo/${product.id}`;
 
-            return (
-              <article className="landing-resource-card" key={product.id}>
-                <span className="ds-badge">{getProductTypeLabel(product.product_type)}</span>
-                <h3>{product.title}</h3>
-                <p>{product.summary}</p>
-                <a className="secondary-button" href={productUrl}>Ver recurso</a>
-              </article>
-            );
-          })}
-        </div>
+              return (
+                <article className="landing-resource-card" key={product.id}>
+                  <span className="ds-badge">{getProductTypeLabel(product.product_type)}</span>
+                  <h3>{product.title}</h3>
+                  <p>{product.summary}</p>
+                  <Link className="secondary-button" href={productUrl}>Ver recurso</Link>
+                </article>
+              );
+            })}
+          </div>
+        ) : (
+          <div className="ds-empty-state">
+            <span aria-hidden="true">+</span>
+            <h3>Los próximos recursos disponibles van a aparecer acá.</h3>
+          </div>
+        )}
       </section>
 
       <section className="landing-final-cta">
         <div>
-          <p className="eyebrow">Empeza hoy</p>
-          <h2>Empeza tu recorrido en LUMEN</h2>
-          <p>Creamos un espacio simple para aprender, reservar consultas y acceder a recursos de bienestar.</p>
+          <p className="eyebrow">Empezá por el camino que necesitás</p>
+          <h2>Reservá una consulta o explorá los cursos disponibles</h2>
+          <p>LUMEN te ayuda a ordenar tu próximo paso con acompañamiento profesional, aprendizaje online y recursos seleccionados.</p>
         </div>
         <div className="landing-actions">
-          {isLoggedIn ? (
-            <a className="button" href="/mi-cuenta">Ir a Mi Espacio</a>
-          ) : (
-            <a className="button" href="/registro">Crear cuenta</a>
-          )}
-          <a className="secondary-button" href="/turnos">Reservar consulta</a>
+          <Link className="button" href="/turnos">Reservar consulta</Link>
+          <Link className="secondary-button" href="/cursos">Explorar cursos</Link>
         </div>
       </section>
 

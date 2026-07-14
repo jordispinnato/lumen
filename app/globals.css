@@ -1472,7 +1472,7 @@ h3 {
   width: min(1180px, calc(100% - 36px));
   margin-inline: auto;
   display: grid;
-  grid-template-columns: repeat(4, minmax(0, 1fr));
+  grid-template-columns: repeat(3, minmax(0, 1fr));
   gap: 14px;
 }
 
@@ -1515,6 +1515,40 @@ h3 {
   display: grid;
   grid-template-columns: repeat(3, minmax(0, 1fr));
   gap: 18px;
+}
+
+.landing-trust-grid {
+  width: min(980px, calc(100% - 36px));
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 14px;
+  margin-inline: auto;
+}
+
+.landing-trust-grid article {
+  display: grid;
+  gap: 10px;
+  border: 1px solid var(--color-border);
+  border-radius: var(--ds-radius);
+  padding: 20px;
+  background: rgba(247, 242, 235, 0.72);
+  box-shadow: var(--ds-shadow-sm);
+}
+
+.landing-trust-grid span {
+  width: 34px;
+  height: 34px;
+  display: inline-grid;
+  place-items: center;
+  border-radius: 50%;
+  background: rgba(60, 140, 152, 0.14);
+  color: var(--color-primary-dark);
+  font-weight: 900;
+}
+
+.landing-trust-grid strong {
+  color: var(--color-primary-dark);
+  line-height: 1.35;
 }
 
 .landing-section > .ds-empty-state {
@@ -5957,7 +5991,8 @@ body:has(.account-app-shell) .site-footer {
 
   .landing-feature-grid,
   .landing-card-grid,
-  .landing-steps {
+  .landing-steps,
+  .landing-trust-grid {
     grid-template-columns: repeat(2, minmax(0, 1fr));
   }
 
@@ -6383,7 +6418,8 @@ body:has(.account-app-shell) .site-footer {
 
   .landing-feature-grid,
   .landing-card-grid,
-  .landing-steps {
+  .landing-steps,
+  .landing-trust-grid {
     grid-template-columns: 1fr;
   }
 
