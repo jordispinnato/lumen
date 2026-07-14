@@ -278,9 +278,23 @@ Esto incluye:
 - Textos legales.
 - Textos del admin visibles para usuarios internos.
 
-### 6. No resolver identidad visual desde el codigo antes del Figma
+### 6. Identidad visual: paleta cromatica ya definida, resto pendiente del Figma
 
-Hasta recibir el Figma oficial, las decisiones visuales deben mantenerse neutrales. Este documento no define colores, tipografias, logo, imagenes finales ni sistema visual definitivo.
+La paleta cromatica oficial de LUMEN ya esta definida y puede integrarse desde el codigo (tokens de color en `app/globals.css`).
+
+Siguen pendientes del Figma definitivo, y no deben resolverse desde el codigo hasta recibirlo:
+
+- Logo.
+- Isotipo.
+- Tipografia.
+- Iconografia.
+- Espaciados.
+- Radios.
+- Sombras.
+- Componentes finales.
+- Layouts visuales definitivos.
+
+Este documento no define esos elementos ni un sistema visual definitivo mas alla de la paleta cromatica.
 
 ### 7. Mantener coherencia entre secciones
 
