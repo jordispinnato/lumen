@@ -95,6 +95,7 @@ function SiteNotificationMenu({
         }}
       >
         <span className="notification-bell-shape" aria-hidden="true" />
+        <span className="site-mobile-action-label">Notificaciones</span>
         <NavCounter value={pendingAlerts} />
       </summary>
       <div className="site-notification-dropdown">
@@ -240,6 +241,7 @@ export default function SiteNav({
                   <circle cx="18" cy="20" r="1.4" />
                   <path d="M2 3h2.4l2.24 11.2a2 2 0 0 0 2 1.6h8.4a2 2 0 0 0 2-1.6L21 7H6" />
                 </svg>
+                <span className="site-mobile-action-label">Carrito</span>
                 <NavCounter value={cartCount} />
               </Link>
               <SiteNotificationMenu
@@ -283,6 +285,11 @@ export default function SiteNav({
                   }}
                 >
                   <span className="site-user-avatar">{initials}</span>
+                  <span className="site-mobile-user-copy">
+                    <strong>{displayName || email || "Mi Espacio"}</strong>
+                    <small>Mi Espacio</small>
+                  </span>
+                  <span className="site-mobile-chevron" aria-hidden="true">{">"}</span>
                 </summary>
                 <div className="site-user-dropdown">
                   <div className="site-user-card">

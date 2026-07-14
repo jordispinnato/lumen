@@ -283,6 +283,12 @@ h3 {
   display: none;
 }
 
+.site-mobile-action-label,
+.site-mobile-user-copy,
+.site-mobile-chevron {
+  display: none;
+}
+
 .site-nav a:not(.button),
 .nav-button {
   min-height: 40px;
@@ -6222,6 +6228,91 @@ body:has(.account-app-shell) .site-footer {
     width: 100%;
     justify-content: flex-start;
     border-bottom: 1px solid rgba(255, 255, 255, 0.14);
+  }
+
+  .site-cart-link,
+  .site-notification-menu summary,
+  .site-user-menu summary {
+    height: auto;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    border-width: 0 0 1px;
+    border-radius: 0;
+    padding: 0 2px;
+    background: transparent;
+    color: var(--color-background);
+    box-shadow: none;
+  }
+
+  .site-cart-link:hover,
+  .site-cart-link:focus-visible,
+  .site-notification-menu:hover summary,
+  .site-notification-menu summary:focus-visible,
+  .site-user-menu:hover .site-user-avatar,
+  .site-user-menu summary:focus-visible .site-user-avatar {
+    transform: none;
+    box-shadow: none;
+  }
+
+  .site-cart-link:hover,
+  .site-cart-link:focus-visible,
+  .site-notification-menu:hover summary,
+  .site-notification-menu summary:focus-visible {
+    background: transparent;
+    color: var(--aqua);
+  }
+
+  .site-mobile-action-label,
+  .site-mobile-user-copy,
+  .site-mobile-chevron {
+    display: inline-flex;
+  }
+
+  .site-mobile-action-label {
+    font-weight: 800;
+  }
+
+  .site-mobile-user-copy {
+    min-width: 0;
+    flex: 1;
+    flex-direction: column;
+    gap: 2px;
+  }
+
+  .site-mobile-user-copy strong,
+  .site-mobile-user-copy small {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  .site-mobile-user-copy strong {
+    color: var(--color-background);
+    font-size: 0.96rem;
+    font-weight: 900;
+  }
+
+  .site-mobile-user-copy small {
+    color: rgba(255, 255, 255, 0.72);
+    font-size: 0.78rem;
+    font-weight: 700;
+  }
+
+  .site-mobile-chevron {
+    margin-left: auto;
+    color: rgba(255, 255, 255, 0.72);
+    font-weight: 900;
+  }
+
+  .site-cart-link .nav-counter,
+  .site-notification-menu summary .nav-counter {
+    position: static;
+    margin-left: auto;
+  }
+
+  .site-user-menu summary .site-user-avatar {
+    flex: 0 0 auto;
   }
 
   .site-notification-list a {
