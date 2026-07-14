@@ -76,7 +76,7 @@ export default async function HomePage() {
         </article>
       </section>
 
-      <section className="landing-section">
+      <section className="landing-section landing-section--marfil">
         <div className="landing-section-head centered">
           <p className="eyebrow">Como funciona</p>
           <h2>Un recorrido simple para empezar.</h2>
@@ -97,7 +97,7 @@ export default async function HomePage() {
         </div>
       </section>
 
-      <section className="landing-section">
+      <section className="landing-section landing-section--blanco">
         <div className="landing-section-head">
           <div>
             <p className="eyebrow">Profesionales destacados</p>
@@ -133,7 +133,7 @@ export default async function HomePage() {
         )}
       </section>
 
-      <section className="landing-section">
+      <section className="landing-section landing-section--marfil">
         <div className="landing-section-head">
           <div>
             <p className="eyebrow">Cursos destacados</p>
@@ -155,7 +155,7 @@ export default async function HomePage() {
         </div>
       </section>
 
-      <section className="landing-section">
+      <section className="landing-section landing-section--blanco">
         <div className="landing-section-head">
           <div>
             <p className="eyebrow">Recursos destacados</p>
