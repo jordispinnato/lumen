@@ -18,8 +18,8 @@
   --ds-shadow-md: 0 16px 42px rgba(15, 23, 42, 0.08);
   --ds-primary: var(--petrol);
   --ds-primary-strong: var(--deep);
-  --ds-primary-soft: rgba(104, 199, 189, 0.16);
-  --ds-focus: 0 0 0 4px rgba(104, 199, 189, 0.24);
+  --ds-primary-soft: rgba(60, 140, 152, 0.16);
+  --ds-focus: var(--color-focus-ring);
   --accent-purple: #BA9CEF;
   --space-1: 4px;
   --space-2: 8px;
@@ -37,6 +37,77 @@
   --color-accent: var(--accent-purple);
   --color-text: var(--ink);
   --color-border: var(--line);
+
+  /*
+   * Rampas cromaticas oficiales (LUMEN Product Bible v1.0, cap. 3.2).
+   * Valores exactos del PDF de paleta del estudio. 700 = color base de marca
+   * (alias al token ya existente, no se duplica el valor); 900 = tinte mas
+   * oscuro; 100 = tinte mas claro.
+   */
+  --color-turquesa-900: #267883;
+  --color-turquesa-700: var(--petrol);
+  --color-turquesa-500: #5ca7b2;
+  --color-turquesa-300: #7ec0c9;
+  --color-turquesa-100: #a7dce2;
+
+  --color-azul-900: #0b2b30;
+  --color-azul-700: var(--deep);
+  --color-azul-500: #29545b;
+  --color-azul-300: #4b7379;
+  --color-azul-100: #76989d;
+
+  --color-lavanda-900: #9874d8;
+  --color-lavanda-700: var(--accent-purple);
+  --color-lavanda-500: #c8b2f3;
+  --color-lavanda-300: #d9cbf7;
+  --color-lavanda-100: #ece5fc;
+
+  --color-marfil-900: #e6ddd2;
+  --color-marfil-700: var(--warm);
+  --color-marfil-500: #fbf8f4;
+  --color-marfil-300: #fdfcfa;
+  --color-marfil-100: #ffffff;
+
+  /*
+   * Capa semantica (Product Bible cap. 3.2). Contraste verificado AA:
+   * success 8.41:1, info 10.34:1, warning 12.04:1, danger 7.49:1 (formalizado
+   * sobre el valor ya en uso, sin cambiar su apariencia).
+   */
+  --color-success-bg: var(--color-turquesa-100);
+  --color-success-text: var(--deep);
+  --color-info-bg: var(--color-lavanda-100);
+  --color-info-text: var(--deep);
+  --color-warning-bg: var(--color-marfil-900);
+  --color-warning-text: var(--ink);
+  --color-danger-bg: #fff0ee;
+  --color-danger-text: #8f2b1d;
+
+  /* Anillo de foco oficial: turquesa, ya no aqua legacy (contraste 3.49:1 sobre marfil) */
+  --color-focus-ring: 0 0 0 4px rgba(60, 140, 152, 0.35);
+
+  /*
+   * Elevation / Shadow system (Product Bible cap. 7): exactamente 3 niveles.
+   * "resting" y "floating" alias los tokens ya existentes (mismo valor, no
+   * se duplica); "layer" es nuevo, reservado a modales.
+   */
+  --shadow-resting: var(--ds-shadow-sm);
+  --shadow-floating: var(--ds-shadow-md);
+  --shadow-layer: 0 24px 60px rgba(17, 56, 63, 0.18);
+
+  /* Motion system (Product Bible cap. 6): 3 duraciones, 2 curvas, sin excepciones */
+  --motion-fast: 120ms;
+  --motion-base: 200ms;
+  --motion-slow: 320ms;
+  --ease-out: cubic-bezier(0.16, 1, 0.3, 1);
+  --ease-in-out: cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  :root {
+    --motion-fast: 0ms;
+    --motion-base: 0ms;
+    --motion-slow: 0ms;
+  }
 }
 
 * {
@@ -242,7 +313,7 @@ h3 {
   bottom: 4px;
   height: 2px;
   border-radius: 999px;
-  background: var(--aqua);
+  background: var(--color-turquesa-100);
   opacity: 0;
   transform: scaleX(0.35);
   transform-origin: center;
@@ -251,7 +322,7 @@ h3 {
 
 .site-nav-links a:hover,
 .site-nav-links a:focus-visible {
-  color: var(--aqua);
+  color: var(--color-turquesa-100);
   transform: translateY(-1px);
 }
 
@@ -357,8 +428,8 @@ h3 {
 
 .site-notification-menu:hover summary,
 .site-notification-menu summary:focus-visible {
-  border-color: rgba(104, 199, 189, 0.62);
-  background: rgba(232, 251, 247, 0.88);
+  border-color: rgba(60, 140, 152, 0.62);
+  background: rgba(60, 140, 152, 0.12);
   color: var(--petrol);
   transform: translateY(-1px);
   box-shadow: 0 14px 30px rgba(14, 45, 49, 0.12);
@@ -424,8 +495,8 @@ h3 {
 
 .site-cart-link:hover,
 .site-cart-link:focus-visible {
-  border-color: rgba(104, 199, 189, 0.62);
-  background: rgba(232, 251, 247, 0.88);
+  border-color: rgba(60, 140, 152, 0.62);
+  background: rgba(60, 140, 152, 0.12);
   color: var(--petrol);
   transform: translateY(-1px);
   box-shadow: 0 14px 30px rgba(14, 45, 49, 0.12);
@@ -768,7 +839,7 @@ h3 {
   content: "";
   height: 8px;
   margin: -26px -26px 22px;
-  background: linear-gradient(90deg, var(--petrol), var(--aqua), var(--sage));
+  background: linear-gradient(90deg, var(--deep), var(--petrol), var(--color-turquesa-100));
 }
 
 .card p {
@@ -878,8 +949,8 @@ h3 {
 .ds-badge.is-completed,
 .ds-badge.is-published {
   border-color: rgba(60, 140, 152, 0.22);
-  background: rgba(104, 199, 189, 0.18);
-  color: var(--color-primary-dark);
+  background: var(--color-success-bg);
+  color: var(--color-success-text);
 }
 
 .ds-badge.is-warning,
@@ -1218,13 +1289,23 @@ h3 {
 }
 
 .notice.error {
-  background: #fff0ee;
-  color: #8f2b1d;
+  background: var(--color-danger-bg);
+  color: var(--color-danger-text);
 }
 
 .notice.success {
-  background: #eaf5f1;
-  color: var(--petrol);
+  background: var(--color-success-bg);
+  color: var(--color-success-text);
+}
+
+.notice.warning {
+  background: var(--color-warning-bg);
+  color: var(--color-warning-text);
+}
+
+.notice.info {
+  background: var(--color-info-bg);
+  color: var(--color-info-text);
 }
 
 .admin-global-notice {
