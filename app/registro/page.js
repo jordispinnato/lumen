@@ -1,4 +1,5 @@
 import Link from "next/link";
+import LumenLogotipo from "../components/LumenLogotipo";
 
 export default async function RegisterPage({ searchParams }) {
   const params = await searchParams;
@@ -8,6 +9,9 @@ export default async function RegisterPage({ searchParams }) {
 
   return (
     <main className="section">
+      <Link href="/" className="auth-brand" aria-label="Ir al inicio de LUMEN">
+        <LumenLogotipo />
+      </Link>
       <form className="form-card" action="/auth/register" method="post">
         <p className="eyebrow">Crear cuenta</p>
         <h1>Registro</h1>

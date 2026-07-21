@@ -1,4 +1,5 @@
 import Link from "next/link";
+import LumenLogotipo from "../components/LumenLogotipo";
 
 export default async function LoginPage({ searchParams }) {
   const params = await searchParams;
@@ -9,6 +10,9 @@ export default async function LoginPage({ searchParams }) {
 
   return (
     <main className="section">
+      <Link href="/" className="auth-brand" aria-label="Ir al inicio de LUMEN">
+        <LumenLogotipo />
+      </Link>
       <form className="form-card" action="/auth/login" method="post">
         <p className="eyebrow">Acceso privado</p>
         <h1>Ingresar</h1>
