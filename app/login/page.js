@@ -22,7 +22,7 @@ export default async function LoginPage({ searchParams }) {
           <input type="email" name="email" required />
         </label>
         <label>
-          Contrasena
+          Contraseña
           <input type="password" name="password" required />
         </label>
         <button className="button" type="submit">Ingresar</button>

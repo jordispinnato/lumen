@@ -57,7 +57,7 @@ function SiteNotificationMenu({
   const items = [
     ...notificationPreview.map((item) => ({
       id: `notification-${item.id}`,
-      label: item.notification_type || "Notificacion",
+      label: item.notification_type || "Notificación",
       title: item.title,
       body: item.body,
       href: item.href || "/mi-cuenta#notificaciones",
@@ -314,7 +314,7 @@ export default function SiteNav({
                     <Link href="/configuracion" onClick={closeMenu}>Configuración</Link>
                   </div>
                   <form action="/auth/logout" method="post">
-                    <button type="submit">Cerrar sesion</button>
+                    <button type="submit">Cerrar sesión</button>
                   </form>
                 </div>
               </details>

@@ -25,7 +25,7 @@ export default async function RegisterPage({ searchParams }) {
           <input type="email" name="email" required />
         </label>
         <label>
-          Contrasena
+          Contraseña
           <input type="password" name="password" required minLength="8" />
         </label>
         <button className="button" type="submit">Crear cuenta</button>
