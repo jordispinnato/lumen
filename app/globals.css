@@ -1053,7 +1053,8 @@ h3 {
   background: linear-gradient(135deg, rgba(255, 255, 255, 0.88), rgba(247, 244, 238, 0.78));
 }
 
-.ds-empty-state > span {
+.ds-empty-state > span,
+.ds-empty-state > svg {
   width: 38px;
   height: 38px;
   display: inline-grid;
@@ -1062,6 +1063,12 @@ h3 {
   background: var(--ds-primary-soft);
   color: var(--petrol);
   font-weight: 900;
+}
+
+.ds-empty-state > svg {
+  width: auto;
+  height: auto;
+  padding: 9px;
 }
 
 .ds-empty-state h3,
@@ -1414,6 +1421,7 @@ h3 {
 
 .landing-hero {
   width: 100%;
+  min-width: 0;
   min-height: min(760px, calc(100svh - 74px));
   display: grid;
   align-items: center;
@@ -1426,6 +1434,10 @@ h3 {
   background-size: cover, contain;
   background-repeat: no-repeat, no-repeat;
   border-bottom: 1px solid rgba(17, 56, 63, 0.08);
+}
+
+.landing-hero-copy {
+  min-width: 0;
 }
 
 .landing-hero-copy h1,
@@ -1456,15 +1468,16 @@ h3 {
   display: grid;
   grid-template-columns: repeat(3, minmax(0, 1fr));
   gap: 18px;
-  margin: -58px auto 74px;
-  position: relative;
-  z-index: 3;
+  margin: 0 auto;
+  padding: 70px 0;
+}
+
+.landing-feature-card {
+  align-content: start;
 }
 
 .landing-feature-card,
-.landing-professional-card,
-.landing-course-card,
-.landing-resource-card {
+.landing-professional-card {
   min-width: 0;
   display: grid;
   gap: 14px;
@@ -1478,29 +1491,27 @@ h3 {
 }
 
 .landing-feature-card:hover,
-.landing-professional-card:hover,
-.landing-course-card:hover,
-.landing-resource-card:hover {
+.landing-professional-card:hover {
   transform: translateY(-2px);
   border-color: rgba(60, 140, 152, 0.32);
   box-shadow: var(--ds-shadow-md);
 }
 
 .landing-feature-card h2,
-.landing-professional-card h3,
-.landing-course-card h3,
-.landing-resource-card h3 {
+.landing-professional-card h3 {
   margin: 0;
   color: var(--color-primary-dark);
 }
 
 .landing-feature-card p,
-.landing-professional-card p,
-.landing-course-card p,
-.landing-resource-card p {
+.landing-professional-card p {
   margin: 0;
   color: var(--muted);
   line-height: 1.55;
+}
+
+.landing-feature-card > svg {
+  color: var(--color-primary);
 }
 
 .landing-section {
@@ -1681,15 +1692,11 @@ h3 {
   box-shadow: var(--ds-shadow-sm);
 }
 
-.landing-trust-grid span {
-  width: 34px;
-  height: 34px;
-  display: inline-grid;
-  place-items: center;
+.landing-trust-grid svg {
+  padding: 8px;
   border-radius: 50%;
   background: rgba(60, 140, 152, 0.14);
   color: var(--color-primary-dark);
-  font-weight: 900;
 }
 
 .landing-trust-grid strong {
@@ -1724,16 +1731,67 @@ h3 {
   gap: 5px;
 }
 
-.landing-professional-card small,
-.landing-course-card small,
-.landing-resource-card small {
-  color: var(--muted);
-  font-weight: 800;
+.credential-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 4px 10px;
+  border-radius: 999px;
+  background: var(--color-success-bg);
+  color: var(--color-success-text);
+  font-size: 0.8125rem;
+  font-weight: 600;
 }
 
-.landing-course-card strong {
+.credential-chip svg {
+  flex-shrink: 0;
+}
+
+.landing-faq {
+  width: min(760px, 100%);
+  margin: 0 auto;
+  display: grid;
+  gap: 12px;
+}
+
+.landing-faq-item {
+  border: 1px solid var(--color-border);
+  border-radius: var(--ds-radius);
+  background: var(--color-surface);
+  box-shadow: var(--shadow-resting);
+}
+
+.landing-faq-item summary {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  padding: 18px 20px;
   color: var(--color-primary-dark);
-  font-size: 1.2rem;
+  font-weight: 600;
+  cursor: pointer;
+  list-style: none;
+}
+
+.landing-faq-item summary::-webkit-details-marker {
+  display: none;
+}
+
+.landing-faq-caret {
+  flex-shrink: 0;
+  color: var(--color-primary);
+  transition: transform var(--motion-fast) var(--ease-out);
+}
+
+.landing-faq-item[open] .landing-faq-caret {
+  transform: rotate(180deg);
+}
+
+.landing-faq-item p {
+  margin: 0;
+  padding: 0 20px 18px;
+  color: var(--muted);
+  line-height: 1.6;
 }
 
 .landing-final-cta {
@@ -1756,31 +1814,30 @@ h3 {
   line-height: 1.6;
 }
 
-.landing-whatsapp-row {
-  width: min(1180px, calc(100% - 36px));
-  display: flex;
-  justify-content: flex-end;
-  margin: -34px auto 74px;
-}
-
+/*
+ * Boton flotante y persistente (Product Bible v1.0 cap. 9): disponible en
+ * cualquier punto del scroll, no solo al final de la pagina.
+ */
 .landing-whatsapp-button {
-  min-height: 54px;
+  position: fixed;
+  right: 20px;
+  bottom: 20px;
+  z-index: 60;
+  width: 56px;
+  height: 56px;
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  border: 1px solid rgba(60, 140, 152, 0.16);
   border-radius: 999px;
-  padding: 0 22px;
-  background: linear-gradient(135deg, var(--color-primary), var(--aqua));
+  background: linear-gradient(135deg, var(--color-primary), var(--color-turquesa-100));
   color: white;
-  font-weight: 900;
-  box-shadow: 0 18px 38px rgba(60, 140, 152, 0.22);
-  transition: transform 180ms ease, box-shadow 180ms ease;
+  box-shadow: var(--shadow-floating);
+  transition: transform var(--motion-fast) var(--ease-out), box-shadow var(--motion-fast) var(--ease-out);
 }
 
 .landing-whatsapp-button:hover {
   transform: translateY(-2px);
-  box-shadow: 0 22px 42px rgba(60, 140, 152, 0.28);
+  box-shadow: var(--shadow-layer);
 }
 
 .about-hero {
@@ -6586,9 +6643,7 @@ body:has(.account-app-shell) .site-footer {
 
   .landing-section-head .secondary-button,
   .landing-feature-card .secondary-button,
-  .landing-professional-card .secondary-button,
-  .landing-course-card .secondary-button,
-  .landing-resource-card .secondary-button {
+  .landing-professional-card .secondary-button {
     width: 100%;
   }
 
