@@ -122,7 +122,7 @@ body {
   margin: 0;
   color: var(--ink);
   background: var(--warm);
-  font-family: var(--font-primary), Arial, Helvetica, sans-serif;
+  font-family: var(--font-secondary), Arial, Helvetica, sans-serif;
   letter-spacing: 0;
 }
 
@@ -174,6 +174,12 @@ h2,
 h3,
 p {
   margin-top: 0;
+}
+
+h1,
+h2,
+h3 {
+  font-family: var(--font-primary), Arial, Helvetica, sans-serif;
 }
 
 h1 {

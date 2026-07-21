@@ -6,6 +6,7 @@ import PWARegister from "./PWARegister";
 import LumenIsotipo from "./components/LumenIsotipo";
 import LumenLogotipo from "./components/LumenLogotipo";
 import { neulis } from "./fonts/neulis";
+import { sourceSans } from "./fonts/sourceSans";
 
 const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || "https://espaciolumen.com";
 
@@ -116,7 +117,7 @@ export default async function RootLayout({ children }) {
   }
 
   return (
-    <html lang="es" className={neulis.variable}>
+    <html lang="es" className={`${neulis.variable} ${sourceSans.variable}`}>
       <head>
         <link rel="manifest" href="/manifest.webmanifest" />
         <link rel="icon" href="/icons/lumen-icon.svg" type="image/svg+xml" />
