@@ -130,6 +130,7 @@ export default async function RootLayout({ children }) {
         <meta name="msapplication-TileColor" content="#11383F" />
       </head>
       <body>
+        <a className="skip-link" href="#main-content">Saltar al contenido principal</a>
         <PWARegister />
         <header className="site-header">
           <a className="brand" href="/" aria-label="Ir al inicio de LUMEN">
@@ -149,7 +150,9 @@ export default async function RootLayout({ children }) {
             messagePreview={messagePreview}
           />
         </header>
-        {children}
+        <div id="main-content" tabIndex={-1}>
+          {children}
+        </div>
         <footer className="site-footer">
           <div>
             <a className="brand" href="/" aria-label="Ir al inicio de LUMEN">
