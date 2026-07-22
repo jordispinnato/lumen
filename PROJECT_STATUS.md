@@ -3,8 +3,8 @@
 | Campo | Valor |
 |---|---|
 | Version | 1.0 |
-| Ultima actualizacion | 2026-07-21 |
-| Ultimo responsable | Claude (IA) - LUMEN Product Bible v1.0: Sprint 1 (Fundamentos del Producto) + Sprint 2 (Landing Premium) |
+| Ultima actualizacion | 2026-07-22 |
+| Ultimo responsable | Claude (IA) - LUMEN Product Bible v1.0: Sprint 1 (Fundamentos del Producto) + Sprint 2 (Landing Premium) + Sprint 3 (Mi Espacio, laboratorio de identidad visual) |
 | Revisado por | Pendiente de revision del usuario |
 | Estado | En desarrollo activo |
 
@@ -133,6 +133,12 @@ Estado de implementacion (sesiones de branding + Sprint 1 "Fundamentos del Produ
 - **Accesibilidad base**: skip-link ("Saltar al contenido principal") + anillo de foco oficial turquesa unificado en toda la UI compartida.
 - Tokens legacy `--aqua`/`--sage`/`--sand` retirados de la UI compartida y de la landing; **siguen en uso** en CSS especifico de admin, aula, turnos (calendario/reserva) y checkout — fuera del alcance de estos sprints, documentado como backlog.
 
+**Sprint 3 — Mi Espacio (2026-07-22)**: segunda interpretacion visual de LUMEN, esta vez guiada por el `Manual de Marca` del estudio (PDF de 20 paginas, estudiado completo) en vez del Product Bible, y sin tocar la Landing (que sigue siendo la primera interpretacion, para comparar). Detalle completo de hallazgos, decisiones de diseño, comparativa y backlog en `docs/SPRINT_3_MI_ESPACIO.md`. Resumen:
+
+- El Manual define a Turquesa como color principal (no solo acento) y a Lavanda/Marfil como secundarios — correccion respecto a como se habia aplicado la paleta en Sprint 1/2. Este sprint le da a Turquesa bloques grandes y a Lavanda el rol de "progreso/evolucion".
+- Se reemplazo la navegacion por anclas de Mi Espacio por rutas reales por dominio (ver seccion "Mi Cuenta / Mi Espacio" mas abajo), siguiendo el mismo patron ya usado por `/facturacion`, `/configuracion`, `/mi-perfil`.
+- Brecha de asset identificada y no resuelta a proposito: el Manual usa una tipografia script ("Neulis Cursive") que no esta entre los archivos disponibles. Por decision del usuario, no se sustituyo por una fuente de terceros; los enfasis emocionales se logran con jerarquia/color/peso sobre la tipografia ya definida.
+
 ### Funcionalidades publicas
 
 - Landing (`/`) reconstruida (2026-07-21) siguiendo el recorrido oficial de la Product Bible: Hero → Franja de confianza → Tres caminos → Equipo profesional → Como funciona → FAQ → CTA final. Sin seccion de Testimonios todavia (no hay testimonios reales; el criterio del propio documento es no mostrarla hasta tenerlos, no inventarlos ni ocultarla con placeholder).
@@ -186,16 +192,15 @@ Estado de implementacion (sesiones de branding + Sprint 1 "Fundamentos del Produ
 
 ### Mi Cuenta / Mi Espacio
 
-Navegacion reorganizada (2026-07-09, etapa 1 de `docs/INFORMATION_ARCHITECTURE.md`): se separo la actividad del usuario (Mi Espacio) de la administracion de su cuenta, que ahora vive en paginas independientes.
+Navegacion reorganizada dos veces: separacion inicial de Mi Espacio vs. administracion de cuenta (2026-07-09, etapa 1 de `docs/INFORMATION_ARCHITECTURE.md`), y Sprint 3 (2026-07-22, ver `docs/SPRINT_3_MI_ESPACIO.md`) que reemplazo la navegacion por anclas dentro de `/mi-cuenta` por **rutas reales por dominio**, ademas de un rediseño visual completo guiado por el Manual de Marca.
 
-- `/mi-cuenta` (Mi Espacio) protegido por sesion. Dashboard privado con:
-  - Inicio
-  - Mis turnos
-  - Mis cursos
-  - Mis recursos
-  - Notificaciones
-  - Mensajes
-  - Certificados (placeholder, ver seccion Cursos y aula)
+- `/mi-cuenta` (Mi Espacio) protegido por sesion. Ahora es solo la "Zona 1 — Lo proximo": saludo, proxima consulta (con CTA "Unirte a la consulta" cuando el turno es el mismo dia, usando `ONLINE_CONSULTATION_URL`), curso a continuar, y checklist de bienvenida para cuentas sin actividad todavia.
+- `/mis-turnos` — proximos turnos + historial, reprogramar/cancelar (antes vivia dentro de `/mi-cuenta#turnos`).
+- `/mis-cursos` — cursos con tabs funcionales por estado (Todos/En progreso/Completados/Pendientes, via `?estado=`) y un recorrido visual de progreso (antes `/mi-cuenta#cursos`, con tabs decorativas sin funcion).
+- `/mis-recursos` — recursos digitales comprados (antes `/mi-cuenta#recursos`).
+- `/mis-notificaciones` y `/mis-mensajes` — listados completos, separados de la preview del dropdown de campana (antes `/mi-cuenta#notificaciones` / `#mensajes`).
+- `/mis-certificados` — mismo placeholder de siempre, solo con ruta propia (antes `/mi-cuenta#certificados`).
+- El shell compartido (`AccountDashboardShell.js`) se rediseño con la paleta oficial (sidebar solido en petroleo oscuro, iconos `AppIcon` en vez de avatares de letra, estado activo por ruta real) y ahora lo heredan automaticamente `/carrito`, `/mis-pedidos`, `/facturacion` y `/configuracion` sin cambios funcionales en esas paginas.
 - `/carrito` — pagina independiente. Agregar, quitar y editar cantidad ya funciona (`catalog_cart_items`), con subtotal por item y total general. Falta finalizar la compra (LUM-003.4 en `TODO_LUMEN.md`).
 - `/mis-pedidos` — pagina independiente. Fusiona el antiguo historial combinado (cursos + catalogo) y el historial de pedidos de catalogo en dos bloques: cursos/productos digitales, y productos fisicos/envios.
 - `/facturacion` — pagina independiente con perfil fiscal y solicitud de factura (ver seccion Facturacion mas abajo).

@@ -3,8 +3,8 @@
 | Campo | Valor |
 |---|---|
 | Version | 1.0 |
-| Ultima actualizacion | 2026-07-21 |
-| Ultimo responsable | Claude (IA) - LUMEN Product Bible v1.0: Sprint 1 (Fundamentos del Producto) + Sprint 2 (Landing Premium) |
+| Ultima actualizacion | 2026-07-22 |
+| Ultimo responsable | Claude (IA) - LUMEN Product Bible v1.0: Sprint 1 (Fundamentos del Producto) + Sprint 2 (Landing Premium) + Sprint 3 (Mi Espacio, laboratorio de identidad visual) |
 | Revisado por | Pendiente de revision del usuario |
 | Estado | En desarrollo activo |
 
@@ -40,7 +40,15 @@ Fuente de verdad: `LUMEN Product Bible v1.0` (documento de producto entregado po
 - `[ ]` Cuando existan testimonios reales (con consentimiento), agregar la seccion "Testimonios" entre "Como funciona" y "FAQ" — el lugar ya esta definido en el recorrido oficial, solo falta el contenido.
 - `[ ]` Verificacion manual pendiente: durante el QA de este sprint, dos comportamientos CSS estandar (`:focus-visible` con transicion en el skip-link, y el selector `[open]` del acordeon de FAQ) no se pudieron confirmar visualmente por una limitacion del navegador de pruebas automatizado de esta sesion (el CSS compilado es correcto y ambos usan patrones nativos bien establecidos). Confirmar con Tab real y con un click real en una FAQ antes de dar el sprint por cerrado al 100%.
 - `[ ]` `npm audit` reporta 4 vulnerabilidades altas preexistentes (brace-expansion vía eslint/typescript-estree, js-yaml, sharp/next transitivo) — no relacionadas con este sprint (no las introdujo `lucide-react`). Arreglarlas de raiz requeriria actualizar Next.js con cambios incompatibles; evaluar en una tarea aparte, no forzarlo sin pedido explicito.
-- `[ ]` Sprint 3 (a definir por el usuario): candidatos naturales segun la Product Bible son Home/Mi Espacio, Cursos, Consultas/Agenda, Catalogo o Design System de componentes (botones/inputs/cards/modal unico) — no arrancar sin autorizacion explicita.
+- `[x]` Sprint 3 — Mi Espacio (laboratorio de identidad visual): **completado** (2026-07-22). Segunda interpretacion visual guiada por el Manual de Marca del estudio (no por el Product Bible), sin tocar la Landing. Rutas reales por dominio, paleta con Turquesa como principal y Lavanda como color de progreso, shell rediseñado. Detalle completo en `docs/SPRINT_3_MI_ESPACIO.md`.
+- `[ ]` Sumar Neulis Cursive (u otra fuente script oficial del estudio) cuando este disponible, exclusivamente para microcopys emocionales — no sustituir por una fuente de terceros (decision explicita del usuario en Sprint 3).
+- `[ ]` Confirmar en un navegador real (no el navegador de pruebas automatizado) que el esqueleto de `loading.js` no queda superpuesto al contenido real en ninguna pagina del shell de cuenta (`/mi-cuenta`, `/mis-turnos`, etc. y tambien `/mi-perfil`, `/carrito`, que ya tenian el mismo patron antes de este sprint). Ver `docs/SPRINT_3_MI_ESPACIO.md` seccion 8.
+- `[ ]` Evaluar, solo si el usuario valida la direccion visual de Mi Espacio frente a la Landing, extender el mismo lenguaje (bloques de color, recorrido de progreso, checklist de bienvenida) a Cursos, Catalogo, Consultas y Checkout.
+- `[ ]` Evaluar sumar accesos directos a `/mis-turnos`, `/mis-cursos` y `/mis-recursos` en el dropdown de usuario de `SiteNav.js` (hoy solo tiene "Mi Espacio" generico) — quedo fuera de Sprint 3 para no exceder el alcance acordado.
+- `[ ]` Sprint 4 (a definir por el usuario): candidatos naturales segun el Product Bible y el resultado de Sprint 3 son Cursos, Consultas/Agenda, Catalogo, o extender el lenguaje visual validado al resto del producto — no arrancar sin autorizacion explicita.
+- `[ ]` **Sprint 8 — Motion System & Microinteracciones** (registrado 2026-07-22, **no implementar todavia**; ajustar el numero si para ese momento ya se definieron los sprints 4-7 de contenido de producto). Objetivo: definir e implementar un sistema coherente de transiciones y microinteracciones para toda la plataforma, alineado con una identidad suave, cercana, organica y tranquila, construido sobre los tokens de motion ya existentes (`--motion-fast/base/slow`, `--ease-out/--ease-in-out`) en vez de crear un sistema paralelo.
+  - Alcance futuro: hover de tarjetas de cursos, profesionales, recursos y catalogo; animaciones de botones; navegacion y estados activos; tabs; sidebars; modales; acordeones; formularios; aparicion de secciones de la Landing; barras y recorridos de progreso; estados de carga; confirmaciones de acciones; iconos y elementos del navbar; comportamiento desktop y mobile; soporte completo de `prefers-reduced-motion`.
+  - Patron de tarjeta de curso a registrar especificamente: portada visual, bordes redondeados, categoria pequeña, titulo, metadata, tarjeta completa clickeable, hover con escala y elevacion muy sutil, transicion aproximada de 180-220ms, sin rebotes ni desplazamientos exagerados.
 
 ## Prioridad Alta
 
@@ -105,6 +113,7 @@ Ver `docs/INFORMATION_ARCHITECTURE.md` para la especificacion completa (arquitec
   - `/mi-perfil` — placeholder simple ("se implementara en una etapa posterior"), enlazado desde el menu del avatar. Todavia no tiene desarrollo real.
   - Menu del avatar (sitio publico y shell privado) reorganizado: Mi Espacio / Mi Perfil, Carrito / Mis pedidos / Facturacion, Configuracion / Cerrar sesion.
   - Logica compartida (helpers de formato, labels de estado, `EmptyState`, `AccountIcon`, construccion de filas de compra) extraida a `app/mi-cuenta/accountShared.js` para reutilizar entre las paginas nuevas sin duplicar codigo.
+- `[x]` Etapa 2 — Reemplazar navegacion por anclas dentro de `/mi-cuenta` por rutas reales por dominio: **completado** (2026-07-22, Sprint 3). `/mi-cuenta#turnos` → `/mis-turnos`, `#cursos` → `/mis-cursos`, `#recursos` → `/mis-recursos`, `#notificaciones` → `/mis-notificaciones`, `#mensajes` → `/mis-mensajes`, `#certificados` → `/mis-certificados`. `/mi-cuenta` queda solo como la pantalla de inicio ("Lo proximo"). Detalle en `docs/SPRINT_3_MI_ESPACIO.md`.
 - `[ ]` Etapa futura (no iniciada): desarrollar `/mi-perfil` con datos personales reales (hoy esos datos viven en `/configuracion`, ver arriba). Definir si en ese momento se migran ahi.
 
 ## Usuarios / Mi Cuenta
