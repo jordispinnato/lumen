@@ -1,7 +1,10 @@
 "use client";
 
 import Link from "next/link";
+import { usePathname } from "next/navigation";
 import { useEffect, useRef, useState } from "react";
+import AppIcon from "../components/AppIcon";
+import LumenIsotipo from "../components/LumenIsotipo";
 
 function useCloseOnOutsideClick(ref, isOpen, onClose) {
   useEffect(() => {
@@ -35,7 +38,7 @@ function NotificationDropdown({ messages = [], notifications = [], count = 0, is
       id: `notification-${item.id}`,
       title: item.title,
       body: item.body,
-      href: item.href || "#notificaciones",
+      href: item.href || "/mis-notificaciones",
       type: item.notification_type || "notificacion",
       date: item.created_at,
       unread: count > 0 && !item.read_at,
@@ -44,7 +47,7 @@ function NotificationDropdown({ messages = [], notifications = [], count = 0, is
       id: `message-${item.id}`,
       title: item.subject,
       body: item.body,
-      href: "#mensajes",
+      href: "/mis-mensajes",
       type: item.message_type || "mensaje",
       date: item.created_at,
       unread: count > 0 && !item.read_at,
@@ -70,7 +73,7 @@ function NotificationDropdown({ messages = [], notifications = [], count = 0, is
       <div className="account-notification-dropdown">
         <div className="account-notification-head">
           <strong>Notificaciones</strong>
-          <a href="#notificaciones" onClick={onClose}>Ver todas</a>
+          <Link href="/mis-notificaciones" onClick={onClose}>Ver todas</Link>
         </div>
         {items.length ? (
           <div className="account-notification-list">
@@ -102,6 +105,7 @@ export default function AccountDashboardShell({
   cartCount = 0,
   children,
 }) {
+  const pathname = usePathname();
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [isNotificationOpen, setIsNotificationOpen] = useState(false);
   const [isUserMenuOpen, setIsUserMenuOpen] = useState(false);
@@ -135,7 +139,7 @@ export default function AccountDashboardShell({
 
       <aside className="account-sidebar" aria-label="Navegacion de Mi Espacio">
         <Link className="account-brand" href="/" onClick={closeMenu}>
-          <span className="account-brand-mark" aria-hidden="true" />
+          <LumenIsotipo className="account-brand-mark" />
           <span>
             <strong>LUMEN</strong>
             <small>Mi Espacio</small>
@@ -143,29 +147,22 @@ export default function AccountDashboardShell({
         </Link>
 
         <nav className="account-sidebar-nav">
-          {navItems.map((item) => {
-            const content = (
-              <>
-                <span>{item.icon}</span>
-                {item.label}
-              </>
-            );
-
-            return item.href.startsWith("#") ? (
-              <a className={item.href === "#inicio" ? "is-active" : ""} href={item.href} key={item.href} onClick={closeMenu}>
-                {content}
-              </a>
-            ) : (
-              <Link className={item.href === "#inicio" ? "is-active" : ""} href={item.href} key={item.href} onClick={closeMenu}>
-                {content}
-              </Link>
-            );
-          })}
+          {navItems.map((item) => (
+            <Link
+              className={pathname === item.href ? "is-active" : ""}
+              href={item.href}
+              key={item.href}
+              onClick={closeMenu}
+            >
+              <AppIcon name={item.icon} size="sm" />
+              {item.label}
+            </Link>
+          ))}
         </nav>
 
         <form className="account-logout-form" action="/auth/logout" method="post">
           <button type="submit">
-            <span aria-hidden="true">X</span>
+            <AppIcon name="close" size="sm" />
             Cerrar sesión
           </button>
         </form>

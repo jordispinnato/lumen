@@ -1,15 +1,21 @@
+import AppIcon from "../components/AppIcon";
+
 const titles = {
   dashboard: { kicker: "Mi Espacio", title: "Mi Espacio" },
   list: { kicker: "Mi cuenta", title: "Carrito" },
-  splitList: { kicker: "Mi cuenta", title: "Mis pedidos" },
+  splitList: { kicker: "Mi Espacio", title: "Mis turnos" },
+  courseGrid: { kicker: "Mi Espacio", title: "Mis cursos" },
   form: { kicker: "Mi cuenta", title: "Facturación" },
 };
 
 const navItems = [
-  { icon: "I", label: "Inicio" },
-  { icon: "T", label: "Mis turnos" },
-  { icon: "C", label: "Mis cursos" },
-  { icon: "R", label: "Mis recursos" },
+  { icon: "home", label: "Inicio" },
+  { icon: "calendar", label: "Mis turnos" },
+  { icon: "book-open", label: "Mis cursos" },
+  { icon: "package", label: "Mis recursos" },
+  { icon: "bell", label: "Notificaciones" },
+  { icon: "message-circle", label: "Mensajes" },
+  { icon: "award", label: "Certificados" },
 ];
 function SkeletonLine({ size = "medium" }) {
   return <span className={`account-skeleton-line is-${size}`} aria-hidden="true" />;
@@ -50,42 +56,32 @@ function SkeletonGrid({ count = 4, wide = false }) {
     </div>
   );
 }
+function SkeletonCourseGrid({ count = 3 }) {
+  return (
+    <div className="account-course-grid" aria-hidden="true">
+      {Array.from({ length: count }).map((_, index) => (
+        <article className="account-course-card account-skeleton-card" key={index}>
+          <div className="account-skeleton-media" />
+          <div className="account-course-body">
+            <SkeletonLine size="large" />
+            <SkeletonLine />
+          </div>
+        </article>
+      ))}
+    </div>
+  );
+}
 function DashboardSkeleton() {
   return (
     <>
-      <section className="account-stats-grid" aria-hidden="true">
-        {Array.from({ length: 4 }).map((_, index) => (
-          <article className="account-stat-card account-skeleton-card" key={index}>
-            <span className="account-skeleton-icon" />
-            <div>
-              <SkeletonLine size="small" />
-              <SkeletonLine />
-            </div>
-          </article>
-        ))}
-      </section>
-      <section className="account-panel">
-        <SkeletonPanelHead />
-        <div className="account-course-grid" aria-hidden="true">
-          {Array.from({ length: 2 }).map((_, index) => (
-            <article className="account-course-card account-skeleton-card" key={index}>
-              <div className="account-skeleton-media" />
-              <div className="account-course-body">
-                <SkeletonLine size="large" />
-                <SkeletonLine />
-              </div>
-            </article>
-          ))}
-        </div>
-      </section>
       <div className="account-lower-grid">
         <section className="account-panel">
           <SkeletonPanelHead />
-          <SkeletonRows count={2} />
+          <SkeletonRows count={1} />
         </section>
         <section className="account-panel">
           <SkeletonPanelHead />
-          <SkeletonRows count={2} />
+          <SkeletonRows count={1} />
         </section>
       </div>
     </>
@@ -95,9 +91,17 @@ function LoadingContent({ variant }) {
   if (variant === "dashboard") {
     return <DashboardSkeleton />;
   }
+  if (variant === "courseGrid") {
+    return (
+      <section className="account-panel">
+        <SkeletonPanelHead />
+        <SkeletonCourseGrid />
+      </section>
+    );
+  }
   if (variant === "splitList") {
     return (
-      <div className="account-lower-grid">
+      <>
         <section className="account-panel">
           <SkeletonPanelHead />
           <SkeletonRows />
@@ -106,7 +110,7 @@ function LoadingContent({ variant }) {
           <SkeletonPanelHead />
           <SkeletonRows />
         </section>
-      </div>
+      </>
     );
   }
   if (variant === "form") {
@@ -140,7 +144,7 @@ export default function AccountLoadingState({ variant = "dashboard", title }) {
         <nav className="account-sidebar-nav" aria-hidden="true">
           {navItems.map((item, index) => (
             <span className={`account-skeleton-nav-item${index === 0 ? " is-active" : ""}`} key={item.label}>
-              <span>{item.icon}</span>
+              <AppIcon name={item.icon} size="sm" />
               {item.label}
             </span>
           ))}
