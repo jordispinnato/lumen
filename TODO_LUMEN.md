@@ -3,8 +3,8 @@
 | Campo | Valor |
 |---|---|
 | Version | 1.0 |
-| Ultima actualizacion | 2026-07-10 |
-| Ultimo responsable | Claude (IA) - BOOKING-UX-01: modal de reserva de consultas + persistencia de seleccion a traves de login/registro |
+| Ultima actualizacion | 2026-07-21 |
+| Ultimo responsable | Claude (IA) - LUMEN Product Bible v1.0: Sprint 1 (Fundamentos del Producto) + Sprint 2 (Landing Premium) |
 | Revisado por | Pendiente de revision del usuario |
 | Estado | En desarrollo activo |
 
@@ -27,6 +27,20 @@ Lista corta y curada de lo que tiene sentido atacar primero, no el backlog compl
 3. `[ ]` Confirmar si `NEXT_PUBLIC_WHATSAPP_URL` tiene un numero real cargado en Vercel (si quedo con el valor por defecto, el boton de WhatsApp de la landing no lleva a ningun lado).
 4. `[~]` Auditar cobertura de `AdminConfirmButton` en las acciones destructivas del panel admin (ya se usa en varios lugares, falta confirmar que no queden borrados sin confirmacion).
 5. `[~]` Completar carrito de compras (plan LUM-003): LUM-003.1 (quitar item), LUM-003.2 (editar cantidad) y LUM-003.3 (subtotal/total) completadas; falta finalizar compra (ver seccion "Usuarios / Mi Cuenta").
+
+## Design System y Branding
+
+Fuente de verdad: `LUMEN Product Bible v1.0` (documento de producto entregado por chat, prioridad por encima del codigo existente ante cualquier conflicto).
+
+### Tecnico
+- `[x]` Sprint 1 — Fundamentos del Producto: **completado** (2026-07-21). Rampas cromaticas oficiales + capa semantica, sistema tipografico de dos voces (Neulis marca / Source Sans 3 producto), tokens de motion/elevation, iconografia Lucide detras de `AppIcon`, accesibilidad base (skip-link + foco unificado), correccion de copy compartido. Detalle completo en `PROJECT_STATUS.md` → "Identidad visual y Design System".
+- `[x]` Sprint 2 — Landing Premium: **completado** (2026-07-21). Recorrido oficial de 8 pasos, hero sin fotografia (patron de marca), FAQ nueva, chips de credencial, WhatsApp flotante. Detalle en `PROJECT_STATUS.md`.
+- `[ ]` Retirar `--aqua`/`--sage`/`--sand` del resto de la aplicacion (admin, aula/cursos, turnos — calendario y selector de horarios —, checkout). Quedaron fuera del alcance de Sprint 1/2 a proposito; identificar el alcance exacto la proxima vez que se trabaje sobre cada una de esas pantallas.
+- `[DECISION]` Las secciones "Cursos destacados" y "Recursos destacados" se sacaron de la landing porque no forman parte del recorrido de 8 pasos que define la Product Bible. Confirmar si esto es definitivo o si se agregan de vuelta (la Bible permite secciones nuevas solo "con justificacion extremadamente solida" — evaluar si mostrar contenido real de cursos/catalogo en la landing la amerita).
+- `[ ]` Cuando existan testimonios reales (con consentimiento), agregar la seccion "Testimonios" entre "Como funciona" y "FAQ" — el lugar ya esta definido en el recorrido oficial, solo falta el contenido.
+- `[ ]` Verificacion manual pendiente: durante el QA de este sprint, dos comportamientos CSS estandar (`:focus-visible` con transicion en el skip-link, y el selector `[open]` del acordeon de FAQ) no se pudieron confirmar visualmente por una limitacion del navegador de pruebas automatizado de esta sesion (el CSS compilado es correcto y ambos usan patrones nativos bien establecidos). Confirmar con Tab real y con un click real en una FAQ antes de dar el sprint por cerrado al 100%.
+- `[ ]` `npm audit` reporta 4 vulnerabilidades altas preexistentes (brace-expansion vía eslint/typescript-estree, js-yaml, sharp/next transitivo) — no relacionadas con este sprint (no las introdujo `lucide-react`). Arreglarlas de raiz requeriria actualizar Next.js con cambios incompatibles; evaluar en una tarea aparte, no forzarlo sin pedido explicito.
+- `[ ]` Sprint 3 (a definir por el usuario): candidatos naturales segun la Product Bible son Home/Mi Espacio, Cursos, Consultas/Agenda, Catalogo o Design System de componentes (botones/inputs/cards/modal unico) — no arrancar sin autorizacion explicita.
 
 ## Prioridad Alta
 

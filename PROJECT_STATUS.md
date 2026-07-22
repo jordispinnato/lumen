@@ -3,8 +3,8 @@
 | Campo | Valor |
 |---|---|
 | Version | 1.0 |
-| Ultima actualizacion | 2026-07-10 |
-| Ultimo responsable | Claude (IA) - BOOKING-UX-01: modal de reserva de consultas + persistencia de seleccion a traves de login/registro |
+| Ultima actualizacion | 2026-07-21 |
+| Ultimo responsable | Claude (IA) - LUMEN Product Bible v1.0: Sprint 1 (Fundamentos del Producto) + Sprint 2 (Landing Premium) |
 | Revisado por | Pendiente de revision del usuario |
 | Estado | En desarrollo activo |
 
@@ -119,9 +119,26 @@ Reglas de trabajo vigentes para cualquier IA o persona que modifique este repo. 
 - Para enviar a especialistas, pacientes y admin sin limites se necesita verificar el dominio propio en Resend.
 - Los emails de confirmacion de turno, notificacion al especialista y recordatorio automatico **ya estan implementados en el codigo** (no es trabajo de desarrollo pendiente). Hoy dependen exclusivamente de que se verifique el dominio en Resend para poder enviarse a destinatarios reales.
 
+### Identidad visual y Design System
+
+Existe un documento oficial de producto, `LUMEN Product Bible v1.0` (entregado por chat, no versionado como archivo en el repo), que define la identidad, el sistema tipografico, el design system y la filosofia de LUMEN. Es la fuente de verdad para cualquier trabajo visual futuro, por encima del codigo existente.
+
+Estado de implementacion (sesiones de branding + Sprint 1 "Fundamentos del Producto" + Sprint 2 "Landing Premium", 2026-07-21):
+
+- **Paleta oficial** (`#3C8C98` turquesa, `#11383F` petroleo, `#F7F2EB` marfil, `#BA9CEF` lavanda) integrada como tokens en `app/globals.css` desde una sesion anterior (color de navbar/footer/botones/landing). Esta sesion sumo las **4 rampas tonales oficiales** (5 tintes por color, del PDF de paleta del estudio) y una **capa semantica** (`--color-success-*`, `--color-warning-*`, `--color-danger-*`, `--color-info-*`), todas con contraste AA verificado.
+- **Logo e isotipo** oficiales integrados como componentes SVG (`app/components/LumenIsotipo.js`, `LumenLogotipo.js`) en navbar, footer, login y registro; favicon, iconos PWA, `og-image.png` y `browserconfig.xml` regenerados desde el isotipo oficial (sesion anterior).
+- **Tipografia de dos voces** (definicion nueva de esta sesion, reemplaza el uso de una sola fuente para todo): **Neulis** (marca, los 18 pesos ya en el repo) reservada a Display/H1/H2/H3 y **Source Sans 3** (nueva, via `next/font/google`, sin dependencia npm) como voz de producto para body/UI/formularios/botones. Escala tipografica oficial aplicada a elementos compartidos (`h1`-`h3`, `.eyebrow`, `.lead`, botones).
+- **Iconografia**: `lucide-react` instalado (unica dependencia npm nueva del sprint) y encapsulado detras de un unico componente `app/components/AppIcon.js` — ningun otro archivo debe importar `lucide-react` directamente.
+- **Motion y elevation system**: tokens `--motion-fast/base/slow`, `--ease-out/--ease-in-out`, `--shadow-resting/floating/layer` en `app/globals.css`, con `prefers-reduced-motion` respetado a nivel de tokens.
+- **Accesibilidad base**: skip-link ("Saltar al contenido principal") + anillo de foco oficial turquesa unificado en toda la UI compartida.
+- Tokens legacy `--aqua`/`--sage`/`--sand` retirados de la UI compartida y de la landing; **siguen en uso** en CSS especifico de admin, aula, turnos (calendario/reserva) y checkout — fuera del alcance de estos sprints, documentado como backlog.
+
 ### Funcionalidades publicas
 
-- Landing page moderna.
+- Landing (`/`) reconstruida (2026-07-21) siguiendo el recorrido oficial de la Product Bible: Hero → Franja de confianza → Tres caminos → Equipo profesional → Como funciona → FAQ → CTA final. Sin seccion de Testimonios todavia (no hay testimonios reales; el criterio del propio documento es no mostrarla hasta tenerlos, no inventarlos ni ocultarla con placeholder).
+  - Hero sin fotografia (no existe sesion de fotos real todavia): usa el patron oficial de circulos de la carpeta de branding del estudio en vez de una foto de stock o inventada.
+  - Ya no muestra "Cursos destacados" ni "Recursos destacados" (esas secciones no forman parte del recorrido de 8 pasos definido en la Product Bible); su contenido se sigue pudiendo ver desde las cards de "Tres caminos" y desde el navbar. **Decision documentada para revision**, no un descarte definitivo — ver `TODO_LUMEN.md`.
+  - Seccion de preguntas frecuentes nueva, con copy honesto (no inventa politica de precio ni de cancelacion, que siguen siendo `[DECISION]`).
 - Navbar con:
   - Quienes somos
   - Cursos
@@ -130,7 +147,7 @@ Reglas de trabajo vigentes para cualquier IA o persona que modifique este repo. 
   - Contacto
 - Pagina `/quienes-somos`.
 - Pagina `/contacto` con formulario, con gestion de esos mensajes desde el admin (estados: nuevo, en revision, respondido, archivado).
-- Boton de WhatsApp preparado (usa `NEXT_PUBLIC_WHATSAPP_URL`; falta confirmar si tiene un numero real cargado en Vercel).
+- Boton de WhatsApp: ahora flotante y persistente (esquina inferior derecha, visible en todo momento del scroll, 2026-07-21). Usa `NEXT_PUBLIC_WHATSAPP_URL`; falta confirmar si tiene un numero real cargado en Vercel.
 - Paginas legales:
   - `/terminos-condiciones`
   - `/politica-privacidad`
