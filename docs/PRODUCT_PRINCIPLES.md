@@ -2,6 +2,8 @@
 
 Este documento define una primera base de principios de producto para LUMEN. No reemplaza al Figma oficial ni define identidad visual final. Su objetivo es ayudar a tomar decisiones coherentes sobre experiencia, tono, jerarquia y claridad mientras el proyecto evoluciona.
 
+Nota (2026-07-22): las decisiones oficiales de vision, filosofia, modelo de negocio, identidad de marca, arquitectura funcional y roadmap de LUMEN quedaron versionadas en `docs/PRODUCT_BIBLE.md`, que es la fuente oficial de decisiones de producto del proyecto. Este documento se mantiene enfocado en principios de diseno, UX y experiencia, y no debe duplicar contenido ya cubierto por la Product Bible.
+
 ## Proposito
 
 LUMEN es una plataforma digital para acompanar procesos de bienestar, aprendizaje y atencion profesional.

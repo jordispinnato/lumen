@@ -4,7 +4,7 @@
 |---|---|
 | Version | 1.0 |
 | Ultima actualizacion | 2026-07-22 |
-| Ultimo responsable | Claude (IA) - LUMEN Product Bible v1.0: Sprint 1 (Fundamentos del Producto) + Sprint 2 (Landing Premium) + Sprint 3 (Mi Espacio, laboratorio de identidad visual) |
+| Ultimo responsable | Claude (IA) - LUMEN Product Bible v1.0: Sprint 1 (Fundamentos del Producto) + Sprint 2 (Landing Premium) + Sprint 3 (Mi Espacio, laboratorio de identidad visual) + actualizacion documental de modelo de negocio previa a Sprint 4 |
 | Revisado por | Pendiente de revision del usuario |
 | Estado | En desarrollo activo |
 
@@ -30,7 +30,7 @@ Lista corta y curada de lo que tiene sentido atacar primero, no el backlog compl
 
 ## Design System y Branding
 
-Fuente de verdad: `LUMEN Product Bible v1.0` (documento de producto entregado por chat, prioridad por encima del codigo existente ante cualquier conflicto).
+Fuente de verdad: `docs/PRODUCT_BIBLE.md` (versionada el 2026-07-22; prioridad por encima del codigo existente ante cualquier conflicto). Antes de esa fecha, la Bible existia solo por chat como `LUMEN Product Bible v1.0`.
 
 ### Tecnico
 - `[x]` Sprint 1 — Fundamentos del Producto: **completado** (2026-07-21). Rampas cromaticas oficiales + capa semantica, sistema tipografico de dos voces (Neulis marca / Source Sans 3 producto), tokens de motion/elevation, iconografia Lucide detras de `AppIcon`, accesibilidad base (skip-link + foco unificado), correccion de copy compartido. Detalle completo en `PROJECT_STATUS.md` → "Identidad visual y Design System".
@@ -45,7 +45,7 @@ Fuente de verdad: `LUMEN Product Bible v1.0` (documento de producto entregado po
 - `[ ]` Confirmar en un navegador real (no el navegador de pruebas automatizado) que el esqueleto de `loading.js` no queda superpuesto al contenido real en ninguna pagina del shell de cuenta (`/mi-cuenta`, `/mis-turnos`, etc. y tambien `/mi-perfil`, `/carrito`, que ya tenian el mismo patron antes de este sprint). Ver `docs/SPRINT_3_MI_ESPACIO.md` seccion 8.
 - `[ ]` Evaluar, solo si el usuario valida la direccion visual de Mi Espacio frente a la Landing, extender el mismo lenguaje (bloques de color, recorrido de progreso, checklist de bienvenida) a Cursos, Catalogo, Consultas y Checkout.
 - `[ ]` Evaluar sumar accesos directos a `/mis-turnos`, `/mis-cursos` y `/mis-recursos` en el dropdown de usuario de `SiteNav.js` (hoy solo tiene "Mi Espacio" generico) — quedo fuera de Sprint 3 para no exceder el alcance acordado.
-- `[ ]` Sprint 4 (a definir por el usuario): candidatos naturales segun el Product Bible y el resultado de Sprint 3 son Cursos, Consultas/Agenda, Catalogo, o extender el lenguaje visual validado al resto del producto — no arrancar sin autorizacion explicita.
+- `[x]` Sprint 4 definido (2026-07-22): **Sprint 4 — Cursos**. Antes de arrancar se registro la decision de modelo de negocio de propiedad de cursos (ver `docs/PRODUCT_PRINCIPLES.md` → "Modelo de negocio" y `PROJECT_STATUS.md` → "Modelo de negocio: propiedad de los cursos"). Los pagos (Mercado Pago u otro flujo de cobro real) **no** forman parte de Sprint 4: quedan para el sprint final del roadmap.
 - `[ ]` **Sprint 8 — Motion System & Microinteracciones** (registrado 2026-07-22, **no implementar todavia**; ajustar el numero si para ese momento ya se definieron los sprints 4-7 de contenido de producto). Objetivo: definir e implementar un sistema coherente de transiciones y microinteracciones para toda la plataforma, alineado con una identidad suave, cercana, organica y tranquila, construido sobre los tokens de motion ya existentes (`--motion-fast/base/slow`, `--ease-out/--ease-in-out`) en vez de crear un sistema paralelo.
   - Alcance futuro: hover de tarjetas de cursos, profesionales, recursos y catalogo; animaciones de botones; navegacion y estados activos; tabs; sidebars; modales; acordeones; formularios; aparicion de secciones de la Landing; barras y recorridos de progreso; estados de carga; confirmaciones de acciones; iconos y elementos del navbar; comportamiento desktop y mobile; soporte completo de `prefers-reduced-motion`.
   - Patron de tarjeta de curso a registrar especificamente: portada visual, bordes redondeados, categoria pequeña, titulo, metadata, tarjeta completa clickeable, hover con escala y elevacion muy sutil, transicion aproximada de 180-220ms, sin rebotes ni desplazamientos exagerados.

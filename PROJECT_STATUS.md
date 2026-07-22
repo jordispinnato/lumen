@@ -4,7 +4,7 @@
 |---|---|
 | Version | 1.0 |
 | Ultima actualizacion | 2026-07-22 |
-| Ultimo responsable | Claude (IA) - LUMEN Product Bible v1.0: Sprint 1 (Fundamentos del Producto) + Sprint 2 (Landing Premium) + Sprint 3 (Mi Espacio, laboratorio de identidad visual) |
+| Ultimo responsable | Claude (IA) - LUMEN Product Bible v1.0: Sprint 1 (Fundamentos del Producto) + Sprint 2 (Landing Premium) + Sprint 3 (Mi Espacio, laboratorio de identidad visual) + actualizacion documental de modelo de negocio previa a Sprint 4 |
 | Revisado por | Pendiente de revision del usuario |
 | Estado | En desarrollo activo |
 
@@ -121,7 +121,7 @@ Reglas de trabajo vigentes para cualquier IA o persona que modifique este repo. 
 
 ### Identidad visual y Design System
 
-Existe un documento oficial de producto, `LUMEN Product Bible v1.0` (entregado por chat, no versionado como archivo en el repo), que define la identidad, el sistema tipografico, el design system y la filosofia de LUMEN. Es la fuente de verdad para cualquier trabajo visual futuro, por encima del codigo existente.
+`docs/PRODUCT_BIBLE.md` **es la fuente oficial de decisiones de producto de LUMEN** (versionada el 2026-07-22, consolidando la `LUMEN Product Bible v1.0` y la Auditoria Integral de Producto que antes solo existian por chat, mas la decision de modelo de negocio sobre propiedad de cursos). Define vision, filosofia, identidad, modelo de negocio, Cursos, Consultas, Catalogo, Mi Espacio, experiencia de usuario, branding, arquitectura funcional y roadmap. Tiene prioridad sobre el codigo existente ante cualquier conflicto, y por encima de `docs/PRODUCT_PRINCIPLES.md` (que queda enfocado en principios de diseno, UX y experiencia, sin duplicar lo ya cubierto por la Bible). Ver `docs/PRODUCT_BIBLE.md` → "Pendientes de validacion" por las contradicciones detectadas entre esta Bible, el Manual de Marca del estudio y la implementacion real de Sprint 3, todavia sin resolver.
 
 Estado de implementacion (sesiones de branding + Sprint 1 "Fundamentos del Producto" + Sprint 2 "Landing Premium", 2026-07-21):
 
@@ -173,6 +173,17 @@ Estado de implementacion (sesiones de branding + Sprint 1 "Fundamentos del Produ
 - Panel especialista incluye turnos, pacientes, historial y notas clinicas por paciente, con **auditoria de cambios** (se registra cada creacion/edicion/borrado de nota, quien y cuando).
 - Google Calendar: el especialista puede conectar su cuenta y, al confirmarse una reserva, se crea el evento correspondiente. Reprogramar y cancelar un turno **ya actualizan/borran** el evento en Google Calendar (implementado 2026-07-08, requiere correr la migracion `020_appointment_calendar_event_id.sql` en Supabase y probar con una cuenta real conectada antes de darlo por verificado en produccion — ver `TODO_LUMEN.md`).
 - Email al paciente y especialista preparado a nivel codigo (confirmacion, reprogramacion, recordatorio automatico via cron), pero envio real a terceros requiere dominio verificado en Resend.
+
+### Modelo de negocio: propiedad de los cursos
+
+Decision oficial registrada el 2026-07-22, previa al Sprint 4 (documentada en detalle en `docs/PRODUCT_PRINCIPLES.md` → "Modelo de negocio"):
+
+- LUMEN es propietario comercial de los cursos de la plataforma. No es un marketplace abierto donde cada profesional publica y vende sus propios cursos.
+- Los profesionales pueden participar como autores, instructores o especialistas de un curso, pero no lo publican de forma autonoma ni lo venden directamente al alumno; el cliente le compra el curso a LUMEN.
+- Un curso puede tener uno o varios profesionales asociados, y un profesional puede participar en varios cursos y, ademas, ofrecer consultas dentro de la plataforma.
+- Precio, publicacion, comercializacion y experiencia de aprendizaje son gestionados por LUMEN.
+
+**Proximo sprint: Sprint 4 — Cursos.** Los pagos (Mercado Pago Checkout u otro flujo de cobro real) no forman parte de este sprint: quedan reservados para el sprint final del roadmap, sin cambios respecto a la restriccion ya vigente de no tocar Mercado Pago sin pedido explicito (ver "Restricciones del proyecto").
 
 ### Cursos y aula
 
