@@ -4609,7 +4609,7 @@ body:has(.admin-cms-shell) {
 }
 
 body:has(.account-app-shell) {
-  background: #f4f7fb;
+  background: var(--color-marfil-500);
 }
 
 body:has(.account-app-shell) .site-header,
@@ -4620,11 +4620,9 @@ body:has(.account-app-shell) .site-footer {
 .account-app-shell {
   min-height: 100vh;
   display: grid;
-  grid-template-columns: 286px minmax(0, 1fr);
-  background:
-    radial-gradient(circle at top right, rgba(37, 99, 235, 0.08), transparent 34%),
-    #f4f7fb;
-  color: #0f172a;
+  grid-template-columns: 280px minmax(0, 1fr);
+  background: var(--color-marfil-500);
+  color: var(--color-text);
 }
 
 .account-app-overlay {
@@ -4637,11 +4635,10 @@ body:has(.account-app-shell) .site-footer {
   height: 100vh;
   display: flex;
   flex-direction: column;
-  gap: 24px;
-  border-right: 1px solid #e5e9f2;
-  padding: 24px 18px;
-  background: rgba(255, 255, 255, 0.94);
-  backdrop-filter: blur(16px);
+  gap: 28px;
+  padding: 26px 18px;
+  background: var(--color-azul-900);
+  color: var(--color-marfil-100);
   overflow-y: auto;
 }
 
@@ -4649,7 +4646,7 @@ body:has(.account-app-shell) .site-footer {
   display: inline-flex;
   align-items: center;
   gap: 12px;
-  color: #0f172a;
+  color: var(--color-marfil-100);
   font-size: 1.45rem;
   letter-spacing: 0;
 }
@@ -4660,25 +4657,21 @@ body:has(.account-app-shell) .site-footer {
 }
 
 .account-brand small {
-  color: #64748b;
+  color: var(--color-turquesa-100);
   font-size: 0.78rem;
   font-weight: 900;
   text-transform: uppercase;
 }
 
 .account-brand-mark {
-  width: 34px;
-  height: 34px;
-  border-radius: 10px;
-  background:
-    linear-gradient(135deg, #2563eb 0 45%, transparent 45%),
-    linear-gradient(45deg, #7c3aed 0 45%, #60a5fa 45%);
-  box-shadow: 0 10px 26px rgba(37, 99, 235, 0.24);
+  width: 32px;
+  height: 32px;
+  color: var(--color-turquesa-100);
 }
 
 .account-sidebar-nav {
   display: grid;
-  gap: 8px;
+  gap: 6px;
 }
 
 .account-sidebar-nav a,
@@ -4692,30 +4685,29 @@ body:has(.account-app-shell) .site-footer {
   border-radius: var(--ds-radius);
   padding: 0 14px;
   background: transparent;
-  color: #25324b;
+  color: var(--color-marfil-300);
   font-weight: 800;
   text-align: left;
+  transition: background var(--motion-fast) var(--ease-out), color var(--motion-fast) var(--ease-out);
 }
 
-.account-sidebar-nav a span,
-.account-logout-form span {
-  width: 24px;
-  height: 24px;
-  display: inline-grid;
-  place-items: center;
-  border-radius: 8px;
-  background: #eef4ff;
-  color: #2563eb;
-  font-size: 0.76rem;
-  font-weight: 900;
+.account-sidebar-nav a svg,
+.account-logout-form svg {
+  flex: 0 0 auto;
+  color: var(--color-turquesa-100);
 }
 
 .account-sidebar-nav a.is-active,
 .account-sidebar-nav a:hover,
 .account-logout-form button:hover {
-  background: #eef4ff;
-  color: #0757e3;
-  box-shadow: var(--ds-shadow-sm);
+  background: var(--color-turquesa-700);
+  color: var(--color-marfil-100);
+}
+
+.account-sidebar-nav a.is-active svg,
+.account-sidebar-nav a:hover svg,
+.account-logout-form button:hover svg {
+  color: var(--color-marfil-100);
 }
 
 .account-logout-form {
@@ -4734,9 +4726,9 @@ body:has(.account-app-shell) .site-footer {
   display: flex;
   align-items: center;
   justify-content: flex-end;
-  border-bottom: 1px solid #e5e9f2;
+  border-bottom: 1px solid var(--color-border);
   padding: 0 36px;
-  background: rgba(255, 255, 255, 0.92);
+  background: rgba(255, 253, 248, 0.92);
   backdrop-filter: blur(16px);
 }
 
@@ -4757,10 +4749,10 @@ body:has(.account-app-shell) .site-footer {
   height: 44px;
   display: inline-grid;
   place-items: center;
-  border: 1px solid #e5e9f2;
+  border: 1px solid var(--color-border);
   border-radius: 8px;
-  background: white;
-  color: #0f172a;
+  background: var(--color-surface);
+  color: var(--deep);
   cursor: pointer;
   list-style: none;
 }
@@ -4775,10 +4767,10 @@ body:has(.account-app-shell) .site-footer {
   height: 44px;
   display: inline-grid;
   place-items: center;
-  border: 1px solid #e5e9f2;
+  border: 1px solid var(--color-border);
   border-radius: 8px;
-  background: white;
-  color: #0f172a;
+  background: var(--color-surface);
+  color: var(--deep);
 }
 
 .account-notification-badge {
@@ -4789,10 +4781,10 @@ body:has(.account-app-shell) .site-footer {
   height: 21px;
   display: inline-grid;
   place-items: center;
-  border: 2px solid white;
+  border: 2px solid var(--color-surface);
   border-radius: 999px;
-  background: #2563eb;
-  color: white;
+  background: var(--color-turquesa-700);
+  color: var(--color-marfil-100);
   font-size: 0.72rem;
   font-weight: 900;
   line-height: 1;
@@ -4806,11 +4798,11 @@ body:has(.account-app-shell) .site-footer {
   width: min(360px, calc(100vw - 28px));
   display: grid;
   gap: 10px;
-  border: 1px solid #e5e9f2;
+  border: 1px solid var(--color-border);
   border-radius: 8px;
   padding: 12px;
-  background: white;
-  box-shadow: 0 18px 40px rgba(15, 23, 42, 0.12);
+  background: var(--color-surface);
+  box-shadow: var(--shadow-floating);
 }
 
 .account-notification-head {
@@ -4821,12 +4813,12 @@ body:has(.account-app-shell) .site-footer {
 }
 
 .account-notification-head strong {
-  color: #0f172a;
+  color: var(--deep);
   font-size: 0.95rem;
 }
 
 .account-notification-head a {
-  color: #2563eb;
+  color: var(--color-turquesa-700);
   font-size: 0.82rem;
   font-weight: 900;
 }
@@ -4840,31 +4832,31 @@ body:has(.account-app-shell) .site-footer {
 .account-notification-empty {
   display: grid;
   gap: 4px;
-  border: 1px solid #eef2f7;
+  border: 1px solid var(--color-border);
   border-radius: 8px;
   padding: 11px;
-  background: #f8fafc;
+  background: var(--color-marfil-500);
 }
 
 .account-notification-list a.is-unread {
-  border-color: rgba(37, 99, 235, 0.22);
-  background: #eff6ff;
+  border-color: var(--color-turquesa-300);
+  background: var(--color-turquesa-100);
 }
 
 .account-notification-list strong {
-  color: #0f172a;
+  color: var(--deep);
   font-size: 0.9rem;
 }
 
 .account-notification-list p,
 .account-notification-empty {
   margin: 0;
-  color: #64748b;
+  color: var(--color-text);
   font-size: 0.82rem;
 }
 
 .account-notification-list small {
-  color: #94a3b8;
+  color: var(--color-azul-300);
   font-size: 0.74rem;
   font-weight: 800;
 }
@@ -4875,10 +4867,10 @@ body:has(.account-app-shell) .site-footer {
   height: 42px;
   display: inline-grid;
   place-items: center;
-  border: 1px solid #e5e9f2;
+  border: 1px solid var(--color-border);
   border-radius: 8px;
-  background: white;
-  color: #0f172a;
+  background: var(--color-surface);
+  color: var(--deep);
   font-weight: 900;
 }
 
@@ -4891,8 +4883,8 @@ body:has(.account-app-shell) .site-footer {
   display: inline-grid;
   place-items: center;
   border-radius: 999px;
-  background: #2563eb;
-  color: white;
+  background: var(--color-turquesa-700);
+  color: var(--color-marfil-100);
   font-size: 0.72rem;
 }
 
@@ -4921,10 +4913,10 @@ body:has(.account-app-shell) .site-footer {
   height: 22px;
   display: inline-grid;
   place-items: center;
-  border: 2px solid white;
+  border: 2px solid var(--color-surface);
   border-radius: 999px;
-  background: #2563eb;
-  color: white;
+  background: var(--color-turquesa-700);
+  color: var(--color-marfil-100);
   font-size: 0.72rem;
   font-weight: 900;
   line-height: 1;
@@ -4938,11 +4930,11 @@ body:has(.account-app-shell) .site-footer {
   min-width: 190px;
   display: grid;
   gap: 6px;
-  border: 1px solid #e5e9f2;
+  border: 1px solid var(--color-border);
   border-radius: 8px;
   padding: 8px;
-  background: white;
-  box-shadow: 0 18px 40px rgba(15, 23, 42, 0.12);
+  background: var(--color-surface);
+  box-shadow: var(--shadow-floating);
 }
 
 .account-user-menu a,
@@ -4952,14 +4944,14 @@ body:has(.account-app-shell) .site-footer {
   border-radius: 8px;
   padding: 0 10px;
   background: transparent;
-  color: #25324b;
+  color: var(--color-text);
   font-weight: 800;
   text-align: left;
 }
 
 .account-user-menu a:hover,
 .account-user-menu button:hover {
-  background: #f2f5fb;
+  background: var(--color-marfil-700);
 }
 
 .account-avatar {
@@ -4969,16 +4961,16 @@ body:has(.account-app-shell) .site-footer {
   place-items: center;
   flex: 0 0 auto;
   border-radius: 50%;
-  background: #0f172a;
-  color: white;
+  background: var(--color-azul-900);
+  color: var(--color-marfil-100);
   font-weight: 900;
 }
 
 .account-avatar.small {
   width: 48px;
   height: 48px;
-  background: linear-gradient(135deg, #dbeafe, #ede9fe);
-  color: #1d4ed8;
+  background: linear-gradient(135deg, var(--color-turquesa-100), var(--color-lavanda-100));
+  color: var(--deep);
 }
 
 .account-mobile-menu {
@@ -5002,7 +4994,7 @@ body:has(.account-app-shell) .site-footer {
 
 .account-hero h1 {
   margin: 0 0 8px;
-  color: #0f172a;
+  color: var(--deep);
   font-size: clamp(2rem, 4vw, 3rem);
   line-height: 1.06;
 }
@@ -5010,7 +5002,7 @@ body:has(.account-app-shell) .site-footer {
 .account-page-kicker {
   display: inline-flex;
   margin-bottom: 10px;
-  color: #2563eb;
+  color: var(--color-turquesa-700);
   font-size: 0.78rem;
   font-weight: 900;
   text-transform: uppercase;
@@ -5019,8 +5011,74 @@ body:has(.account-app-shell) .site-footer {
 .account-hero p,
 .account-muted {
   margin: 0;
-  color: #64748b;
+  color: var(--color-text);
   line-height: 1.6;
+}
+
+.account-hero--home {
+  position: relative;
+  align-items: flex-start;
+  overflow: hidden;
+  border-radius: 20px;
+  padding: 40px clamp(24px, 4vw, 48px);
+  background:
+    radial-gradient(circle at 8% 120%, rgba(186, 156, 239, 0.55), transparent 55%),
+    radial-gradient(circle at 96% -10%, rgba(60, 140, 152, 0.6), transparent 48%),
+    var(--color-azul-900);
+  color: var(--color-marfil-100);
+}
+
+.account-hero--home::before {
+  content: "";
+  position: absolute;
+  inset: -30% -10% auto auto;
+  width: 360px;
+  height: 360px;
+  border-radius: 42% 58% 65% 35% / 45% 40% 60% 55%;
+  background: radial-gradient(circle, rgba(255, 255, 255, 0.08), transparent 70%);
+  pointer-events: none;
+}
+
+.account-hero--home h1,
+.account-hero--home .account-page-kicker {
+  color: var(--color-marfil-100);
+}
+
+.account-hero--home .account-page-kicker {
+  color: var(--color-turquesa-100);
+}
+
+.account-hero--home p {
+  color: var(--color-marfil-300);
+  max-width: 52ch;
+}
+
+.account-hero-body {
+  position: relative;
+  z-index: 1;
+  display: grid;
+  gap: 10px;
+}
+
+.account-consult-cta {
+  position: relative;
+  z-index: 1;
+  min-height: 48px;
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  border-radius: var(--ds-radius);
+  padding: 0 20px;
+  background: var(--color-turquesa-500);
+  color: var(--color-azul-900);
+  font-weight: 900;
+  white-space: nowrap;
+  box-shadow: var(--shadow-floating);
+  transition: transform var(--motion-fast) var(--ease-out);
+}
+
+.account-consult-cta:hover {
+  transform: translateY(-1px);
 }
 
 .account-featured-notice {
@@ -5028,23 +5086,23 @@ body:has(.account-app-shell) .site-footer {
   grid-template-columns: auto minmax(0, 1fr) auto;
   gap: 14px;
   align-items: center;
-  border: 1px solid #e0e6f0;
+  border: 1px solid var(--color-border);
   border-radius: var(--ds-radius);
   padding: 16px;
-  background: rgba(255, 255, 255, 0.96);
-  box-shadow: 0 16px 42px rgba(15, 23, 42, 0.06);
+  background: var(--color-surface);
+  box-shadow: var(--shadow-resting);
 }
 
 .account-featured-notice.is-unread {
-  border-color: rgba(37, 99, 235, 0.24);
-  background: linear-gradient(135deg, rgba(239, 246, 255, 0.95), rgba(255, 255, 255, 0.98));
+  border-color: var(--color-lavanda-300);
+  background: linear-gradient(135deg, var(--color-lavanda-100), var(--color-surface) 70%);
 }
 
 .account-featured-notice > span {
   border-radius: 999px;
   padding: 6px 10px;
-  background: #eef4ff;
-  color: #0757e3;
+  background: var(--color-lavanda-100);
+  color: var(--color-lavanda-900);
   font-size: 0.74rem;
   font-weight: 900;
   text-transform: uppercase;
@@ -5052,13 +5110,13 @@ body:has(.account-app-shell) .site-footer {
 
 .account-featured-notice h2 {
   margin: 0 0 4px;
-  color: #0f172a;
+  color: var(--deep);
   font-size: clamp(1rem, 2vw, 1.25rem);
 }
 
 .account-featured-notice p {
   margin: 0;
-  color: #64748b;
+  color: var(--color-text);
   line-height: 1.45;
 }
 
@@ -5067,11 +5125,11 @@ body:has(.account-app-shell) .site-footer {
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  border: 1px solid #d8deea;
+  border: 1px solid var(--color-border);
   border-radius: var(--ds-radius);
   padding: 0 14px;
-  background: white;
-  color: #0757e3;
+  background: var(--color-surface);
+  color: var(--color-turquesa-700);
   font-weight: 900;
 }
 
@@ -5086,13 +5144,13 @@ body:has(.account-app-shell) .site-footer {
   border-radius: var(--ds-radius);
   padding: 0 16px;
   font-weight: 900;
-  transition: transform 180ms ease, box-shadow 180ms ease, border-color 180ms ease, background 180ms ease;
+  transition: transform var(--motion-fast) var(--ease-out), box-shadow var(--motion-fast) var(--ease-out), border-color var(--motion-fast) var(--ease-out), background var(--motion-fast) var(--ease-out);
 }
 
 .account-primary-action {
-  background: #2563eb;
-  color: white;
-  box-shadow: 0 16px 30px rgba(37, 99, 235, 0.22);
+  background: var(--color-turquesa-700);
+  color: var(--color-marfil-100);
+  box-shadow: var(--shadow-floating);
 }
 
 .account-primary-action:hover,
@@ -5101,97 +5159,42 @@ body:has(.account-app-shell) .site-footer {
 .account-course-actions a:hover,
 .account-panel-head > a:hover {
   transform: translateY(-1px);
-  box-shadow: var(--ds-shadow-md);
+  box-shadow: var(--shadow-floating);
 }
 
 .account-secondary-action,
 .account-wide-action {
-  border: 1px solid #d8deea;
-  background: white;
-  color: #0757e3;
+  border: 1px solid var(--color-border);
+  background: var(--color-surface);
+  color: var(--color-turquesa-700);
 }
 
-.account-stats-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(min(230px, 100%), 1fr));
-  gap: 18px;
-}
-
-.account-stat-card,
 .account-panel,
 .account-course-card,
 .account-resource-card {
   min-width: 0;
-  border: 1px solid #e0e6f0;
+  border: 1px solid var(--color-border);
   border-radius: var(--ds-radius);
-  background: rgba(255, 255, 255, 0.96);
-  box-shadow: 0 16px 42px rgba(15, 23, 42, 0.06);
+  background: var(--color-surface);
+  box-shadow: var(--shadow-resting);
 }
 
-.account-stat-card,
 .account-course-card,
 .account-resource-card,
 .account-appointment-card,
 .account-activity-list article,
 .account-history-list article {
-  transition: transform 180ms ease, border-color 180ms ease, box-shadow 180ms ease;
+  transition: transform var(--motion-fast) var(--ease-out), border-color var(--motion-fast) var(--ease-out), box-shadow var(--motion-fast) var(--ease-out);
 }
 
-.account-stat-card:hover,
 .account-course-card:hover,
 .account-resource-card:hover,
 .account-appointment-card:hover,
 .account-activity-list article:hover,
 .account-history-list article:hover {
   transform: translateY(-1px);
-  border-color: rgba(37, 99, 235, 0.22);
-  box-shadow: var(--ds-shadow-md);
-}
-
-.account-stat-card {
-  min-height: 150px;
-  display: grid;
-  grid-template-columns: auto minmax(0, 1fr);
-  gap: 16px;
-  align-content: center;
-  padding: 22px;
-}
-
-.account-stat-card :where(span, strong, small, em, a) {
-  overflow-wrap: break-word;
-  word-break: normal;
-}
-
-.account-stat-card div {
-  min-width: 0;
-  display: grid;
-  gap: 6px;
-}
-
-.account-stat-card span,
-.account-profile-grid span,
-.account-resource-card span,
-.account-history-list span {
-  color: #64748b;
-  font-size: 0.82rem;
-  font-weight: 900;
-}
-
-.account-stat-card strong {
-  color: #0f172a;
-  font-size: clamp(1.45rem, 3vw, 2rem);
-  line-height: 1;
-}
-
-.account-stat-card small {
-  color: #64748b;
-}
-
-.account-stat-card em {
-  grid-column: 2;
-  color: #0757e3;
-  font-style: normal;
-  font-weight: 900;
+  border-color: var(--color-turquesa-300);
+  box-shadow: var(--shadow-floating);
 }
 
 .account-icon {
@@ -5205,23 +5208,23 @@ body:has(.account-app-shell) .site-footer {
 }
 
 .account-icon.is-blue {
-  background: #dbeafe;
-  color: #2563eb;
+  background: var(--color-azul-100);
+  color: var(--color-azul-900);
 }
 
 .account-icon.is-purple {
-  background: #ede9fe;
-  color: #7c3aed;
+  background: var(--color-lavanda-100);
+  color: var(--color-lavanda-900);
 }
 
 .account-icon.is-green {
-  background: #dcfce7;
-  color: #16a34a;
+  background: var(--color-turquesa-100);
+  color: var(--color-turquesa-900);
 }
 
 .account-icon.is-orange {
-  background: #ffedd5;
-  color: #f97316;
+  background: var(--color-marfil-900);
+  color: var(--deep);
 }
 
 .account-skeleton-shell { pointer-events: none; }
@@ -5233,7 +5236,7 @@ body:has(.account-app-shell) .site-footer {
 .account-skeleton-nav-item span {
   animation: account-skeleton-pulse 1.8s ease-in-out infinite;
   border-radius: 999px;
-  background: #e8edf5;
+  background: var(--color-marfil-900);
 }
 
 .account-skeleton-block { display: inline-flex; min-width: 42px; min-height: 42px; }
@@ -5245,11 +5248,11 @@ body:has(.account-app-shell) .site-footer {
   min-height: 46px;
   border-radius: var(--ds-radius);
   padding: 0 14px;
-  color: #64748b;
+  color: var(--color-marfil-300);
   font-weight: 850;
 }
 
-.account-skeleton-nav-item.is-active { background: #eef4ff; color: #0757e3; }
+.account-skeleton-nav-item.is-active { background: var(--color-turquesa-700); color: var(--color-marfil-100); }
 
 .account-skeleton-nav-item span,
 .account-skeleton-icon { flex: 0 0 auto; width: 46px; height: 46px; }
@@ -5317,7 +5320,7 @@ body:has(.account-app-shell) .site-footer {
 
 .account-panel-head h2 {
   margin: 0;
-  color: #0f172a;
+  color: var(--deep);
   font-size: 1.35rem;
 }
 
@@ -5326,13 +5329,13 @@ body:has(.account-app-shell) .site-footer {
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  border: 1px solid #d8deea;
+  border: 1px solid var(--color-border);
   border-radius: var(--ds-radius);
   padding: 0 12px;
-  background: white;
-  color: #0757e3;
+  background: var(--color-surface);
+  color: var(--color-turquesa-700);
   font-weight: 900;
-  transition: transform 180ms ease, box-shadow 180ms ease;
+  transition: transform var(--motion-fast) var(--ease-out), box-shadow var(--motion-fast) var(--ease-out);
 }
 
 .account-course-tabs {
@@ -5344,28 +5347,24 @@ body:has(.account-app-shell) .site-footer {
   padding-bottom: 2px;
 }
 
-.account-course-tabs span {
+.account-course-tabs a {
   position: relative;
   min-height: 36px;
   display: inline-flex;
   align-items: center;
-  border: 1px solid #e5e9f2;
+  border: 1px solid var(--color-border);
   border-radius: 999px;
-  padding: 0 12px;
-  background: white;
-  color: #475569;
+  padding: 0 14px;
+  background: var(--color-surface);
+  color: var(--color-text);
   font-weight: 800;
   white-space: nowrap;
 }
 
-.account-course-tabs span.is-active {
-  border-color: rgba(37, 99, 235, 0.32);
-  background: #eef4ff;
-  color: #0757e3;
-}
-
-.account-course-tabs span.is-active::after {
-  content: none;
+.account-course-tabs a.is-active {
+  border-color: var(--color-lavanda-500);
+  background: var(--color-lavanda-100);
+  color: var(--color-lavanda-900);
 }
 
 .account-course-grid {
@@ -5379,26 +5378,20 @@ body:has(.account-app-shell) .site-footer {
 }
 
 .account-course-media {
-  min-height: 122px;
+  min-height: 96px;
   display: flex;
   align-items: flex-start;
   justify-content: space-between;
   padding: 14px;
-  background:
-    radial-gradient(circle at 86% 24%, rgba(37, 99, 235, 0.18), transparent 30%),
-    linear-gradient(135deg, #eef4ff, #f8fafc);
+  background: linear-gradient(135deg, var(--color-turquesa-100), var(--color-marfil-500));
 }
 
 .account-course-card.is-visual-1 .account-course-media {
-  background:
-    radial-gradient(circle at 80% 20%, rgba(249, 115, 22, 0.2), transparent 34%),
-    linear-gradient(135deg, #fff7ed, #f8fafc);
+  background: linear-gradient(135deg, var(--color-lavanda-100), var(--color-marfil-500));
 }
 
 .account-course-card.is-visual-2 .account-course-media {
-  background:
-    radial-gradient(circle at 84% 18%, rgba(34, 197, 94, 0.2), transparent 34%),
-    linear-gradient(135deg, #f0fdf4, #f8fafc);
+  background: linear-gradient(135deg, var(--color-marfil-900), var(--color-turquesa-100));
 }
 
 .account-course-status {
@@ -5409,18 +5402,18 @@ body:has(.account-app-shell) .site-footer {
 }
 
 .account-course-status.is-progress {
-  background: #ede9fe;
-  color: #6d28d9;
+  background: var(--color-lavanda-100);
+  color: var(--color-lavanda-900);
 }
 
 .account-course-status.is-complete {
-  background: #dcfce7;
-  color: #15803d;
+  background: var(--color-turquesa-100);
+  color: var(--color-turquesa-900);
 }
 
 .account-course-status.is-pending {
-  background: #e2e8f0;
-  color: #475569;
+  background: var(--color-marfil-900);
+  color: var(--deep);
 }
 
 .account-course-body {
@@ -5434,13 +5427,13 @@ body:has(.account-app-shell) .site-footer {
 .account-empty-state h3,
 .account-subsection h3 {
   margin: 0;
-  color: #0f172a;
+  color: var(--deep);
 }
 
 .account-course-body p,
 .account-resource-card p {
   margin: 0;
-  color: #64748b;
+  color: var(--color-text);
   line-height: 1.5;
 }
 
@@ -5455,25 +5448,25 @@ body:has(.account-app-shell) .site-footer {
   height: 8px;
   overflow: hidden;
   border-radius: 999px;
-  background: #e8edf5;
+  background: var(--color-marfil-900);
 }
 
 .account-progress-track span {
   height: 100%;
   display: block;
   border-radius: inherit;
-  background: #2563eb;
+  background: var(--color-lavanda-700);
 }
 
 .account-course-card.is-visual-2 .account-progress-track span {
-  background: #16a34a;
+  background: var(--color-turquesa-700);
 }
 
 .account-course-meta {
   display: flex;
   justify-content: space-between;
   gap: 10px;
-  color: #64748b;
+  color: var(--color-text);
   font-size: 0.88rem;
 }
 
@@ -5485,9 +5478,9 @@ body:has(.account-app-shell) .site-footer {
 
 .account-course-actions a {
   min-height: 38px;
-  border: 1px solid #d8deea;
-  background: white;
-  color: #0757e3;
+  border: 1px solid var(--color-border);
+  background: var(--color-surface);
+  color: var(--color-turquesa-700);
 }
 
 .account-lower-grid {
@@ -5512,36 +5505,36 @@ body:has(.account-app-shell) .site-footer {
   min-width: 0;
   display: grid;
   gap: 12px;
-  border: 1px solid #e5e9f2;
+  border: 1px solid var(--color-border);
   border-radius: var(--ds-radius);
   padding: 14px;
-  background: white;
+  background: var(--color-surface);
 }
 
 .account-message-list article.is-unread {
-  border-color: rgba(37, 99, 235, 0.24);
-  background: linear-gradient(135deg, rgba(239, 246, 255, 0.95), #fff);
+  border-color: var(--color-lavanda-300);
+  background: linear-gradient(135deg, var(--color-lavanda-100), var(--color-surface) 70%);
 }
 
 .account-message-list span {
   width: fit-content;
   border-radius: 999px;
   padding: 5px 9px;
-  background: #eef4ff;
-  color: #0757e3;
+  background: var(--color-lavanda-100);
+  color: var(--color-lavanda-900);
   font-size: 0.75rem;
   font-weight: 900;
   text-transform: uppercase;
 }
 
 .account-message-list strong {
-  color: #0f172a;
+  color: var(--deep);
 }
 
 .account-message-list p,
 .account-message-list small {
   margin: 0;
-  color: #64748b;
+  color: var(--color-text);
   line-height: 1.5;
 }
 
@@ -5557,13 +5550,13 @@ body:has(.account-app-shell) .site-footer {
 
 .account-appointment-card strong,
 .account-history-list strong {
-  color: #0f172a;
+  color: var(--deep);
 }
 
 .account-appointment-card span,
 .account-activity-list span,
 .account-history-list small {
-  color: #64748b;
+  color: var(--color-text);
 }
 
 .account-wide-action {
@@ -5573,7 +5566,7 @@ body:has(.account-app-shell) .site-footer {
 .account-subsection {
   display: grid;
   gap: 12px;
-  border-top: 1px solid #e5e9f2;
+  border-top: 1px solid var(--color-border);
   padding-top: 18px;
 }
 
@@ -5584,7 +5577,7 @@ body:has(.account-app-shell) .site-footer {
 
 .account-activity-list p {
   margin: 0;
-  color: #25324b;
+  color: var(--color-text);
   line-height: 1.45;
 }
 
@@ -5601,12 +5594,12 @@ body:has(.account-app-shell) .site-footer {
 }
 
 .account-resource-card strong {
-  color: #0f172a;
+  color: var(--deep);
   font-size: 1.25rem;
 }
 
 .account-resource-card small {
-  color: #64748b;
+  color: var(--color-text);
   overflow-wrap: anywhere;
 }
 
@@ -5614,16 +5607,15 @@ body:has(.account-app-shell) .site-footer {
   display: grid;
   justify-items: start;
   gap: 12px;
-  border: 1px dashed #cbd5e1;
+  border: 1px dashed var(--color-lavanda-300);
   border-radius: var(--ds-radius);
   padding: 24px;
-  background:
-    linear-gradient(135deg, rgba(238, 244, 255, 0.88), rgba(248, 250, 252, 0.94));
+  background: linear-gradient(135deg, var(--color-lavanda-100), var(--color-marfil-500) 70%);
 }
 
 .account-empty-state p {
   margin: 0;
-  color: #64748b;
+  color: var(--color-text);
   line-height: 1.5;
 }
 
@@ -5633,8 +5625,8 @@ body:has(.account-app-shell) .site-footer {
   display: inline-grid;
   place-items: center;
   border-radius: 50%;
-  background: #eef4ff;
-  color: #2563eb;
+  background: var(--color-lavanda-100);
+  color: var(--color-lavanda-900);
   font-weight: 900;
 }
 
@@ -5647,14 +5639,14 @@ body:has(.account-app-shell) .site-footer {
 .account-profile-grid div {
   display: grid;
   gap: 6px;
-  border: 1px solid #e5e9f2;
+  border: 1px solid var(--color-border);
   border-radius: var(--ds-radius);
   padding: 14px;
-  background: white;
+  background: var(--color-surface);
 }
 
 .account-profile-grid strong {
-  color: #0f172a;
+  color: var(--deep);
   overflow-wrap: anywhere;
 }
 
@@ -5673,10 +5665,10 @@ body:has(.account-app-shell) .site-footer {
   display: grid;
   align-content: start;
   gap: 12px;
-  border: 1px solid #e5e9f2;
+  border: 1px solid var(--color-border);
   border-radius: var(--ds-radius);
   padding: 16px;
-  background: white;
+  background: var(--color-surface);
 }
 
 .account-settings-card h3,
@@ -5685,14 +5677,14 @@ body:has(.account-app-shell) .site-footer {
 }
 
 .account-settings-card p {
-  color: #64748b;
+  color: var(--color-text);
   line-height: 1.5;
 }
 
 .account-settings-card label {
   display: grid;
   gap: 7px;
-  color: #25324b;
+  color: var(--color-text);
   font-weight: 800;
 }
 
@@ -5701,11 +5693,11 @@ body:has(.account-app-shell) .site-footer {
 .account-settings-card textarea {
   width: 100%;
   min-height: 44px;
-  border: 1px solid #d8deea;
+  border: 1px solid var(--color-border);
   border-radius: 8px;
   padding: 0 12px;
-  background: #f8fafc;
-  color: #0f172a;
+  background: var(--color-marfil-500);
+  color: var(--deep);
 }
 
 .account-settings-card textarea {
@@ -5728,11 +5720,11 @@ body:has(.account-app-shell) .site-footer {
   display: grid;
   gap: 16px;
   margin: 22px auto 0;
-  border: 1px solid var(--ds-border);
+  border: 1px solid var(--color-border);
   border-radius: var(--ds-radius);
   padding: 24px;
-  background: rgba(255, 255, 255, 0.94);
-  box-shadow: var(--ds-shadow-md);
+  background: var(--color-surface);
+  box-shadow: var(--shadow-floating);
 }
 
 .billing-post-checkout h2 {
@@ -5743,6 +5735,82 @@ body:has(.account-app-shell) .site-footer {
   display: flex;
   flex-wrap: wrap;
   gap: 12px;
+}
+
+.account-onboarding-checklist {
+  display: grid;
+  gap: 10px;
+}
+
+.account-onboarding-item {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr);
+  gap: 14px;
+  align-items: center;
+  border: 1px solid var(--color-border);
+  border-radius: 999px;
+  padding: 12px 18px;
+  background: var(--color-surface);
+}
+
+.account-onboarding-item span:first-child {
+  width: 40px;
+  height: 40px;
+  display: inline-grid;
+  place-items: center;
+  border-radius: 50%;
+  background: var(--color-turquesa-100);
+  color: var(--color-turquesa-900);
+}
+
+.account-onboarding-item strong {
+  display: block;
+  color: var(--deep);
+}
+
+.account-onboarding-item p {
+  margin: 2px 0 0;
+  color: var(--color-text);
+  font-size: 0.92rem;
+}
+
+.account-journey-path {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0;
+  align-items: center;
+  margin-bottom: 4px;
+}
+
+.account-journey-step {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  color: var(--color-text);
+  font-size: 0.82rem;
+  font-weight: 800;
+}
+
+.account-journey-step span {
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  background: var(--color-marfil-900);
+}
+
+.account-journey-step.is-done span {
+  background: var(--color-lavanda-700);
+}
+
+.account-journey-connector {
+  width: clamp(24px, 4vw, 56px);
+  height: 2px;
+  margin: 0 6px;
+  background: var(--color-marfil-900);
+}
+
+.account-journey-connector.is-done {
+  background: var(--color-lavanda-500);
 }
 
 .specialist-dashboard .account-hero {
@@ -6733,9 +6801,9 @@ body:has(.account-app-shell) .site-footer {
     display: inline-grid;
     place-items: center;
     gap: 4px;
-    border: 1px solid #e5e9f2;
+    border: 1px solid var(--color-border);
     border-radius: 8px;
-    background: white;
+    background: var(--color-surface);
     cursor: pointer;
   }
 
@@ -6744,7 +6812,7 @@ body:has(.account-app-shell) .site-footer {
     height: 2px;
     display: block;
     border-radius: 999px;
-    background: #0f172a;
+    background: var(--deep);
   }
 
   .account-skeleton-menu {
@@ -6782,10 +6850,6 @@ body:has(.account-app-shell) .site-footer {
     font-size: clamp(2.1rem, 11vw, 3rem);
   }
 
-  .account-stats-grid {
-    gap: 12px;
-  }
-
   .account-course-grid,
   .account-lower-grid,
   .account-resource-grid,
@@ -6794,15 +6858,6 @@ body:has(.account-app-shell) .site-footer {
   .account-settings-grid.is-wide,
   .billing-form {
     grid-template-columns: 1fr;
-  }
-
-  .account-stats-grid {
-    grid-template-columns: repeat(auto-fit, minmax(min(220px, 100%), 1fr));
-  }
-
-  .account-stat-card {
-    min-height: 126px;
-    padding: 18px;
   }
 
   .account-panel {
