@@ -1,7 +1,7 @@
 export default function LumenIsotipo({ className, ...props }) {
   return (
     <svg
-      viewBox="0 0 1080 1080"
+      viewBox="415.95 355.06 245.91 315.95"
       className={className}
       aria-hidden="true"
       focusable="false"
