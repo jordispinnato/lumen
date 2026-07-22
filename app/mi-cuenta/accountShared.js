@@ -1,11 +1,148 @@
 import Link from "next/link";
 
+export const ACCOUNT_NAV_ITEMS = [
+  { href: "/mi-cuenta", icon: "home", label: "Inicio" },
+  { href: "/mis-turnos", icon: "calendar", label: "Mis turnos" },
+  { href: "/mis-cursos", icon: "book-open", label: "Mis cursos" },
+  { href: "/mis-recursos", icon: "package", label: "Mis recursos" },
+  { href: "/mis-notificaciones", icon: "bell", label: "Notificaciones" },
+  { href: "/mis-mensajes", icon: "message-circle", label: "Mensajes" },
+  { href: "/mis-certificados", icon: "award", label: "Certificados" },
+];
+
+export const ACCOUNT_RETURN_NAV_ITEM = [{ href: "/mi-cuenta", icon: "home", label: "Volver a Mi Espacio" }];
+
 export function formatDateTime(value) {
   if (!value) {
     return "";
   }
 
   return new Date(value).toLocaleDateString("es-AR");
+}
+
+export function formatDate(value) {
+  if (!value) {
+    return "";
+  }
+
+  return new Date(`${value}T00:00:00`).toLocaleDateString("es-AR", {
+    weekday: "short",
+    day: "numeric",
+    month: "short",
+    year: "numeric",
+  });
+}
+
+export function formatTime(value) {
+  return value?.slice(0, 5) || "";
+}
+
+export function initialsFromName(name) {
+  return String(name || "L")
+    .split(" ")
+    .filter(Boolean)
+    .slice(0, 2)
+    .map((part) => part.slice(0, 1).toUpperCase())
+    .join("");
+}
+
+export function getCourseState(progress) {
+  if (progress.percent >= 100) {
+    return "Completado";
+  }
+
+  if (progress.percent > 0) {
+    return "En progreso";
+  }
+
+  return "Pendiente";
+}
+
+export function getCourseTone(progress) {
+  if (progress.percent >= 100) {
+    return "complete";
+  }
+
+  if (progress.percent > 0) {
+    return "progress";
+  }
+
+  return "pending";
+}
+
+export function buildCourseCards(enrollments, lessons, lessonProgress) {
+  const lessonsByCourse = new Map();
+  const progressByCourse = new Map();
+
+  (lessons || []).forEach((lesson) => {
+    lessonsByCourse.set(lesson.course_id, [...(lessonsByCourse.get(lesson.course_id) || []), lesson]);
+  });
+
+  (lessonProgress || []).forEach((item) => {
+    progressByCourse.set(item.course_id, [...(progressByCourse.get(item.course_id) || []), item]);
+  });
+
+  function getCourseProgress(courseId) {
+    const courseLessons = lessonsByCourse.get(courseId) || [];
+    const progress = progressByCourse.get(courseId) || [];
+    const completed = new Set(progress.filter((item) => item.completed_at).map((item) => item.lesson_id));
+    const lastViewed = [...progress]
+      .filter((item) => item.last_viewed_at)
+      .sort((a, b) => String(b.last_viewed_at).localeCompare(String(a.last_viewed_at)))[0];
+    const total = courseLessons.length;
+
+    return {
+      total,
+      completed: completed.size,
+      percent: total ? Math.round((completed.size / total) * 100) : 0,
+      lastLessonId: lastViewed?.lesson_id || courseLessons[0]?.id || "",
+      lastLessonTitle: lastViewed?.lessons?.title || courseLessons[0]?.title || "Primera clase",
+    };
+  }
+
+  return (enrollments || []).map((enrollment, index) => {
+    const progress = getCourseProgress(enrollment.courses?.id);
+    const continueUrl = enrollment.courses?.slug
+      ? `/aula?curso=${enrollment.courses.slug}${progress.lastLessonId ? `&lesson=${progress.lastLessonId}` : ""}`
+      : "/aula";
+
+    return {
+      id: enrollment.id,
+      course: enrollment.courses,
+      progress,
+      state: getCourseState(progress),
+      tone: getCourseTone(progress),
+      continueUrl,
+      enrolledAt: enrollment.created_at,
+      visual: index % 3,
+    };
+  });
+}
+
+export async function getEnrollmentsWithProgress(supabase, userId) {
+  const { data: enrollments } = await supabase
+    .from("enrollments")
+    .select("id,created_at,courses:course_id (id,slug,title,summary,price,status)")
+    .eq("user_id", userId)
+    .order("created_at", { ascending: false });
+
+  const courseIds = (enrollments || []).map((enrollment) => enrollment.courses?.id).filter(Boolean);
+  const [{ data: lessons }, { data: lessonProgress }] = courseIds.length
+    ? await Promise.all([
+        supabase
+          .from("lessons")
+          .select("id,course_id,title,status")
+          .in("course_id", courseIds)
+          .eq("status", "published"),
+        supabase
+          .from("lesson_progress")
+          .select("course_id,lesson_id,completed_at,last_viewed_at,lessons:lesson_id (title)")
+          .eq("user_id", userId)
+          .in("course_id", courseIds),
+      ])
+    : [{ data: [] }, { data: [] }];
+
+  return buildCourseCards(enrollments || [], lessons || [], lessonProgress || []);
 }
 
 export function EmptyState({ title, text, href, action }) {
