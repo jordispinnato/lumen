@@ -4,6 +4,7 @@ import { formatPrice } from "../../lib/courses";
 import BillingDetailsForm from "../components/BillingDetailsForm";
 import AccountDashboardShell from "../mi-cuenta/AccountDashboardShell";
 import {
+  ACCOUNT_RETURN_NAV_ITEM,
   applyReadReceipts,
   buildPurchaseRows,
   getInvoiceStatusLabel,
@@ -114,7 +115,7 @@ export default async function FacturacionPage({ searchParams }) {
 
   return (
     <AccountDashboardShell
-      navItems={[{ href: "/mi-cuenta", icon: "I", label: "Volver a Mi Espacio" }]}
+      navItems={ACCOUNT_RETURN_NAV_ITEM}
       displayName={displayName}
       avatarInitials={avatarInitials}
       isAdmin={profile?.role === "admin"}

@@ -3,7 +3,7 @@ import Link from "next/link";
 import { createSupabaseServerClient } from "../../lib/supabase/server";
 import { formatPrice } from "../../lib/courses";
 import AccountDashboardShell from "../mi-cuenta/AccountDashboardShell";
-import { applyReadReceipts, buildPurchaseRows, EmptyState, AccountIcon, formatDateTime } from "../mi-cuenta/accountShared";
+import { ACCOUNT_RETURN_NAV_ITEM, applyReadReceipts, buildPurchaseRows, EmptyState, AccountIcon, formatDateTime } from "../mi-cuenta/accountShared";
 import { getCartQuantityTotal } from "../../lib/cart";
 
 function initialsFromName(name) {
@@ -108,7 +108,7 @@ export default async function MisPedidosPage({ searchParams }) {
 
   return (
     <AccountDashboardShell
-      navItems={[{ href: "/mi-cuenta", icon: "I", label: "Volver a Mi Espacio" }]}
+      navItems={ACCOUNT_RETURN_NAV_ITEM}
       displayName={displayName}
       avatarInitials={avatarInitials}
       isAdmin={profile?.role === "admin"}

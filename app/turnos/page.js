@@ -70,7 +70,7 @@ export default async function TurnosPage({ searchParams }) {
             <p className="eyebrow">Reprogramar consulta</p>
             <h2>No se puede reprogramar esta consulta</h2>
             <p className="muted">La reserva no existe, no pertenece a tu cuenta, ya fue cancelada o corresponde a una fecha pasada.</p>
-            <Link className="button secondary" href="/mi-cuenta#turnos">Volver a Mi Espacio</Link>
+            <Link className="button secondary" href="/mis-turnos">Volver a Mi Espacio</Link>
           </section>
         ) : null}
 

@@ -33,7 +33,7 @@ export async function GET(request, { params }) {
     .maybeSingle();
 
   if (error || !order) {
-    return NextResponse.redirect(`${origin}/mi-cuenta#recursos`, { status: 303 });
+    return NextResponse.redirect(`${origin}/mis-recursos`, { status: 303 });
   }
 
   if (order.catalog_products?.digital_url) {
@@ -41,7 +41,7 @@ export async function GET(request, { params }) {
   }
 
   if (!order.catalog_products?.digital_file_path) {
-    return NextResponse.redirect(`${origin}/mi-cuenta#recursos`, { status: 303 });
+    return NextResponse.redirect(`${origin}/mis-recursos`, { status: 303 });
   }
 
   const storageSupabase = createSupabaseAdminClient() || supabase;
@@ -50,7 +50,7 @@ export async function GET(request, { params }) {
     .createSignedUrl(order.catalog_products.digital_file_path, 60 * 10);
 
   if (signedError || !signed?.signedUrl) {
-    return NextResponse.redirect(`${origin}/mi-cuenta#recursos`, { status: 303 });
+    return NextResponse.redirect(`${origin}/mis-recursos`, { status: 303 });
   }
 
   return NextResponse.redirect(signed.signedUrl, { status: 303 });

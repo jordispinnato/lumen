@@ -69,7 +69,7 @@ export async function POST(request) {
     user_id: null,
     title: subject,
     body,
-    href: "/mi-cuenta#mensajes",
+    href: "/mis-mensajes",
     notification_type: messageType || "mensaje",
   });
 

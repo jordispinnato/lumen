@@ -1,7 +1,7 @@
 import { redirect } from "next/navigation";
 import { createSupabaseServerClient } from "../../lib/supabase/server";
 import AccountDashboardShell from "../mi-cuenta/AccountDashboardShell";
-import { applyReadReceipts, formatDateTime, AccountIcon } from "../mi-cuenta/accountShared";
+import { ACCOUNT_RETURN_NAV_ITEM, applyReadReceipts, formatDateTime, AccountIcon } from "../mi-cuenta/accountShared";
 import { getCartQuantityTotal } from "../../lib/cart";
 
 export const metadata = {
@@ -67,7 +67,7 @@ export default async function ConfiguracionPage({ searchParams }) {
 
   return (
     <AccountDashboardShell
-      navItems={[{ href: "/mi-cuenta", icon: "I", label: "Volver a Mi Espacio" }]}
+      navItems={ACCOUNT_RETURN_NAV_ITEM}
       displayName={displayName}
       avatarInitials={avatarInitials}
       isAdmin={profile?.role === "admin"}

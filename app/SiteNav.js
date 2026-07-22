@@ -60,7 +60,7 @@ function SiteNotificationMenu({
       label: item.notification_type || "Notificación",
       title: item.title,
       body: item.body,
-      href: item.href || "/mi-cuenta#notificaciones",
+      href: item.href || "/mis-notificaciones",
       date: item.created_at,
       unread: pendingAlerts > 0 && !item.read_at,
     })),
@@ -69,7 +69,7 @@ function SiteNotificationMenu({
       label: item.message_type || "Mensaje",
       title: item.subject,
       body: item.body,
-      href: "/mi-cuenta#mensajes",
+      href: "/mis-mensajes",
       date: item.created_at,
       unread: pendingAlerts > 0 && !item.read_at,
     })),
@@ -114,7 +114,7 @@ function SiteNotificationMenu({
         ) : (
           <p className="site-notification-empty">No tenes novedades por ahora.</p>
         )}
-        <Link className="site-notification-all" href="/mi-cuenta#notificaciones" onClick={onClose}>Ver todas</Link>
+        <Link className="site-notification-all" href="/mis-notificaciones" onClick={onClose}>Ver todas</Link>
       </div>
     </details>
   );

@@ -16,7 +16,7 @@ async function getCalendarConnection(supabase, specialistId) {
 }
 
 function redirectToAccount(origin, type, message) {
-  return NextResponse.redirect(`${origin}/mi-cuenta?${type}=${encodeURIComponent(message)}#turnos`, { status: 303 });
+  return NextResponse.redirect(`${origin}/mis-turnos?${type}=${encodeURIComponent(message)}`, { status: 303 });
 }
 
 async function updateBookingStatus(supabase, bookingId, userId, reason) {

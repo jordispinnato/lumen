@@ -3,7 +3,7 @@ import Link from "next/link";
 import { createSupabaseServerClient } from "../../lib/supabase/server";
 import { formatPrice } from "../../lib/courses";
 import AccountDashboardShell from "../mi-cuenta/AccountDashboardShell";
-import { applyReadReceipts, EmptyState, AccountIcon } from "../mi-cuenta/accountShared";
+import { ACCOUNT_RETURN_NAV_ITEM, applyReadReceipts, EmptyState, AccountIcon } from "../mi-cuenta/accountShared";
 
 function initialsFromName(name) {
   return String(name || "L")
@@ -91,7 +91,7 @@ export default async function CarritoPage({ searchParams }) {
 
   return (
     <AccountDashboardShell
-      navItems={[{ href: "/mi-cuenta", icon: "I", label: "Volver a Mi Espacio" }]}
+      navItems={ACCOUNT_RETURN_NAV_ITEM}
       displayName={displayName}
       avatarInitials={avatarInitials}
       isAdmin={profile?.role === "admin"}
