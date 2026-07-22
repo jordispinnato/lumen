@@ -198,7 +198,7 @@ export default async function HomePage() {
       </section>
 
       <a className="landing-whatsapp-button" href={whatsappUrl} target="_blank" rel="noreferrer" aria-label="Escribinos por WhatsApp">
-        <AppIcon name="message-circle" size="lg" />
+        <img src="/assets/whatsapp.png" alt="" aria-hidden="true" />
       </a>
     </main>
   );

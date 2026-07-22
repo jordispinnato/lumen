@@ -4,7 +4,7 @@
 |---|---|
 | Version | 1.0 |
 | Ultima actualizacion | 2026-07-22 |
-| Ultimo responsable | Claude (IA) - LUMEN Product Bible v1.0: Sprint 1 (Fundamentos del Producto) + Sprint 2 (Landing Premium) + Sprint 3 (Mi Espacio, laboratorio de identidad visual) + actualizacion documental de modelo de negocio previa a Sprint 4 |
+| Ultimo responsable | Codex (IA) - UI Refinements (Pre Sprint 4) + plan tecnico de implementacion de perfil |
 | Revisado por | Pendiente de revision del usuario |
 | Estado | En desarrollo activo |
 
@@ -139,6 +139,8 @@ Estado de implementacion (sesiones de branding + Sprint 1 "Fundamentos del Produ
 - Se reemplazo la navegacion por anclas de Mi Espacio por rutas reales por dominio (ver seccion "Mi Cuenta / Mi Espacio" mas abajo), siguiendo el mismo patron ya usado por `/facturacion`, `/configuracion`, `/mi-perfil`.
 - Brecha de asset identificada y no resuelta a proposito: el Manual usa una tipografia script ("Neulis Cursive") que no esta entre los archivos disponibles. Por decision del usuario, no se sustituyo por una fuente de terceros; los enfasis emocionales se logran con jerarquia/color/peso sobre la tipografia ya definida.
 
+**UI Refinements (Pre Sprint 4) — completado (2026-07-22)**: ajustes incrementales previos al Sprint 4, sin cambios de arquitectura, autenticacion ni Supabase. Se quitaron el isotipo del header superior publico manteniendo el logotipo textual, se ajustaron los botones de carrito y notificaciones para usar fondo Marfil y centrado consistente, se reemplazo el icono del boton flotante de WhatsApp por el PNG oficial provisto por el usuario, y se priorizo "Mi Espacio" como primera opcion del menu mobile/PWA para usuarios autenticados. La implementacion funcional de `/mi-perfil` no se improviso porque requiere extender `profiles` y crear un bucket/politicas de Storage; el diseno tecnico previo quedo documentado en `docs/PROFILE_IMPLEMENTATION_PLAN.md`.
+
 ### Funcionalidades publicas
 
 - Landing (`/`) reconstruida (2026-07-21) siguiendo el recorrido oficial de la Product Bible: Hero → Franja de confianza → Tres caminos → Equipo profesional → Como funciona → FAQ → CTA final. Sin seccion de Testimonios todavia (no hay testimonios reales; el criterio del propio documento es no mostrarla hasta tenerlos, no inventarlos ni ocultarla con placeholder).
@@ -216,7 +218,7 @@ Navegacion reorganizada dos veces: separacion inicial de Mi Espacio vs. administ
 - `/mis-pedidos` — pagina independiente. Fusiona el antiguo historial combinado (cursos + catalogo) y el historial de pedidos de catalogo en dos bloques: cursos/productos digitales, y productos fisicos/envios.
 - `/facturacion` — pagina independiente con perfil fiscal y solicitud de factura (ver seccion Facturacion mas abajo).
 - `/configuracion` — pagina independiente y funcional: edicion de nombre y telefono, cambio de email con confirmacion y cambio de contraseña con confirmacion (usando los flujos nativos de Supabase Auth). Antes vivia dentro de `/mi-cuenta`.
-- `/mi-perfil` — pagina placeholder ("se implementara en una etapa posterior"). Todavia sin desarrollo real; los datos personales se editan hoy desde `/configuracion`.
+- `/mi-perfil` — pagina placeholder ("se implementara en una etapa posterior"). Todavia sin desarrollo real; los datos personales se editan hoy desde `/configuracion`. La implementacion funcional quedo planificada tecnicamente en `docs/PROFILE_IMPLEMENTATION_PLAN.md`, pendiente de aprobacion antes de migrar Supabase.
 - Menu del avatar (sitio publico en `SiteNav.js` y shell privado en `AccountDashboardShell.js`) reorganizado: Mi Espacio / Mi Perfil, Carrito / Mis pedidos / Facturacion, Configuracion / Cerrar sesion.
 - Dropdown de usuario y campana de notificaciones con preview de notificaciones y mensajes recientes, disponible en todas las paginas privadas.
 - Icono de carrito en la barra superior (junto a la campana), visible para usuarios con sesion iniciada en cualquier pagina. Muestra una insignia con la suma de cantidades de `catalog_cart_items` (oculta si el carrito esta vacio) y lleva a `/carrito` al hacer click.

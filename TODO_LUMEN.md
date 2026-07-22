@@ -4,7 +4,7 @@
 |---|---|
 | Version | 1.0 |
 | Ultima actualizacion | 2026-07-22 |
-| Ultimo responsable | Claude (IA) - LUMEN Product Bible v1.0: Sprint 1 (Fundamentos del Producto) + Sprint 2 (Landing Premium) + Sprint 3 (Mi Espacio, laboratorio de identidad visual) + actualizacion documental de modelo de negocio previa a Sprint 4 |
+| Ultimo responsable | Codex (IA) - UI Refinements (Pre Sprint 4) + plan tecnico de implementacion de perfil |
 | Revisado por | Pendiente de revision del usuario |
 | Estado | En desarrollo activo |
 
@@ -41,6 +41,7 @@ Fuente de verdad: `docs/PRODUCT_BIBLE.md` (versionada el 2026-07-22; prioridad p
 - `[ ]` Verificacion manual pendiente: durante el QA de este sprint, dos comportamientos CSS estandar (`:focus-visible` con transicion en el skip-link, y el selector `[open]` del acordeon de FAQ) no se pudieron confirmar visualmente por una limitacion del navegador de pruebas automatizado de esta sesion (el CSS compilado es correcto y ambos usan patrones nativos bien establecidos). Confirmar con Tab real y con un click real en una FAQ antes de dar el sprint por cerrado al 100%.
 - `[ ]` `npm audit` reporta 4 vulnerabilidades altas preexistentes (brace-expansion vía eslint/typescript-estree, js-yaml, sharp/next transitivo) — no relacionadas con este sprint (no las introdujo `lucide-react`). Arreglarlas de raiz requeriria actualizar Next.js con cambios incompatibles; evaluar en una tarea aparte, no forzarlo sin pedido explicito.
 - `[x]` Sprint 3 — Mi Espacio (laboratorio de identidad visual): **completado** (2026-07-22). Segunda interpretacion visual guiada por el Manual de Marca del estudio (no por el Product Bible), sin tocar la Landing. Rutas reales por dominio, paleta con Turquesa como principal y Lavanda como color de progreso, shell rediseñado. Detalle completo en `docs/SPRINT_3_MI_ESPACIO.md`.
+- `[x]` UI Refinements (Pre Sprint 4): **completado** (2026-07-22). Ajustes acotados de header superior, botones de carrito/notificaciones, icono oficial de WhatsApp y prioridad de "Mi Espacio" en el menu mobile/PWA, sin cambios de arquitectura, autenticacion ni Supabase.
 - `[ ]` Sumar Neulis Cursive (u otra fuente script oficial del estudio) cuando este disponible, exclusivamente para microcopys emocionales — no sustituir por una fuente de terceros (decision explicita del usuario en Sprint 3).
 - `[ ]` Confirmar en un navegador real (no el navegador de pruebas automatizado) que el esqueleto de `loading.js` no queda superpuesto al contenido real en ninguna pagina del shell de cuenta (`/mi-cuenta`, `/mis-turnos`, etc. y tambien `/mi-perfil`, `/carrito`, que ya tenian el mismo patron antes de este sprint). Ver `docs/SPRINT_3_MI_ESPACIO.md` seccion 8.
 - `[ ]` Evaluar, solo si el usuario valida la direccion visual de Mi Espacio frente a la Landing, extender el mismo lenguaje (bloques de color, recorrido de progreso, checklist de bienvenida) a Cursos, Catalogo, Consultas y Checkout.
@@ -114,7 +115,7 @@ Ver `docs/INFORMATION_ARCHITECTURE.md` para la especificacion completa (arquitec
   - Menu del avatar (sitio publico y shell privado) reorganizado: Mi Espacio / Mi Perfil, Carrito / Mis pedidos / Facturacion, Configuracion / Cerrar sesion.
   - Logica compartida (helpers de formato, labels de estado, `EmptyState`, `AccountIcon`, construccion de filas de compra) extraida a `app/mi-cuenta/accountShared.js` para reutilizar entre las paginas nuevas sin duplicar codigo.
 - `[x]` Etapa 2 — Reemplazar navegacion por anclas dentro de `/mi-cuenta` por rutas reales por dominio: **completado** (2026-07-22, Sprint 3). `/mi-cuenta#turnos` → `/mis-turnos`, `#cursos` → `/mis-cursos`, `#recursos` → `/mis-recursos`, `#notificaciones` → `/mis-notificaciones`, `#mensajes` → `/mis-mensajes`, `#certificados` → `/mis-certificados`. `/mi-cuenta` queda solo como la pantalla de inicio ("Lo proximo"). Detalle en `docs/SPRINT_3_MI_ESPACIO.md`.
-- `[ ]` Etapa futura (no iniciada): desarrollar `/mi-perfil` con datos personales reales (hoy esos datos viven en `/configuracion`, ver arriba). Definir si en ese momento se migran ahi.
+- `[ ]` Etapa futura (no iniciada): desarrollar `/mi-perfil` con datos personales reales (hoy esos datos viven en `/configuracion`, ver arriba). Antes de implementar, aprobar el diseno tecnico documentado en `docs/PROFILE_IMPLEMENTATION_PLAN.md`; requiere migracion de `profiles`, bucket `profile-avatars` y politicas RLS/Storage.
 
 ## Usuarios / Mi Cuenta
 

@@ -134,7 +134,6 @@ export default async function RootLayout({ children }) {
         <PWARegister />
         <header className="site-header">
           <a className="brand" href="/" aria-label="Ir al inicio de LUMEN">
-            <LumenIsotipo className="brand-mark" />
             <LumenLogotipo className="brand-logotipo" />
           </a>
           <SiteNav

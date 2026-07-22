@@ -461,10 +461,12 @@ h3 {
   width: 44px;
   height: 44px;
   display: inline-grid;
+  align-items: center;
+  justify-content: center;
   place-items: center;
   border: 1px solid rgba(20, 53, 56, 0.14);
   border-radius: 8px;
-  background: rgba(255, 255, 255, 0.78);
+  background: var(--color-marfil-500);
   color: #173b3f;
   cursor: pointer;
   list-style: none;
@@ -530,10 +532,12 @@ h3 {
   width: 44px;
   height: 44px;
   display: inline-grid;
+  align-items: center;
+  justify-content: center;
   place-items: center;
   border: 1px solid rgba(20, 53, 56, 0.14);
   border-radius: 8px;
-  background: rgba(255, 255, 255, 0.78);
+  background: var(--color-marfil-500);
   color: #173b3f;
   box-shadow: 0 10px 24px rgba(14, 45, 49, 0.08);
   transition: color 160ms ease, border-color 160ms ease, background 160ms ease, box-shadow 160ms ease, transform 160ms ease;
@@ -1838,6 +1842,13 @@ h3 {
 .landing-whatsapp-button:hover {
   transform: translateY(-2px);
   box-shadow: var(--shadow-layer);
+}
+
+.landing-whatsapp-button img {
+  width: 30px;
+  height: 30px;
+  display: block;
+  object-fit: contain;
 }
 
 .about-hero {
@@ -4748,10 +4759,12 @@ body:has(.account-app-shell) .site-footer {
   width: 44px;
   height: 44px;
   display: inline-grid;
+  align-items: center;
+  justify-content: center;
   place-items: center;
   border: 1px solid var(--color-border);
   border-radius: 8px;
-  background: var(--color-surface);
+  background: var(--color-marfil-500);
   color: var(--deep);
   cursor: pointer;
   list-style: none;
@@ -4766,10 +4779,12 @@ body:has(.account-app-shell) .site-footer {
   width: 44px;
   height: 44px;
   display: inline-grid;
+  align-items: center;
+  justify-content: center;
   place-items: center;
   border: 1px solid var(--color-border);
   border-radius: 8px;
-  background: var(--color-surface);
+  background: var(--color-marfil-500);
   color: var(--deep);
 }
 
@@ -6509,7 +6524,26 @@ body:has(.account-app-shell) .site-footer {
   }
 
   .site-nav-actions {
-    margin-top: 10px;
+    display: contents;
+    margin-top: 0;
+  }
+
+  .site-user-menu {
+    order: 0;
+  }
+
+  .site-nav-links {
+    order: 1;
+  }
+
+  .site-cart-link,
+  .site-nav-actions > .secondary-button {
+    order: 2;
+  }
+
+  .site-notification-menu,
+  .site-nav-actions > .button {
+    order: 3;
   }
 
   .site-user-menu,
